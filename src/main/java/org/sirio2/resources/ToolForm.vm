@@ -1,0 +1,159 @@
+<!-- INIZIO ToolForm.vm -->
+
+<SCRIPT LANGUAGE="JavaScript">
+
+  function $funcNameEdit(url, tipo)
+  {
+    apriFinestraEdit(url, tipo);
+  }
+
+  function $funcNameSubmit()
+  {
+    var url = "$baseUri";
+
+    jQuery.ajax({
+      type: "POST",
+      url: url,
+      data: $("#$formName").serialize(), // serializes the form's elements.
+      success: function (data)
+      {
+        $("#$bodyName").html(data);
+      }
+    });
+
+    return false; // avoid to execute the actual submit of the form.
+  }
+
+  function showLoading_$unique()
+  {
+  }
+
+  function salva_$unique()
+  {
+    if (!testForm_$unique())
+      return;
+
+    relCommand_$unique('salva');
+    showLoading_$unique();
+  }
+
+  function duplica_$unique()
+  {
+    relCommand_$unique('duplica');
+    showLoading_$unique();
+  }
+
+  function salvanew_$unique()
+  {
+    if (!testForm_$unique())
+      return;
+
+    relCommand_$unique('salvanew');
+    showLoading_$unique();
+  }
+
+  function nuovodett_$unique()
+  {
+    if (!testForm_$unique())
+      return;
+
+    relCommand_$unique('nuovodett');
+  }
+
+  function apriFinestraLista_$unique(url, tipo)
+  {
+    apriFinestraLista(url, tipo);
+  }
+
+  function apriFinestraEdit_$unique(url, tipo)
+  {
+    apriFinestraEdit(url, tipo);
+  }
+
+  function apriFinestraForm_$unique(url, tipo)
+  {
+    apriFinestraForm(url, tipo);
+  }
+
+  function relCommand_$unique(comando)
+  {
+    document.$formName.command.value = comando;
+    $funcNameSubmit();
+  }
+
+  function testForm_$unique()
+  {
+    // $!scTest
+    // $!dettTest
+    return true;
+  }
+
+  // $htpageForm.allJavascriptNotag
+  // $htpageLista.allJavascriptNotag
+
+  // this is the id of the form
+  jQuery(function () {
+    $("#$formName").submit($funcNameSubmit);
+  });
+
+</SCRIPT>
+
+<form name="$formName" id="$formName" method="post" action="javascript:alert('Javascript runtime error.');">
+  <input type="hidden" name="command" value="">
+
+  <div id="$bodyName">
+    <!-- __START_CUT__ -->
+
+    <table width=100%>
+      <tr>
+        <td width=50% bgcolor="$ui.topbarbgcolor" class="big_title">
+          &nbsp; $pwl.header
+        </td>
+        <td>
+          #if($saveEnabled)
+          <INPUT type="button" value="Salva" onclick="salva_$unique()">
+          #end
+          #if($saveEnabled && $newEnabled)
+          <INPUT type="button" value="Duplica" onclick="duplica_$unique()">
+          <INPUT type="button" value="Salva e nuovo" onclick="salvanew_$unique()">
+          #end
+        </td>
+      </tr>
+    </table>
+
+    <!-- html principale -->
+    <div class="rigel_body" style="padding: 2px;">
+      $htpageForm.getHtml("body")
+    </div>
+
+    #if($dettHtml)
+    <!-- inizio dettaglio -->
+
+    <table width=100%>
+      <tr>
+        <td width=50% bgcolor="$ui.topbarbgcolor" class="big_title">
+          &nbsp; $edl.header
+        </td>
+        <td>
+          #if($newEnabled)
+          <INPUT type="button" value="Nuovo" onclick="nuovodett_$unique()" >
+          #end
+          #if($saveEnabled)
+          <INPUT type="button" value="Salva" onclick="salva_$unique()" >
+          #end
+        </td>
+      </tr>
+    </table>
+
+    <div id="rigel_body_detail_$unique">
+      $htpageLista.getHtml("body")
+    </div>
+
+    <!-- fine dettaglio -->
+    #end
+
+    <!-- __END_CUT__ -->
+  </div>
+</form>
+
+<!-- FINE ToolForm.vm -->

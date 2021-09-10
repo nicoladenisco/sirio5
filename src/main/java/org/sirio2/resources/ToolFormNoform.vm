@@ -1,0 +1,60 @@
+<!-- INIZIO ToolFormNoform.vm -->
+
+<SCRIPT LANGUAGE="JavaScript">
+
+  function apriFinestraLista_$unique(url, tipo)
+  {
+    apriFinestraLista(url, tipo);
+  }
+
+  function apriFinestraEdit_$unique(url, tipo)
+  {
+    apriFinestraEdit(url, tipo);
+  }
+
+  function apriFinestraForm_$unique(url, tipo)
+  {
+    apriFinestraForm(url, tipo);
+  }
+
+  function testForm_$unique()
+  {
+    // $!scTest
+    // $!dettTest
+    return true;
+  }
+
+  function testForm_$type()
+  {
+    return testForm_$unique();
+  }
+
+  // $htpageForm.allJavascriptNotag
+  // $htpageLista.allJavascriptNotag
+
+</SCRIPT>
+
+<div id="$bodyName">
+  <!-- __START_CUT__ -->
+
+  <!-- html principale -->
+  <div class="rigel_body" style="padding: 2px;">
+    $htpageForm.getHtml("body")
+  </div>
+
+  #if($dettHtml)
+  <!-- inizio dettaglio -->
+
+  <div id="rigel_body_detail_$unique">
+    $htpageLista.getHtml("body")
+  </div>
+
+  <!-- fine dettaglio -->
+  #end
+
+  <!-- __END_CUT__ -->
+</div>
+
+<INPUT type="hidden" name="type" value="$type">
+
+<!-- FINE ToolFormNoform.vm -->
