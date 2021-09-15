@@ -20,8 +20,8 @@ package org.sirio2.utils.factory;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.fulcrum.pool.PoolService;
 import org.apache.turbine.services.TurbineServices;
-import org.commonlib.lambda.ConsumerThrowException;
-import org.commonlib.lambda.FunctionTrowException;
+import org.commonlib5.lambda.ConsumerThrowException;
+import org.commonlib5.lambda.FunctionTrowException;
 import org.sirio2.services.CoreServiceException;
 import org.sirio2.services.localization.INT;
 

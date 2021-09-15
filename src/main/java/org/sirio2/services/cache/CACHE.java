@@ -28,7 +28,7 @@ import org.apache.fulcrum.cache.CachedObject;
 import org.apache.fulcrum.cache.GlobalCacheService;
 import org.apache.fulcrum.cache.ObjectExpiredException;
 import org.apache.turbine.services.TurbineServices;
-import org.commonlib.lambda.FunctionTrowException;
+import org.commonlib5.lambda.FunctionTrowException;
 import org.sirio2.CoreConst;
 import org.sirio2.services.modellixml.MDL;
 import org.sirio2.utils.SU;

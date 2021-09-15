@@ -27,7 +27,7 @@ package org.sirio2.utils;
 
 import java.util.*;
 import org.apache.turbine.om.security.User;
-import org.commonlib.utils.MacroResolver;
+import org.commonlib5.utils.MacroResolver;
 
 /**
  * Risolutore generico di macro.

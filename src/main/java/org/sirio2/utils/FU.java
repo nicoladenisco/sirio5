@@ -23,7 +23,7 @@ import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.commonlib.utils.CommonFileUtils;
+import org.commonlib5.utils.CommonFileUtils;
 
 /**
  * File Utils for Servlets.

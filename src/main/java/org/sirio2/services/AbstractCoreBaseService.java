@@ -25,9 +25,9 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.*;
 import org.apache.turbine.*;
 import org.apache.turbine.services.*;
-import org.commonlib.utils.CommonFileUtils;
-import org.commonlib.utils.OsIdent;
-import org.commonlib.utils.StringOper;
+import org.commonlib5.utils.CommonFileUtils;
+import org.commonlib5.utils.OsIdent;
+import org.commonlib5.utils.StringOper;
 import static org.sirio2.CoreConst.APP_PREFIX;
 import org.sirio2.services.allarmi.ALLARM;
 

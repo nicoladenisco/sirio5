@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -23,9 +23,10 @@ import java.util.Arrays;
 import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
-import org.commonlib.xmlrpc.RemoteErrorException;
+import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+import org.commonlib5.xmlrpc.RemoteErrorException;
 
 /**
  * Implementazione di base dei client XML-RPC.
@@ -45,7 +46,7 @@ public class BaseXmlRpcClient
     this.stubName = stubName;
     this.server = url.getHost();
     this.port = url.getPort();
-    client = new XmlRpcClient(url);
+    init(url);
   }
 
   public BaseXmlRpcClient(String stubName, String server, int port)
@@ -54,8 +55,15 @@ public class BaseXmlRpcClient
     this.stubName = stubName;
     this.server = server;
     this.port = port;
-    uri = String.format("http://%s:%d/RPC2", server, port);
-    client = new XmlRpcClient(uri);
+    init(new URL(uri));
+  }
+
+  protected void init(URL url)
+  {
+    XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+    config.setServerURL(url);
+    client = new XmlRpcClient();
+    client.setConfig(config);
   }
 
   protected Object call(String method, Object... parameters)

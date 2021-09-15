@@ -21,12 +21,12 @@ import java.util.Map;
 import javax.swing.table.TableModel;
 import org.apache.torque.map.ColumnMap;
 import org.jdom2.Element;
-import org.rigel2.RigelI18nInterface;
-import org.rigel2.db.torque.TableMapHelper;
-import org.rigel2.exceptions.XmlSyntaxException;
-import org.rigel2.table.CustomColumnEdit;
-import org.rigel2.table.RigelColumnDescriptor;
-import org.rigel2.table.peer.PeerAbstractTableModel;
+import org.rigel5.RigelI18nInterface;
+import org.rigel5.db.torque.TableMapHelper;
+import org.rigel5.exceptions.XmlSyntaxException;
+import org.rigel5.table.CustomColumnEdit;
+import org.rigel5.table.RigelColumnDescriptor;
+import org.rigel5.table.peer.PeerAbstractTableModel;
 import org.sirio2.ErrorMessageException;
 import org.sirio2.utils.SU;
 

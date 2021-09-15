@@ -19,11 +19,11 @@ package org.sirio2.modules.screens.rigel;
 
 import java.util.*;
 
-import org.rigel2.HtmlUtils;
-import org.rigel2.RigelCustomUrlBuilder;
-import org.rigel2.SetupHolder;
-import org.rigel2.table.html.wrapper.HtmlWrapperBase;
-import org.rigel2.glue.table.AlternateColorTableAppBase;
+import org.rigel5.HtmlUtils;
+import org.rigel5.RigelCustomUrlBuilder;
+import org.rigel5.SetupHolder;
+import org.rigel5.table.html.wrapper.HtmlWrapperBase;
+import org.rigel5.glue.table.AlternateColorTableAppBase;
 import org.apache.velocity.context.*;
 import org.sirio2.utils.CoreRunData;
 import org.sirio2.utils.SU;

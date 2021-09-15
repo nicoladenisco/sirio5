@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 import org.apache.fulcrum.cache.CachedObject;
 import org.apache.fulcrum.cache.ObjectExpiredException;
 import org.apache.fulcrum.cache.RefreshableCachedObject;
-import org.commonlib.utils.ArrayMap;
+import org.commonlib5.utils.ArrayMap;
 import org.sirio2.services.bus.BUS;
 import org.sirio2.services.bus.BusContext;
 import org.sirio2.services.bus.BusMessages;

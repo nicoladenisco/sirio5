@@ -19,7 +19,7 @@ package org.sirio2.modules.tools;
 
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.pull.ApplicationTool;
-import org.rigel2.RigelI18nInterface;
+import org.rigel5.RigelI18nInterface;
 import org.sirio2.rigel.RigelHtmlI18n;
 import org.sirio2.services.modellixml.modelliXML;
 import org.sirio2.utils.CoreRunData;

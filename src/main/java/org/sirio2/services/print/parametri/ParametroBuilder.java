@@ -15,7 +15,7 @@
 package org.sirio2.services.print.parametri;
 
 import java.util.List;
-import org.commonlib.utils.Pair;
+import org.commonlib5.utils.Pair;
 import org.sirio2.services.print.AbstractReportParametersInfo;
 import org.sirio2.utils.factory.CoreBasePlugin;
 

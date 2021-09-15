@@ -19,8 +19,8 @@ package org.sirio2.utils.xmlrpc;
 
 import java.util.Hashtable;
 import java.util.Vector;
-import org.commonlib.utils.Pair;
-import org.commonlib.xmlrpc.FileTransfer;
+import org.commonlib5.utils.Pair;
+import org.commonlib5.xmlrpc.FileTransfer;
 import org.sirio2.beans.BeanFactory;
 import org.sirio2.services.token.TokenAuthItem;
 import org.sirio2.utils.SU;

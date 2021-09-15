@@ -28,7 +28,7 @@ import org.apache.torque.om.ColumnAccessByName;
 import org.apache.torque.om.NumberKey;
 import org.apache.torque.om.ObjectKey;
 import org.apache.torque.om.Persistent;
-import org.rigel2.db.torque.TableMapHelper;
+import org.rigel5.db.torque.TableMapHelper;
 import org.sirio2.utils.SU;
 
 /**

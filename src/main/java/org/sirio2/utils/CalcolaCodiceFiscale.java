@@ -21,7 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Pattern;
-import org.commonlib.utils.StringOper;
+import org.commonlib5.utils.StringOper;
 import org.sirio2.services.localization.INT;
 
 /**

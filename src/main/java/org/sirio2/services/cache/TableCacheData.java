@@ -24,7 +24,7 @@ import org.apache.torque.criteria.Criteria;
 import org.apache.torque.om.ColumnAccessByName;
 import org.apache.torque.om.ObjectKey;
 import org.apache.torque.om.Persistent;
-import org.rigel2.db.torque.PeerTransactAgent;
+import org.rigel5.db.torque.PeerTransactAgent;
 import org.sirio2.utils.SU;
 
 /**

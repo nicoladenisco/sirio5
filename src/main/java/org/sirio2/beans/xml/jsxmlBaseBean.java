@@ -24,7 +24,7 @@ import org.apache.turbine.services.Service;
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.rundata.RunDataService;
 import org.apache.turbine.util.RunData;
-import org.commonlib.utils.StringOper;
+import org.commonlib5.utils.StringOper;
 import org.sirio2.services.modellixml.MDL;
 import org.sirio2.services.security.SEC;
 import org.sirio2.utils.DT;

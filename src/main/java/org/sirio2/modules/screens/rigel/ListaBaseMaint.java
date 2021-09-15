@@ -17,8 +17,8 @@
  */
 package org.sirio2.modules.screens.rigel;
 
-import org.rigel2.glue.table.AlternateColorTableAppBase;
-import org.rigel2.table.html.wrapper.HtmlWrapperBase;
+import org.rigel5.glue.table.AlternateColorTableAppBase;
+import org.rigel5.table.html.wrapper.HtmlWrapperBase;
 import org.apache.velocity.context.*;
 import org.sirio2.utils.CoreRunData;
 

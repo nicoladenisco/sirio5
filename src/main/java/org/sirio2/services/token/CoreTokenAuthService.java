@@ -28,7 +28,7 @@ import org.apache.fulcrum.security.util.DataBackendException;
 import org.apache.fulcrum.security.util.UnknownEntityException;
 import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.security.SecurityService;
-import org.commonlib.utils.CommonFileUtils;
+import org.commonlib5.utils.CommonFileUtils;
 import org.sirio2.services.AbstractCoreBaseService;
 import org.sirio2.services.bus.BUS;
 import org.sirio2.services.bus.BusContext;

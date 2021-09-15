@@ -18,7 +18,6 @@
 package org.sirio2.servlets;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Iterator;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,7 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xmlrpc.XmlRpcServer;
+import org.apache.xmlrpc.server.PropertyHandlerMapping;
+import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
+import org.apache.xmlrpc.webserver.XmlRpcServletServer;
 import org.sirio2.services.localization.INT;
 import org.sirio2.utils.TR;
 
@@ -44,7 +45,7 @@ public class EmbeddedXmlRpc extends HttpServlet
   /** Logging */
   private static final Log log = LogFactory.getLog(EmbeddedXmlRpc.class);
   /** Gestore connessioni xmlrpc */
-  protected XmlRpcServer server = new XmlRpcServer();
+  protected XmlRpcServletServer server = new XmlRpcServletServer();
 
   @Override
   public void init()
@@ -52,6 +53,7 @@ public class EmbeddedXmlRpc extends HttpServlet
   {
     super.init();
 
+    PropertyHandlerMapping phm = new PropertyHandlerMapping();
     Configuration conf = TR.getConfiguration("services.XmlRpcService.embedded");
 
     // Check if there are any handlers to register at startup
@@ -63,8 +65,15 @@ public class EmbeddedXmlRpc extends HttpServlet
 
       log.debug(INT.I("Found Handler %s as %s / %s", handler, handlerName, handlerClass));
 
-      registerHandler(handlerName, handlerClass);
+      registerHandler(phm, handlerName, handlerClass);
     }
+
+    server.setHandlerMapping(phm);
+
+    // some boilerplate stuff
+    XmlRpcServerConfigImpl serverConfig = (XmlRpcServerConfigImpl) server.getConfig();
+    serverConfig.setEnabledForExtensions(true);
+    serverConfig.setContentLengthOptional(false);
   }
 
   /**
@@ -73,17 +82,18 @@ public class EmbeddedXmlRpc extends HttpServlet
    * dynamic class loading and throw an InitializationException on
    * error.
    *
+   * @param phm
    * @param handlerName The name the handler is registered under.
    * @param handlerClass The name of the class to use as a handler.
    * @throws javax.servlet.ServletException
    */
-  public void registerHandler(String handlerName, String handlerClass)
+  public void registerHandler(PropertyHandlerMapping phm, String handlerName, String handlerClass)
      throws ServletException
   {
     try
     {
-      Object handler = Class.forName(handlerClass).newInstance();
-      server.addHandler(handlerName, handler);
+      Class clHandler = Class.forName(handlerClass);
+      phm.addHandler(handlerName, clHandler);
     }
     catch(ClassNotFoundException ex)
     {
@@ -111,19 +121,7 @@ public class EmbeddedXmlRpc extends HttpServlet
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
      throws ServletException, IOException
   {
-    try
-    {
-      byte[] result = server.execute(request.getInputStream());
-      response.setContentType("text/xml");
-      response.setContentLength(result.length);
-      OutputStream out = response.getOutputStream();
-      out.write(result);
-      out.flush();
-    }
-    catch(IOException ex)
-    {
-      log.error("Fatal error in XMLRPC connector", ex);
-    }
+    server.execute(request, response);
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

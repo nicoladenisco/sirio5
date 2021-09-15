@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.commonlib.utils.DateTime;
+import org.commonlib5.utils.DateTime;
 
 /**
  * Formattatore per file JAXB.

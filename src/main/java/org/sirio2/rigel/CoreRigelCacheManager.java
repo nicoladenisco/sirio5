@@ -19,8 +19,8 @@ package org.sirio2.rigel;
 
 import java.util.List;
 import org.apache.fulcrum.cache.CachedObject;
-import org.rigel2.RigelCacheManager;
-import org.rigel2.table.ForeignDataHolder;
+import org.rigel5.RigelCacheManager;
+import org.rigel5.table.ForeignDataHolder;
 import org.sirio2.CoreConst;
 import org.sirio2.services.cache.CACHE;
 

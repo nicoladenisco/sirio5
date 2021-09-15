@@ -20,7 +20,7 @@ package org.sirio2.services;
 import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.commonlib.utils.JavaLoggingToCommonLoggingRedirector;
+import org.commonlib5.utils.JavaLoggingToCommonLoggingRedirector;
 import org.sirio2.utils.SU;
 
 /**

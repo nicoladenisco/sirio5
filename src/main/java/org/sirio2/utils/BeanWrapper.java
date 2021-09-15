@@ -22,8 +22,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 import org.apache.torque.om.*;
 import org.apache.turbine.services.TurbineServices;
-import org.commonlib.utils.DateTime;
-import org.commonlib.utils.StringOper;
+import org.commonlib5.utils.DateTime;
+import org.commonlib5.utils.StringOper;
 import org.sirio2.services.formatter.DataFormatter;
 import org.sirio2.services.localization.INT;
 

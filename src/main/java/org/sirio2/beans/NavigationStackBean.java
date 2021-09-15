@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
-import org.commonlib.utils.ArrayMap;
-import org.rigel2.HtmlUtils;
+import org.commonlib5.utils.ArrayMap;
+import org.rigel5.HtmlUtils;
 import org.sirio2.utils.CoreRunData;
 import org.sirio2.utils.SU;
 

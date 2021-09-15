@@ -20,7 +20,7 @@ package org.sirio2.services.bus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.commonlib.utils.ArrayOper;
+import org.commonlib5.utils.ArrayOper;
 import org.sirio2.rigel.RigelHtmlI18n;
 import org.sirio2.utils.CoreRunData;
 import org.sirio2.utils.SirioGenericContext;

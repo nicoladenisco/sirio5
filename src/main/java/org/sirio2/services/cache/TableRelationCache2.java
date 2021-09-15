@@ -29,7 +29,7 @@ import org.apache.torque.om.NumberKey;
 import org.apache.torque.om.ObjectKey;
 import org.apache.torque.om.Persistent;
 import org.apache.torque.om.SimpleKey;
-import org.commonlib.lambda.PredicateThrowException;
+import org.commonlib5.lambda.PredicateThrowException;
 import org.sirio2.utils.SU;
 
 /**

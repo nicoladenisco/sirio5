@@ -18,8 +18,8 @@
 package org.sirio2.rigel;
 
 import javax.servlet.http.HttpSession;
-import org.rigel2.table.html.AbstractHtmlTablePager;
-import org.rigel2.table.html.RigelHtmlPageComponent;
+import org.rigel5.table.html.AbstractHtmlTablePager;
+import org.rigel5.table.html.RigelHtmlPageComponent;
 
 /**
  * Gestore dell'interfaccia rigel per nuove dialog.

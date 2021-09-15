@@ -19,7 +19,7 @@ package org.sirio2.beans;
 
 import java.util.*;
 import org.apache.fulcrum.localization.LocalizationService;
-import org.commonlib.utils.Pair;
+import org.commonlib5.utils.Pair;
 import org.sirio2.rigel.RigelHtmlI18n;
 import org.sirio2.utils.CoreRunData;
 import org.sirio2.utils.DT;

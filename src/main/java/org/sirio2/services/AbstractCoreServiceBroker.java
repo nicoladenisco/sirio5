@@ -30,7 +30,7 @@ import org.apache.turbine.services.ServiceManager;
 import org.apache.turbine.services.schedule.JobEntryTorque;
 import org.apache.turbine.services.schedule.JobEntryTorquePeer;
 import org.apache.turbine.util.TurbineException;
-import org.rigel2.db.DbUtils;
+import org.rigel5.db.DbUtils;
 import static org.sirio2.services.localization.INT.I;
 
 /**

@@ -26,7 +26,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.turbine.services.BaseService;
-import org.commonlib.utils.SimpleTimer;
+import org.commonlib5.utils.SimpleTimer;
 import org.sirio2.CoreConst;
 import org.sirio2.services.localization.INT;
 

@@ -20,11 +20,11 @@ package org.sirio2.rigel;
 import javax.servlet.http.HttpSession;
 import org.apache.torque.om.Persistent;
 import org.apache.turbine.util.RunData;
-import org.rigel2.table.RigelTableModel;
-import org.rigel2.table.WrapperBase;
-import org.rigel2.table.html.wrapper.HtmlWrapperBase;
-import org.rigel2.table.peer.html.PeerTableModel;
-import org.rigel2.table.sql.html.SqlTableModel;
+import org.rigel5.table.RigelTableModel;
+import org.rigel5.table.WrapperBase;
+import org.rigel5.table.html.wrapper.HtmlWrapperBase;
+import org.rigel5.table.peer.html.PeerTableModel;
+import org.rigel5.table.sql.html.SqlTableModel;
 import org.sirio2.services.security.SEC;
 import org.sirio2.utils.CoreRunData;
 

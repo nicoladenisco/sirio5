@@ -19,7 +19,7 @@ package org.sirio2.utils;
 
 import java.io.Serializable;
 import java.util.*;
-import org.rigel2.RigelI18nInterface;
+import org.rigel5.RigelI18nInterface;
 import org.sirio2.rigel.RigelDefaultI18n;
 
 /**

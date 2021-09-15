@@ -18,12 +18,12 @@
 package org.sirio2.rigel;
 
 import javax.servlet.http.HttpSession;
-import org.commonlib.utils.StringOper;
-import org.rigel2.DefaultUIManager;
-import org.rigel2.table.html.AbstractHtmlTablePager;
-import org.rigel2.table.html.PageComponentType;
-import org.rigel2.table.html.RigelHtmlPage;
-import org.rigel2.table.html.RigelHtmlPageComponent;
+import org.commonlib5.utils.StringOper;
+import org.rigel5.DefaultUIManager;
+import org.rigel5.table.html.AbstractHtmlTablePager;
+import org.rigel5.table.html.PageComponentType;
+import org.rigel5.table.html.RigelHtmlPage;
+import org.rigel5.table.html.RigelHtmlPageComponent;
 import org.sirio2.utils.LI;
 
 /**

@@ -19,7 +19,7 @@ package org.sirio2.services.formatter;
 
 import java.util.Date;
 import java.util.List;
-import org.commonlib.utils.Pair;
+import org.commonlib5.utils.Pair;
 import org.sirio2.services.CoreServiceExtension;
 
 /**

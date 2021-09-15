@@ -27,7 +27,7 @@ import org.apache.turbine.services.*;
 import org.apache.turbine.util.RunData;
 import org.apache.turbine.util.uri.TemplateURI;
 import org.apache.velocity.context.Context;
-import org.commonlib.utils.ArrayMap;
+import org.commonlib5.utils.ArrayMap;
 import org.sirio2.ErrorMessageException;
 import org.sirio2.beans.BeanFactory;
 import org.sirio2.beans.CoreBaseBean;

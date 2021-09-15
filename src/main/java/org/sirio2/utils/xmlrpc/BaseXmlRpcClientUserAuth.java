@@ -20,8 +20,8 @@ package org.sirio2.utils.xmlrpc;
 import java.net.URL;
 import java.util.*;
 import org.apache.xmlrpc.XmlRpcException;
-import org.commonlib.xmlrpc.RemoteErrorException;
-import org.commonlib.xmlrpc.XmlRpcCostant;
+import org.commonlib5.xmlrpc.RemoteErrorException;
+import org.commonlib5.xmlrpc.XmlRpcCostant;
 
 /**
  * Classe base dei client XML-RPC che implementano l'autenticazione utente.

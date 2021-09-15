@@ -23,16 +23,16 @@ import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.util.RunData;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.rigel2.glue.WrapperCacheBase;
-import org.rigel2.table.html.AbstractHtmlTablePager;
-import org.rigel2.table.html.hTable;
-import org.rigel2.table.peer.html.PeerWrapperEditHtml;
-import org.rigel2.table.peer.html.PeerWrapperFormHtml;
-import org.rigel2.table.peer.html.PeerWrapperListaHtml;
-import org.rigel2.table.peer.xml.PeerWrapperListaXml;
-import org.rigel2.table.sql.html.SqlWrapperFormHtml;
-import org.rigel2.table.sql.html.SqlWrapperListaHtml;
-import org.rigel2.table.sql.xml.SqlWrapperListaXml;
+import org.rigel5.glue.WrapperCacheBase;
+import org.rigel5.table.html.AbstractHtmlTablePager;
+import org.rigel5.table.html.hTable;
+import org.rigel5.table.peer.html.PeerWrapperEditHtml;
+import org.rigel5.table.peer.html.PeerWrapperFormHtml;
+import org.rigel5.table.peer.html.PeerWrapperListaHtml;
+import org.rigel5.table.peer.xml.PeerWrapperListaXml;
+import org.rigel5.table.sql.html.SqlWrapperFormHtml;
+import org.rigel5.table.sql.html.SqlWrapperListaHtml;
+import org.rigel5.table.sql.xml.SqlWrapperListaXml;
 
 /**
  * Accesso al servizio modelliXML.

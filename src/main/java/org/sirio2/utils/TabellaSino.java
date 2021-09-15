@@ -19,7 +19,7 @@ package org.sirio2.utils;
 
 import java.util.*;
 import org.apache.commons.lang.ArrayUtils;
-import org.commonlib.utils.Pair;
+import org.commonlib5.utils.Pair;
 
 /**
  * Generatore HTML per tabella si/no.

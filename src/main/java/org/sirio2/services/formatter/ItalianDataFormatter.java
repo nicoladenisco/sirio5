@@ -20,8 +20,8 @@ package org.sirio2.services.formatter;
 import java.util.*;
 import java.text.*;
 import org.apache.commons.configuration2.Configuration;
-import org.commonlib.gui.validator.ItalianParser;
-import org.commonlib.utils.Pair;
+import org.commonlib5.gui.validator.ItalianParser;
+import org.commonlib5.utils.Pair;
 import org.sirio2.services.AbstractCoreBaseService;
 
 public class ItalianDataFormatter extends AbstractCoreBaseService

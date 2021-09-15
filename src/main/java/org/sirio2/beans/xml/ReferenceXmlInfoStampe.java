@@ -18,9 +18,9 @@
 package org.sirio2.beans.xml;
 
 import javax.servlet.http.HttpSession;
-import org.rigel2.table.RigelTableModel;
-import org.rigel2.table.peer.html.PeerPager;
-import org.rigel2.table.sql.html.SqlPager;
+import org.rigel5.table.RigelTableModel;
+import org.rigel5.table.peer.html.PeerPager;
+import org.rigel5.table.sql.html.SqlPager;
 
 /**
  * Memoria per il passaggio dei dati da una lista visualizzata

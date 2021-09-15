@@ -23,7 +23,7 @@ import java.util.Enumeration;
 import java.util.function.Predicate;
 import javax.swing.tree.TreeNode;
 import org.apache.commons.collections.IteratorUtils;
-import org.commonlib.lambda.PredicateThrowException;
+import org.commonlib5.lambda.PredicateThrowException;
 
 /**
  * Nodo di un albero.

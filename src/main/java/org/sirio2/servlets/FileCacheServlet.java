@@ -33,7 +33,7 @@ import org.apache.fulcrum.mimetype.MimeTypeService;
 import org.apache.fulcrum.parser.DefaultParameterParser;
 import org.apache.fulcrum.upload.UploadService;
 import org.apache.turbine.services.TurbineServices;
-import org.commonlib.utils.Pair;
+import org.commonlib5.utils.Pair;
 import org.sirio2.CoreConst;
 import org.sirio2.services.cache.FileCacheItem;
 import org.sirio2.services.localization.INT;

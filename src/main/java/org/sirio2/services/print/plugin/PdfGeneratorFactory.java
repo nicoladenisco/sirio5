@@ -21,7 +21,7 @@ import org.sirio2.utils.SU;
 import java.io.File;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.ArrayUtils;
-import org.commonlib.utils.ClassOper;
+import org.commonlib5.utils.ClassOper;
 import org.sirio2.services.CoreServiceException;
 
 /**

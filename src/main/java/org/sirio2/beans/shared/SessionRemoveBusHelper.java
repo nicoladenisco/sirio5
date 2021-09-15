@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
-import org.commonlib.utils.Classificatore;
+import org.commonlib5.utils.Classificatore;
 import org.sirio2.services.bus.BUS;
 import org.sirio2.services.bus.BusContext;
 import org.sirio2.services.bus.MessageBusListener;

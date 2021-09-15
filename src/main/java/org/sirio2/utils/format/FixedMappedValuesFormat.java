@@ -22,7 +22,7 @@ import java.text.Format;
 import java.text.ParsePosition;
 import java.util.List;
 import java.util.Map;
-import org.commonlib.utils.ArrayMap;
+import org.commonlib5.utils.ArrayMap;
 import org.jdom2.Element;
 import org.sirio2.utils.SU;
 

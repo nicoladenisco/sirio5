@@ -19,10 +19,10 @@ package org.sirio2.rigel;
 
 import org.apache.fulcrum.localization.LocalizationService;
 import org.apache.turbine.services.TurbineServices;
-import org.rigel2.RigelI18nInterface;
-import org.rigel2.table.RigelColumnDescriptor;
-import org.rigel2.table.RigelTableModel;
-import org.rigel2.table.html.hTable;
+import org.rigel5.RigelI18nInterface;
+import org.rigel5.table.RigelColumnDescriptor;
+import org.rigel5.table.RigelTableModel;
+import org.rigel5.table.html.hTable;
 
 /**
  * Interfaccia multilingua per RIGEL.

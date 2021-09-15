@@ -22,7 +22,7 @@ import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.schedule.JobEntry;
 import org.apache.turbine.services.schedule.ScheduleService;
 import org.apache.turbine.util.TurbineException;
-import org.commonlib.utils.ClassOper;
+import org.commonlib5.utils.ClassOper;
 
 /**
  * Utility per la gestione semplificata dello scheduler.

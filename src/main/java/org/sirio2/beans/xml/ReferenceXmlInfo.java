@@ -19,9 +19,9 @@ package org.sirio2.beans.xml;
 
 import javax.servlet.http.HttpSession;
 import org.jdom2.Element;
-import org.rigel2.table.RigelTableModel;
-import org.rigel2.table.peer.html.PeerPager;
-import org.rigel2.table.sql.html.SqlPager;
+import org.rigel5.table.RigelTableModel;
+import org.rigel5.table.peer.html.PeerPager;
+import org.rigel5.table.sql.html.SqlPager;
 
 /**
  * Salva nella sessione le impostazioni di una lista affinchè

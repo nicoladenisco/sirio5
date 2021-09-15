@@ -20,8 +20,8 @@ package org.sirio2.services.modellixml;
 import java.util.List;
 import org.apache.turbine.util.RunData;
 import org.jdom2.Document;
-import org.rigel2.glue.WrapperBuilderInterface;
-import org.rigel2.glue.WrapperCacheBase;
+import org.rigel5.glue.WrapperBuilderInterface;
+import org.rigel5.glue.WrapperCacheBase;
 import org.sirio2.services.CoreServiceExtension;
 
 /**

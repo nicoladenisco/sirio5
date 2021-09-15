@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -22,9 +22,9 @@ import java.util.*;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.*;
 import org.apache.turbine.om.security.User;
-import org.rigel2.db.sql.FiltroData;
-import org.rigel2.table.FiltroListe;
-import org.rigel2.table.xml.*;
+import org.rigel5.db.sql.FiltroData;
+import org.rigel5.table.FiltroListe;
+import org.rigel5.table.xml.*;
 import org.sirio2.services.localization.INT;
 
 /**
@@ -78,7 +78,7 @@ public class stampaListeBean extends jsxmlBaseBean
      throws Exception
   {
     xTable tbl = new xTable();
-    org.rigel2.table.peer.xml.PeerTableModel ptm = new org.rigel2.table.peer.xml.PeerTableModel();
+    org.rigel5.table.peer.xml.PeerTableModel ptm = new org.rigel5.table.peer.xml.PeerTableModel();
 
     ptm.setSuppEsclRicerca(true);
     ptm.initFrom(rInfo.getRtm());
@@ -114,7 +114,7 @@ public class stampaListeBean extends jsxmlBaseBean
      throws Exception
   {
     xTable tbl = new xTable();
-    org.rigel2.table.sql.xml.SqlTableModel stm = new org.rigel2.table.sql.xml.SqlTableModel();
+    org.rigel5.table.sql.xml.SqlTableModel stm = new org.rigel5.table.sql.xml.SqlTableModel();
 
     stm.setSuppEsclRicerca(true);
     stm.initFrom(rInfo.getRtm());

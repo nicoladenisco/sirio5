@@ -27,8 +27,8 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.turbine.Turbine;
-import org.commonlib.ssl.SSLSocketInfo;
-import org.commonlib.ssl.TrustAllSecurityProvider;
+import org.commonlib5.ssl.SSLSocketInfo;
+import org.commonlib5.ssl.TrustAllSecurityProvider;
 import org.sirio2.services.localization.INT;
 
 /**

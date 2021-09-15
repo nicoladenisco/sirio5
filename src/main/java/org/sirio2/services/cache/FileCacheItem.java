@@ -20,7 +20,7 @@ package org.sirio2.services.cache;
 import java.io.File;
 import org.apache.fulcrum.mimetype.MimeTypeService;
 import org.apache.turbine.services.TurbineServices;
-import org.commonlib.utils.CommonFileUtils;
+import org.commonlib5.utils.CommonFileUtils;
 import org.sirio2.CoreConst;
 
 /**

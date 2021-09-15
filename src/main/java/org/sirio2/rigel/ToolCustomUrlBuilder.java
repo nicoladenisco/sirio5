@@ -18,8 +18,8 @@
 package org.sirio2.rigel;
 
 import java.util.Map;
-import org.rigel2.table.RigelColumnDescriptor;
-import org.rigel2.table.RigelTableModel;
+import org.rigel5.table.RigelColumnDescriptor;
+import org.rigel5.table.RigelTableModel;
 
 /**
  * Implementazione speciale dedicata ai Tool.

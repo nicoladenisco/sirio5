@@ -17,13 +17,13 @@
  */
 package org.sirio2.rigel;
 
-import org.rigel2.glue.table.PeerAppMaintFormTable;
+import org.rigel5.glue.table.PeerAppMaintFormTable;
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.util.RunData;
-import org.rigel2.glue.PeerObjectSaver;
-import org.rigel2.glue.WrapperCacheBase;
-import org.rigel2.glue.table.AlternateColorTableAppBase;
-import org.rigel2.glue.table.HeditTableApp;
+import org.rigel5.glue.PeerObjectSaver;
+import org.rigel5.glue.WrapperCacheBase;
+import org.rigel5.glue.table.AlternateColorTableAppBase;
+import org.rigel5.glue.table.HeditTableApp;
 import org.sirio2.services.modellixml.modelliXML;
 import org.sirio2.utils.CoreRunData;
 import org.sirio2.utils.TR;

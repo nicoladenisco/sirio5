@@ -19,7 +19,7 @@ package org.sirio2.services;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.commonlib.utils.SimpleTimer;
+import org.commonlib5.utils.SimpleTimer;
 import org.sirio2.CoreConst;
 
 import static org.sirio2.services.localization.INT.I;

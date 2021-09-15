@@ -23,7 +23,7 @@ import java.util.function.Function;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.turbine.util.RunData;
-import org.commonlib.utils.ClassOper;
+import org.commonlib5.utils.ClassOper;
 import org.sirio2.beans.shared.SessionRemoveBusHelper;
 import org.sirio2.services.token.TokenAuthItem;
 import org.sirio2.utils.CoreRunData;

@@ -18,17 +18,17 @@
 package org.sirio2.rigel;
 
 import java.net.URLEncoder;
-import org.commonlib.utils.StringOper;
-import org.rigel2.RigelI18nInterface;
-import org.rigel2.SetupHolder;
-import org.rigel2.table.BuilderRicercaGenerica;
-import org.rigel2.table.RigelColumnDescriptor;
-import org.rigel2.table.RigelTableModel;
-import org.rigel2.table.html.AbstractHtmlTablePagerFilter;
-import org.rigel2.table.html.HtmlMascheraRicercaGenerica;
-import org.rigel2.table.html.PageComponentType;
-import org.rigel2.table.html.RigelHtmlPage;
-import org.rigel2.table.html.RigelHtmlPageComponent;
+import org.commonlib5.utils.StringOper;
+import org.rigel5.RigelI18nInterface;
+import org.rigel5.SetupHolder;
+import org.rigel5.table.BuilderRicercaGenerica;
+import org.rigel5.table.RigelColumnDescriptor;
+import org.rigel5.table.RigelTableModel;
+import org.rigel5.table.html.AbstractHtmlTablePagerFilter;
+import org.rigel5.table.html.HtmlMascheraRicercaGenerica;
+import org.rigel5.table.html.PageComponentType;
+import org.rigel5.table.html.RigelHtmlPage;
+import org.rigel5.table.html.RigelHtmlPageComponent;
 import org.sirio2.services.modellixml.MDL;
 
 /**

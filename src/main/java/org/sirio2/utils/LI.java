@@ -25,7 +25,7 @@ import org.apache.turbine.services.pull.tools.UITool;
 import org.apache.turbine.util.RunData;
 import org.apache.turbine.util.ServerData;
 import org.apache.turbine.util.uri.TemplateURI;
-import org.rigel2.HtmlUtils;
+import org.rigel5.HtmlUtils;
 import static org.sirio2.CoreConst.APP_PREFIX;
 
 /**

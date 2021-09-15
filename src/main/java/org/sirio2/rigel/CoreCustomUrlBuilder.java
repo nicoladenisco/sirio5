@@ -18,11 +18,11 @@
 package org.sirio2.rigel;
 
 import java.util.Map;
-import org.rigel2.HtmlUtils;
-import org.rigel2.RigelCustomUrlBuilder;
-import org.rigel2.table.RigelColumnDescriptor;
-import org.rigel2.table.RigelTableModel;
-import org.rigel2.table.html.wrapper.CustomButtonInfo;
+import org.rigel5.HtmlUtils;
+import org.rigel5.RigelCustomUrlBuilder;
+import org.rigel5.table.RigelColumnDescriptor;
+import org.rigel5.table.RigelTableModel;
+import org.rigel5.table.html.wrapper.CustomButtonInfo;
 import org.sirio2.utils.LI;
 
 /**

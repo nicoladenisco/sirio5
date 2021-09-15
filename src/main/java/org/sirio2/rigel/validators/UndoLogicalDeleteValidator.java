@@ -29,11 +29,11 @@ import org.apache.torque.om.ColumnAccessByName;
 import org.apache.torque.om.Persistent;
 import org.apache.torque.util.Criteria;
 import org.jdom2.Element;
-import org.rigel2.RigelI18nInterface;
-import org.rigel2.db.torque.TableMapHelper;
-import org.rigel2.glue.validators.PostParseValidator;
-import org.rigel2.table.RigelTableModel;
-import org.rigel2.table.html.hEditTable;
+import org.rigel5.RigelI18nInterface;
+import org.rigel5.db.torque.TableMapHelper;
+import org.rigel5.glue.validators.PostParseValidator;
+import org.rigel5.table.RigelTableModel;
+import org.rigel5.table.html.hEditTable;
 import org.sirio2.services.localization.INT;
 import org.sirio2.utils.SU;
 

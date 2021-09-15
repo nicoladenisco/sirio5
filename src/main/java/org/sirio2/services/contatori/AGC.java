@@ -21,7 +21,7 @@ import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.apache.turbine.services.TurbineServices;
-import org.commonlib.utils.StringOper;
+import org.commonlib5.utils.StringOper;
 
 /**
  * Utility per la gestione dei contatori permanenti.
