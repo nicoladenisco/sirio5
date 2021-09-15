@@ -64,6 +64,10 @@ public class BaseXmlRpcClient
     config.setServerURL(url);
     client = new XmlRpcClient();
     client.setConfig(config);
+
+    // set this transport factory for host-specific SSLContexts to work
+    //XmlRpcCommonsTransportFactory f = new XmlRpcCommonsTransportFactory(client);
+    //client.setTransportFactory(f);
   }
 
   protected Object call(String method, Object... parameters)
