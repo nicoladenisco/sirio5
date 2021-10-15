@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -101,7 +101,7 @@ public class ToolRicercaListe extends HtmlMascheraRicercaGenerica
    * @throws Exception
    */
   @Override
-  public void buildHtmlRicercaSemplice(String nomeForm, int sizeFld, RigelHtmlPage page)
+  public void buildHtmlRicercaSemplice(String nomeForm, int sizeFld, boolean haveFilter, RigelHtmlPage page)
      throws Exception
   {
     this.formName = nomeForm;
