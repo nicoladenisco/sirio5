@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -76,6 +77,17 @@ public class DT extends DateTime
     {
       return defVal;
     }
+  }
+
+  public static Date parseDataObj(Object toParse, Date defVal)
+  {
+    if(toParse == null)
+      return defVal;
+
+    if(toParse instanceof Date)
+      return (Date) toParse;
+
+    return parseData(toParse.toString(), defVal);
   }
 
   /**
@@ -432,6 +444,27 @@ public class DT extends DateTime
     return Instant.ofEpochMilli(dateToConvert.getTime())
        .atZone(ZoneId.systemDefault())
        .toLocalDate();
+  }
+
+  public static LocalDateTime convertToLocalDateTimeViaMilisecond(Date dateToConvert)
+  {
+    return Instant.ofEpochMilli(dateToConvert.getTime())
+       .atZone(ZoneId.systemDefault())
+       .toLocalDateTime();
+  }
+
+  public static Date convertToDateViaInstant(LocalDate dateToConvert)
+  {
+    return java.util.Date.from(dateToConvert.atStartOfDay()
+       .atZone(ZoneId.systemDefault())
+       .toInstant());
+  }
+
+  public static Date convertToDateViaInstant(LocalDateTime dateToConvert)
+  {
+    return java.util.Date
+       .from(dateToConvert.atZone(ZoneId.systemDefault())
+          .toInstant());
   }
 
   /**

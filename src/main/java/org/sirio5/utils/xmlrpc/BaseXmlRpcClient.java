@@ -55,6 +55,7 @@ public class BaseXmlRpcClient
     this.stubName = stubName;
     this.server = server;
     this.port = port;
+    uri = String.format("http://%s:%d/RPC2", server, port);
     init(new URL(uri));
   }
 

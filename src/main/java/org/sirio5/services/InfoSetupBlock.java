@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@ package org.sirio5.services;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections.map.LinkedMap;
+import org.sirio5.utils.SU;
 
 /**
  * Blocco informazioni di setup.
@@ -44,6 +45,36 @@ public class InfoSetupBlock
   public InfoSetupBlock add(String key, String value)
   {
     info.put(key, value);
+    return this;
+  }
+
+  public InfoSetupBlock add(String key, String[] value)
+  {
+    info.put(key, SU.join(value, ','));
+    return this;
+  }
+
+  public InfoSetupBlock add(String key, int value)
+  {
+    info.put(key, Integer.toString(value));
+    return this;
+  }
+
+  public InfoSetupBlock add(String key, float value)
+  {
+    info.put(key, Float.toString(value));
+    return this;
+  }
+
+  public InfoSetupBlock add(String key, double value)
+  {
+    info.put(key, Double.toString(value));
+    return this;
+  }
+
+  public InfoSetupBlock add(String key, boolean value)
+  {
+    info.put(key, value ? "true" : "false");
     return this;
   }
 

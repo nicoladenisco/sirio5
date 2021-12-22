@@ -154,18 +154,25 @@ public class BeanFactory
   {
     CoreBaseBean bean = (CoreBaseBean) data.getSession().getAttribute(key);
 
-    if(bean == null || !bean.isValid((CoreRunData) data))
+    if(bean == null)
     {
-      removeFromSession(data, key);
       bean = createBean(beanClass);
       bean.init((CoreRunData) data);
       data.getSession().setAttribute(key, bean);
-    }
-    else
-    {
-      bean.refreshSession((CoreRunData) data);
+      return bean;
     }
 
+    if(!bean.isValid((CoreRunData) data))
+    {
+      removeFromSession(data, key);
+      CoreBaseBean newBean = createBean(beanClass);
+      newBean.init((CoreRunData) data);
+      newBean.preserveData((CoreRunData) data, bean);
+      data.getSession().setAttribute(key, newBean);
+      return newBean;
+    }
+
+    bean.refreshSession((CoreRunData) data);
     return bean;
   }
 
@@ -218,7 +225,13 @@ public class BeanFactory
       }
     }
 
+    nameMap.put(nomeBean, nomeBean);
     return nomeBean;
+  }
+
+  public static void clearMaps()
+  {
+    nameMap.clear();
   }
 
   /**
@@ -314,18 +327,25 @@ public class BeanFactory
   {
     CoreTokenBean bean = (CoreTokenBean) data.getAttribute(key);
 
-    if(bean == null || !bean.isValid(data))
+    if(bean == null)
     {
-      removeFromToken(data, key);
       bean = createTokenBean(beanClass);
       bean.init(data);
       data.setAttribute(key, bean);
-    }
-    else
-    {
-      bean.refreshSession(data);
+      return bean;
     }
 
+    if(!bean.isValid(data))
+    {
+      removeFromToken(data, key);
+      CoreTokenBean newBean = createTokenBean(beanClass);
+      newBean.init(data);
+      newBean.preserveData(data, bean);
+      data.setAttribute(key, newBean);
+      return newBean;
+    }
+
+    bean.refreshSession(data);
     return bean;
   }
 

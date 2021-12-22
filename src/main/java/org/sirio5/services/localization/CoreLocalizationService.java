@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -187,7 +187,10 @@ public class CoreLocalizationService extends DefaultLocalizationService
             String defmsg = e.getChildTextTrim("DEFAULT");
             String locmsg = e.getChildTextTrim(key);
 
-            if(isOkAlt && locmsg.isEmpty())
+            if(StringUtils.isEmpty(defmsg))
+              continue;
+
+            if(isOkAlt && StringUtils.isEmpty(locmsg))
               locmsg = e.getChildTextTrim(alt);
 
             // nota: la chiave è senza spazi per evitare incoerenze di formattazione
@@ -238,8 +241,8 @@ public class CoreLocalizationService extends DefaultLocalizationService
       }
       else
       {
-        if(outputUnknowKey)
-          log.info("Unknow key [" + key + "]");
+        if((value = reportUnknowKey(mapKey, key)) != null)
+          return value;
       }
     }
 
@@ -272,6 +275,22 @@ public class CoreLocalizationService extends DefaultLocalizationService
       log.debug("Missing localization for [" + key + "] " + locale);
 
     return key;
+  }
+
+  /**
+   * Segnaposto per classi derivate.
+   * Consente di agganciare una forma di risoluzione alternativa.
+   * Invia alla log la chiave e ritorna null.
+   * @param mapKey chiave di ricerca
+   * @param key messaggio da tradurre
+   * @return traduzione eventuale oppure null
+   */
+  protected String reportUnknowKey(String mapKey, String key)
+  {
+    if(outputUnknowKey)
+      log.info("Unknow key [" + key + "]");
+
+    return null;
   }
 
   /**

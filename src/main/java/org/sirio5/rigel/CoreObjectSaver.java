@@ -46,14 +46,15 @@ import org.sirio5.utils.TR;
  */
 public class CoreObjectSaver implements PeerObjectSaver
 {
-  private Class objectClass, peerClass;
-  private Method setIdAziendaM, setIdApplicativiM, getIdUserM, setIdUserM, setIdUcreaM,
+  protected Class objectClass, peerClass;
+  protected Method setIdAziendaM, setIdApplicativiM, getIdUserM, setIdUserM, setIdUcreaM,
      getStatoRecM, setStatoRecM, getUltModifM, setUltModifM, retrieveByPKM, setCreazioneM,
      getUuidM, setUuidM;
-  private int idAzienda, idApplicativo;
-  private int idUser = 0;
-  private boolean isAdmin = false;
-  private boolean strict = false;
+  protected int idAzienda, idApplicativo;
+  protected int idUser = 0;
+  protected boolean isAdmin = false;
+  protected boolean strict = false;
+  protected boolean ignoreWl = false;
 
   /**
    * Costruttore per classi derivate.
@@ -88,6 +89,7 @@ public class CoreObjectSaver implements PeerObjectSaver
 
     idUser = SEC.getUserID(data);
     isAdmin = SEC.isAdmin(data);
+    ignoreWl = SEC.checkAllPermission(data, "COS_ignoreWriteLevel");
   }
 
   /**
@@ -104,6 +106,7 @@ public class CoreObjectSaver implements PeerObjectSaver
 
     idUser = SEC.getUserID(session);
     isAdmin = SEC.isAdmin(session);
+    ignoreWl = SEC.checkAllPermission(session, "COS_ignoreWriteLevel");
   }
 
   /**
@@ -116,6 +119,7 @@ public class CoreObjectSaver implements PeerObjectSaver
   {
     idUser = SEC.getUserID(data);
     isAdmin = SEC.isAdmin(data);
+    ignoreWl = SEC.checkAllPermission(data, "COS_ignoreWriteLevel");
   }
 
   @Override
@@ -423,12 +427,12 @@ public class CoreObjectSaver implements PeerObjectSaver
         // controlli sullo stato precedente del record
         if(prev != null && writeLevel != -1)
         {
-          if(getStatoRecM != null)
+          if(!ignoreWl && getStatoRecM != null)
           {
             int statoRec = getStatoRec(prev) % 10;
             if(statoRec > writeLevel && !adminFlag)
               throw new UnmodificableRecordException(
-                 "Table:" + objectClass.getName() + " Key:" + pKey + " WL:" + statoRec); // NOI18N
+                 "Table:" + objectClass.getName() + " Key:" + pKey + " WL:" + statoRec + " UL:" + writeLevel); // NOI18N
           }
 
           if(getUltModifM != null)
@@ -449,7 +453,7 @@ public class CoreObjectSaver implements PeerObjectSaver
               int userIDprev = getIdUser(prev);
               if(userID != userIDprev)
                 throw new ConcurrentDatabaseModificationException(
-                   "Table:" + objectClass.getName() + " Key:" + pKey); // NOI18N
+                   "Table:" + objectClass.getName() + " Key:" + pKey + " User:" + userIDprev); // NOI18N
             }
           }
         }

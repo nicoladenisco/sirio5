@@ -123,7 +123,7 @@ abstract public class ListaEditBase extends RigelEditBaseScreen
 
     if(eh.isHeaderButton())
     {
-      List<CoreMenuTreeNode> lsMenu = makeHeaderButtons(eh, baseUri);
+      List<CoreMenuTreeNode> lsMenu = makeHeaderButtons(data, eh, baseUri);
       if(!lsMenu.isEmpty())
       {
         StringBuilder sb = new StringBuilder(512);

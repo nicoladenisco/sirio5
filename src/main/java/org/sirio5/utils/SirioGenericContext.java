@@ -280,9 +280,19 @@ public class SirioGenericContext extends HashMap<String, Object>
     return getAsInt(key, 0);
   }
 
+  public long getAsLong(String key)
+  {
+    return getAsLong(key, 0);
+  }
+
   public double getAsDouble(String key)
   {
     return getAsDouble(key, 0.0);
+  }
+
+  public float getAsFloat(String key)
+  {
+    return getAsFloat(key, 0.0f);
   }
 
   public boolean getAsBoolean(String key)
@@ -309,6 +319,15 @@ public class SirioGenericContext extends HashMap<String, Object>
     return val instanceof Number ? ((Number) val).intValue() : SU.parse(val, defVal);
   }
 
+  public long getAsLong(String key, long defVal)
+  {
+    Object val = get(key);
+    if(val == null)
+      return defVal;
+
+    return val instanceof Number ? ((Number) val).longValue() : (long) SU.parse(val, (double) defVal);
+  }
+
   public double getAsDouble(String key, double defVal)
   {
     Object val = get(key);
@@ -316,6 +335,11 @@ public class SirioGenericContext extends HashMap<String, Object>
       return defVal;
 
     return val instanceof Number ? ((Number) val).doubleValue() : SU.parse(val, defVal);
+  }
+
+  public float getAsFloat(String key, float defVal)
+  {
+    return (float) getAsDouble(key, defVal);
   }
 
   public boolean getAsBoolean(String key, boolean defVal)

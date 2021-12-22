@@ -192,10 +192,32 @@ public class TR
    * @param def The default value of the resource.
    * @return The value of the resource as an integer.
    */
-  public static int getInt(String name,
-     int def)
+  public static int getInt(String name, int def)
   {
     return Turbine.getConfiguration().getInt(name, def);
+  }
+
+  /**
+   * The purpose of this method is to get the configuration resource
+   * with the given name as an integer, or a default value.
+   *
+   * @param name The resource name.
+   * @param def The default value of the resource.
+   * @param min the minimum value returned
+   * @param max the maximum value returned (0=unlimited)
+   * @return The value of the resource as an integer.
+   */
+  public static int getInt(String name, int def, int min, int max)
+  {
+    int val = Turbine.getConfiguration().getInt(name, def);
+
+    if(val < min)
+      return min;
+
+    if(max != 0 && val > max)
+      return max;
+
+    return val;
   }
 
   /**

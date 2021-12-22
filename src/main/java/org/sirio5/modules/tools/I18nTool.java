@@ -30,13 +30,15 @@ import org.apache.turbine.util.RunData;
  */
 public class I18nTool implements RunDataApplicationTool
 {
-  private LocalizationService lsrv;
-  private Locale userLocale;
+  private LocalizationService lsrv = null;
+  private Locale userLocale = null;
 
   @Override
   public void init(Object data)
   {
-    lsrv = (LocalizationService) TurbineServices.getInstance().getService(LocalizationService.ROLE);
+    if(lsrv == null)
+      lsrv = (LocalizationService) TurbineServices.getInstance().
+         getService(LocalizationService.SERVICE_NAME);
   }
 
   @Override

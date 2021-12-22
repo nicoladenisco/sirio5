@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -73,6 +73,22 @@ public class CoreTokenBean implements CoreTokenBindingListener
    * @throws java.lang.Exception
    */
   public void refreshSession(TokenAuthItem data)
+     throws Exception
+  {
+  }
+
+  /**
+   * Conservazione dati alla scadenza di validita.
+   * Quando un bean non è più valido (isValid torna false)
+   * ne viene creata una nuova istanza.
+   * Prima che quella corrente venga distrutta viene
+   * chiamata questa funzione per consentire di trasferire
+   * alcuni dati da una istanza all'altra.
+   * @param data dati della richiesta
+   * @param beanNonValido istanza precedente del bean destinata alla distruzione
+   * @throws java.lang.Exception
+   */
+  public void preserveData(TokenAuthItem data, CoreTokenBean beanNonValido)
      throws Exception
   {
   }

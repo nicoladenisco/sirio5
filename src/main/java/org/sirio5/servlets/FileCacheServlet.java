@@ -130,7 +130,10 @@ public class FileCacheServlet extends HttpServlet
       pgmlog.info("FileCacheServlet: OK " + fi.getFile().getAbsolutePath());
 
       // invio del file come risposta
-      FU.sendFile(request, response, fi.getTipoMime(), fi.getFile(), fi.getFileName(), false);
+      if(SU.checkTrueFalse(request.getParameter("inline"), false))
+        FU.sendFileResponse(request, response, fi.getFile(), fi.getTipoMime(), fi.getFileName(), false);
+      else
+        FU.sendFile(request, response, fi.getTipoMime(), fi.getFile(), fi.getFileName(), false);
     }
     catch(ServletException ex)
     {

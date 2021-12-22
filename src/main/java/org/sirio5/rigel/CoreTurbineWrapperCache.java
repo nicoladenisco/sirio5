@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,15 +17,21 @@
  */
 package org.sirio5.rigel;
 
-import org.rigel5.glue.table.PeerAppMaintFormTable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.util.RunData;
 import org.rigel5.glue.PeerObjectSaver;
 import org.rigel5.glue.WrapperCacheBase;
 import org.rigel5.glue.table.AlternateColorTableAppBase;
 import org.rigel5.glue.table.HeditTableApp;
+import org.rigel5.glue.table.PeerAppMaintFormTable;
+import org.rigel5.table.RigelTableModel;
 import org.sirio5.services.modellixml.modelliXML;
 import org.sirio5.utils.CoreRunData;
+import org.sirio5.utils.SirioMacroResolver;
 import org.sirio5.utils.TR;
 
 /**
@@ -39,8 +45,11 @@ import org.sirio5.utils.TR;
  */
 public class CoreTurbineWrapperCache extends WrapperCacheBase
 {
-  // gestore modelli xml
-  private modelliXML mdl = (modelliXML) (TurbineServices.getInstance().getService(modelliXML.SERVICE_NAME));
+  /** gestore modelli xml */
+  protected final modelliXML mdl = (modelliXML) (TurbineServices.getInstance().getService(modelliXML.SERVICE_NAME));
+  /** proprieta da passare nei table model */
+  protected final Map<String, String> properties = new HashMap<>();
+  protected User tuser;
 
   /**
    * Inizializzazione di questa cache oggetti rigel.
@@ -54,10 +63,11 @@ public class CoreTurbineWrapperCache extends WrapperCacheBase
 
     basePath = new String[]
     {
-      "org.sirio2.rigel.table" // NOI18N
+      "org.sirio5.rigel.table" // NOI18N
     };
 
     wrpBuilder = mdl;
+    tuser = data.getUser();
   }
 
   @Override
@@ -82,5 +92,25 @@ public class CoreTurbineWrapperCache extends WrapperCacheBase
   public HeditTableApp buildDefaultTableEdit()
   {
     return new HeditTableApp();
+  }
+
+  public Map<String, String> getProperties()
+  {
+    return Collections.unmodifiableMap(properties);
+  }
+
+  public void setProperties(Map<String, String> properties)
+  {
+    this.properties.clear();
+    this.properties.putAll(properties);
+  }
+
+  @Override
+  public void populateTableModelProperties(RigelTableModel tm)
+  {
+    tm.setProperties(properties);
+    SirioMacroResolver mr = new SirioMacroResolver(tuser);
+    mr.putAll(properties);
+    tm.getQuery().setMacroResolver(mr);
   }
 }

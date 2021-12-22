@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.mutable.MutableDouble;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fulcrum.cache.CachedObject;
@@ -190,6 +191,7 @@ public class SU extends StringOper
       if(val != null)
         htParam.put(name, val);
 
+      // in Turbine 5 la gestione dei files allegati è molto diversa
 //      request.getParts(name);
 //
 //      FileItem[] fi = request.getFileItems(name);
@@ -342,7 +344,7 @@ public class SU extends StringOper
 
   public static int parseInt(Object val)
   {
-    return val == null ? 0 : parse(val, (int) 0);
+    return val == null ? 0 : StringOper.parse(val, (int) 0);
   }
 
   public static boolean checkTrueFalse(Object oBool)
@@ -575,6 +577,27 @@ public class SU extends StringOper
 
     log.info("Comando " + command + " non implementato; ignorato.");
     return false;
+  }
+
+  /**
+   * Converte stringa in intero.
+   * Ritorna il valore intero della stringa in base 10 senza
+   * sollevare alcuna eccezione.
+   * @param val un qualsiasi oggetto java
+   * @param valout oggetto per memorizzare il risultato della conversione
+   * @return vero se val è convertibile in un numero
+   */
+  public static boolean parse(Object val, MutableInt valout)
+  {
+    try
+    {
+      valout.setValue(Integer.parseInt(okStrNull(val)));
+      return true;
+    }
+    catch(Exception e)
+    {
+      return false;
+    }
   }
 
   /**
@@ -873,9 +896,12 @@ public class SU extends StringOper
       File[] utenti = home.listFiles();
       for(File dirUtente : utenti)
       {
-        File test = new File(dirUtente, "cvsinfomedica");
-        if(test.isDirectory())
-          return true;
+        if(dirUtente.isDirectory())
+        {
+          File test = new File(dirUtente, "cvsinfomedica");
+          if(test.isDirectory())
+            return true;
+        }
       }
     }
 
@@ -995,5 +1021,40 @@ public class SU extends StringOper
     }
 
     return sb.toString();
+  }
+
+  /**
+   * Converte stringa in doppia precisione.
+   * Ritorna il valore doppia precisione della stringa in base 10 senza
+   * sollevare alcuna eccezione. Effettua un ulteriore tentativo sostituendo ',' con '.'.
+   * @param val un qualsiasi oggetto java
+   * @param valout oggetto per memorizzare il risultato della conversione
+   * @return vero se val è convertibile in un numero
+   */
+  public static boolean parseComma(Object val, MutableDouble valout)
+  {
+    String s = SU.okStrNull(val);
+    if(s == null)
+      return false;
+
+    try
+    {
+      valout.setValue(Double.parseDouble(s));
+      return true;
+    }
+    catch(Exception e)
+    {
+    }
+
+    try
+    {
+      valout.setValue(Double.parseDouble(s.replace(',', '.')));
+      return true;
+    }
+    catch(Exception e)
+    {
+    }
+
+    return false;
   }
 }

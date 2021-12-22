@@ -219,9 +219,12 @@ public class JasperPlugin extends BasePdfPlugin
       die(INT.I("Rendering jasper del PDF non completato. Vedi log per errori."));
     }
 
-    log.debug("-STDOUT-------------------------------------");
-    log.debug(eh.getOutput());
-    log.debug("-STDERR-------------------------------------");
-    log.debug(eh.getError());
+    if(log.isDebugEnabled())
+    {
+      log.debug("-STDOUT-------------------------------------");
+      log.debug(eh.getOutput());
+      log.debug("-STDERR-------------------------------------");
+      log.debug(eh.getError());
+    }
   }
 }

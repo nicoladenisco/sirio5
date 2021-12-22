@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -167,7 +167,7 @@ abstract public class ListaBase extends RigelEditBaseScreen
 
     if(lso.isHeaderButton())
     {
-      List<CoreMenuTreeNode> lsMenu = makeHeaderButtons(lso, baseUri);
+      List<CoreMenuTreeNode> lsMenu = makeHeaderButtons(data, lso, baseUri);
       if(!lsMenu.isEmpty())
       {
         StringBuilder sb = new StringBuilder(512);

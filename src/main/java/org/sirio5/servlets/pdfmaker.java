@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -84,12 +84,9 @@ public class pdfmaker extends HttpServlet
       String s;
       if((s = getInitParameter("enableGzip")) != null && s.equals("true"))
         enableGzip = true;
-
-      pp = (PdfPrint) (TurbineServices.getInstance().getService(PdfPrint.SERVICE_NAME));
     }
     catch(Exception ex)
     {
-      ex.printStackTrace();
       pgmlog.error(ex);
       throw new ServletException(ex);
     }
@@ -114,6 +111,9 @@ public class pdfmaker extends HttpServlet
   {
     try
     {
+      if(pp == null)
+        pp = (PdfPrint) (TurbineServices.getInstance().getService(PdfPrint.SERVICE_NAME));
+
       // estrae nome della richiesta
       String sRequest = request.getPathInfo().substring(1);
 
@@ -136,14 +136,7 @@ public class pdfmaker extends HttpServlet
        con la cache.
        */
       boolean force = SU.checkTrueFalse(request.getParameter("force"), false);
-      Hashtable<String, PdfPrint.JobInfo> htReq
-         = (Hashtable<String, PdfPrint.JobInfo>) request.getSession().getAttribute(CACHE_RICHIESTE_SESSIONE);
-
-      if(htReq == null)
-      {
-        htReq = new Hashtable<String, PdfPrint.JobInfo>();
-        request.getSession().setAttribute(CACHE_RICHIESTE_SESSIONE, htReq);
-      }
+      Hashtable<String, PdfPrint.JobInfo> htReq = getJobCache(request);
 
       PdfPrint.JobInfo job = force ? null : htReq.get(cacheKey);
 
@@ -236,6 +229,26 @@ public class pdfmaker extends HttpServlet
   }
 
   /**
+   * Recupera dalla sessione la cache dei job di stampa per l'utente.
+   * Se non presente viene creata e inserita nei dati di sessione.
+   * @param request request http per recuperare la sessione
+   * @return chache job
+   */
+  protected Hashtable<String, PdfPrint.JobInfo> getJobCache(HttpServletRequest request)
+  {
+    Hashtable<String, PdfPrint.JobInfo> htReq
+       = (Hashtable<String, PdfPrint.JobInfo>) request.getSession().getAttribute(CACHE_RICHIESTE_SESSIONE);
+
+    if(htReq == null)
+    {
+      htReq = new Hashtable<String, PdfPrint.JobInfo>();
+      request.getSession().setAttribute(CACHE_RICHIESTE_SESSIONE, htReq);
+    }
+
+    return htReq;
+  }
+
+  /**
    * Costruisce il PDF in base al tipo di richiesta.
    *
    * @param sRequest richiesta da processare
@@ -260,7 +273,8 @@ public class pdfmaker extends HttpServlet
     {
       params.put(mappaParametri, parameters);
       params.putAll(parameters);
-      request.getSession().removeAttribute(mappaParametri);
+      if(SU.checkTrueFalse(parameters.get("autoremove"), true))
+        request.getSession().removeAttribute(mappaParametri);
     }
 
     params.put(PdfPrint.PATH_INFO, request.getPathInfo());

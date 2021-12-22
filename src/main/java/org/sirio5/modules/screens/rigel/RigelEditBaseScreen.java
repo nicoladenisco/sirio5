@@ -37,7 +37,6 @@ import org.rigel5.table.peer.html.*;
 import org.sirio5.beans.menu.MenuItemBean;
 import org.sirio5.modules.screens.CoreBaseScreen;
 import org.sirio5.services.modellixml.MDL;
-import org.sirio5.services.security.SEC;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.LI;
 import org.sirio5.utils.SU;
@@ -178,10 +177,10 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
   protected boolean isAuthorizedDelete(CoreRunData data)
      throws Exception
   {
-    return SEC.checkAllPermission(data, "cancella_manutenzione");
+    return isAuthorizedAll(data, "cancella_manutenzione");
   }
 
-  protected List<CoreMenuTreeNode> makeHeaderButtons(HtmlWrapperBase lso, String baseUri)
+  protected List<CoreMenuTreeNode> makeHeaderButtons(RunData data, HtmlWrapperBase lso, String baseUri)
      throws Exception
   {
     ArrayList<CoreMenuTreeNode> arBut = new ArrayList<>();
@@ -190,6 +189,8 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
     for(int i = 0; i < lso.getNumHeaderButtons(); i++)
     {
       CustomButtonInfo cb = lso.getHeaderButton(i);
+      cb.addRuntimeParam("user", data.getUser());
+
       MenuItemBean mb = new MenuItemBean();
       boolean popup = isPopup() || cb.getPopup() > 0;
       String script = null, url = null;
@@ -218,9 +219,11 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
         }
         else
         {
-          url = urlBuilder.buildUrlHeaderButton(popup, lso.getPtm(), cb);
-          if(url != null)
-            url = StringOper.strReplace(url, LI.getContextPath() + "@self", baseUri);
+          // se url == null vuol dire che questo custom button non è applicabile
+          if((url = urlBuilder.buildUrlHeaderButton(popup, lso.getPtm(), cb)) == null)
+            continue;
+
+          url = StringOper.strReplace(url, LI.getContextPath() + "@self", baseUri);
         }
 
         // modifica url in base alle opzioni del custom button

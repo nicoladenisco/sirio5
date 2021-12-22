@@ -123,12 +123,9 @@ abstract public class FormBase extends RigelEditBaseScreen
     context.put("document", MDL.getDocument());
     if(SU.isOkStr(pwl.getCustomScript()))
       context.put("cscriptm", pwl.getCustomScript());
-    if(pwl.isEditEnabled())
-      context.put("editEnabled", "1");
-    if(pwl.isSaveEnabled() && RigelUtils.checkPermessiScrittura(data, pwl))
-      context.put("saveEnabled", "1");
-    if(pwl.isNewEnabled() && RigelUtils.checkPermessiCreazione(data, pwl))
-      context.put("newEnabled", "1");
+
+    // imposta abilitazioni edit, salva, nuovo
+    enableEditSaveNew(data, context, params, pwl);
 
     boolean isNewObject = false;
 
@@ -144,7 +141,7 @@ abstract public class FormBase extends RigelEditBaseScreen
     {
       // se previsto inserisce header button master
       if(pwl.isHeaderButton())
-        context.put("hbuts", makeHeaderButtons(pwl, baseUri));
+        context.put("hbuts", makeHeaderButtons(data, pwl, baseUri));
 
       // verifica per master/detail
       if(pwl.getMdInfo() != null)
@@ -183,18 +180,30 @@ abstract public class FormBase extends RigelEditBaseScreen
         context.put("dettHtml", dettHtml);
         context.put("dettTest", "\n" + dettTest);
         context.put("edl", eh);
+        context.put("dettType", dettType);
 
         if(eh.isNewEnabled() && RigelUtils.checkPermessiCreazione(data, eh))
           context.put("newEnabledDett", "1");
 
         // se previsto inserisce header button detail
         if(eh.isHeaderButton())
-          context.put("hbutd", makeHeaderButtons(eh, baseUri));
+          context.put("hbutd", makeHeaderButtons(data, eh, baseUri));
 
         if(SU.isOkStr(eh.getCustomScript()))
           context.put("cscriptd", eh.getCustomScript());
       }
     }
+  }
+
+  protected void enableEditSaveNew(CoreRunData data, Context context, Map params, PeerWrapperFormHtml pwl)
+     throws Exception
+  {
+    if(pwl.isEditEnabled())
+      context.put("editEnabled", "1");
+    if(pwl.isSaveEnabled() && RigelUtils.checkPermessiScrittura(data, pwl))
+      context.put("saveEnabled", "1");
+    if(pwl.isNewEnabled() && RigelUtils.checkPermessiCreazione(data, pwl))
+      context.put("newEnabled", "1");
   }
 
   @Override

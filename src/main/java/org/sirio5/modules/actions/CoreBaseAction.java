@@ -273,6 +273,12 @@ public class CoreBaseAction extends VelocitySecureAction
     throw new ErrorMessageException(message);
   }
 
+  protected boolean verificaPaginaRitorno(CoreRunData data, CoreBaseBean bean)
+     throws Exception
+  {
+    return verificaPaginaRitorno(data, SU.okStrNull(bean.getJlc()), SU.okStrNull(bean.getJvm()));
+  }
+
   protected boolean verificaPaginaRitorno(CoreRunData data, String jlc, String jvm)
      throws Exception
   {
@@ -366,5 +372,15 @@ public class CoreBaseAction extends VelocitySecureAction
      throws Exception
   {
     SU.doCommand(this, command, data, params, args);
+  }
+
+  public void ASSERT(boolean test, String cause)
+  {
+    if(!test)
+    {
+      String mess = "ASSERT failed: " + cause;
+      log.error(mess);
+      throw new RuntimeException(mess);
+    }
   }
 }

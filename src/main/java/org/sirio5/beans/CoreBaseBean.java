@@ -42,8 +42,9 @@ public class CoreBaseBean implements HttpSessionBindingListener
 {
   protected Date today = new Date();
   protected String currJspName = null;
-  private PullService ps = null;
+  protected PullService ps = null;
   protected UITool ui = null;
+  protected String jvm, jlc;
   public String tagTabelleForm = null;
   public String tagTabelleList = null;
   // loggin
@@ -98,6 +99,22 @@ public class CoreBaseBean implements HttpSessionBindingListener
   }
 
   /**
+   * Conservazione dati alla scadenza di validita.
+   * Quando un bean non è più valido (isValid torna false)
+   * ne viene creata una nuova istanza.
+   * Prima che quella corrente venga distrutta viene
+   * chiamata questa funzione per consentire di trasferire
+   * alcuni dati da una istanza all'altra.
+   * @param data dati della richiesta
+   * @param beanNonValido istanza precedente del bean destinata alla distruzione
+   * @throws java.lang.Exception
+   */
+  public void preserveData(CoreRunData data, CoreBaseBean beanNonValido)
+     throws Exception
+  {
+  }
+
+  /**
    * Data una url relativa torna l'url completa a seconda dell'ambiente.
    * La stringa si riferisce a una risorsa JSP
    * ES url=jsmia.jsp -> http://localhost:8080/src/jsmia.jsp
@@ -114,7 +131,6 @@ public class CoreBaseBean implements HttpSessionBindingListener
   }
 
   public String getImgGeneric(String imgName, String tip)
-     throws Exception
   {
     return "<img src=\"" + ui.image(imgName) + "\" alt=\"" + tip
        + "\" title=\"" + tip + "\" border=\"0\">";
@@ -219,5 +235,25 @@ public class CoreBaseBean implements HttpSessionBindingListener
       log.error(mess);
       throw new RuntimeException(mess);
     }
+  }
+
+  public String getJvm()
+  {
+    return jvm;
+  }
+
+  public void setJvm(String jvm)
+  {
+    this.jvm = jvm;
+  }
+
+  public String getJlc()
+  {
+    return jlc;
+  }
+
+  public void setJlc(String jlc)
+  {
+    this.jlc = jlc;
   }
 }

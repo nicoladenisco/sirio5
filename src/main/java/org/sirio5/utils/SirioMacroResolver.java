@@ -46,9 +46,11 @@ import org.commonlib5.utils.MacroResolver;
  * <li>TODAY - data odierna (solo data)</li>
  * <li>TODAYM30 - data odierna meno 30 giorni (solo data)</li>
  * <li>TODAYM60 - data odierna meno 60 giorni (solo data)</li>
+ * <li>YESTERDAY - data giorno precedente (solo data)</li>
  * <li>TOTIME - data odierna (data e ora)</li>
  * <li>TOTIMEM30 - data odierna meno 30 giorni (data e ora)</li>
  * <li>TOTIMEM60 - data odierna meno 60 giorni (data e ora)</li>
+ * <li>YESTERDAY_TIME - data giorno precedente (data e ora)</li>
  * <li>IYEAR - intervallo primo e ultimo giorno dell'anno</li>
  * <li>IMOUNTH - intervallo primo e ultimo giorno del mese</li>
  *
@@ -64,10 +66,12 @@ import org.commonlib5.utils.MacroResolver;
  * <li>ISO_TODAYM30 - data odierna meno 30 giorni (solo data) in formato ISO</li>
  * <li>ISO_TODAYM60 - data odierna meno 60 giorni (solo data) in formato ISO</li>
  * <li>ISO_TODAY_OFFSET(numGiorni) - data odierna con spiazzamento (solo data) in formato ISO</li>
+ * <li>ISO_YESTERDAY - data giorno precedente (solo data) in formato ISO</li>
  * <li>ISO_TOTIME - data odierna (data e ora) in formato ISO</li>
  * <li>ISO_TOTIMEM30 - data odierna meno 30 giorni (data e ora) in formato ISO</li>
  * <li>ISO_TOTIMEM60 - data odierna meno 60 giorni (data e ora) in formato ISO</li>
  * <li>ISO_TOTIME_OFFSET(numGiorni) - data odierna con spiazzamento (data e ora) in formato ISO</li>
+ * <li>ISO_YESTERDAY_TIME - data giorno precedente (data e ora) in formato ISO</li>
  * <li>ISO_IYEAR - intervallo primo e ultimo giorno dell'anno in formato ISO</li>
  * <li>ISO_IMOUNTH - intervallo primo e ultimo giorno del mese in formato ISO</li>
  *
@@ -187,6 +191,19 @@ public class SirioMacroResolver extends MacroResolver
     mapFunction.put("TODAY", (seg) -> formatData(today));
     mapFunction.put("TOTIME", (seg) -> formatDataFull(today));
 
+    mapFunction.put("YESTERDAY", (seg) ->
+    {
+      GregorianCalendar cal = new GregorianCalendar();
+      cal.add(Calendar.DAY_OF_YEAR, -1);
+      return formatData(cal.getTime());
+    });
+    mapFunction.put("YESTERDAY_TIME", (seg) ->
+    {
+      GregorianCalendar cal = new GregorianCalendar();
+      cal.add(Calendar.DAY_OF_YEAR, -1);
+      return formatDataFull(cal.getTime());
+    });
+
     mapFunction.put("TODAYM30", (seg) ->
     {
       GregorianCalendar cal = new GregorianCalendar();
@@ -304,6 +321,19 @@ public class SirioMacroResolver extends MacroResolver
 
     mapFunction.put("ISO_TODAY", (seg) -> formatIso(today));
     mapFunction.put("ISO_TOTIME", (seg) -> formatIsoFull(today));
+
+    mapFunction.put("ISO_YESTERDAY", (seg) ->
+    {
+      GregorianCalendar cal = new GregorianCalendar();
+      cal.add(Calendar.DAY_OF_YEAR, -1);
+      return formatIso(cal.getTime());
+    });
+    mapFunction.put("ISO_YESTERDAY_TIME", (seg) ->
+    {
+      GregorianCalendar cal = new GregorianCalendar();
+      cal.add(Calendar.DAY_OF_YEAR, -1);
+      return formatIsoFull(cal.getTime());
+    });
 
     mapFunction.put("ISO_TODAYM30", (seg) ->
     {
