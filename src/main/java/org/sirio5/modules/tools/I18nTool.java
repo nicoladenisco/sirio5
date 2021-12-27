@@ -30,8 +30,8 @@ import org.apache.turbine.util.RunData;
  */
 public class I18nTool implements RunDataApplicationTool
 {
-  private LocalizationService lsrv = null;
-  private Locale userLocale = null;
+  protected LocalizationService lsrv = null;
+  protected Locale userLocale = null;
 
   @Override
   public void init(Object data)

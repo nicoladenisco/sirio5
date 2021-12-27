@@ -18,11 +18,7 @@
 package org.sirio5.modules.tools;
 
 import org.apache.turbine.services.TurbineServices;
-import org.apache.turbine.services.pull.ApplicationTool;
-import org.rigel5.RigelI18nInterface;
-import org.sirio5.rigel.RigelHtmlI18n;
 import org.sirio5.services.modellixml.modelliXML;
-import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.LI;
 
 /**
@@ -30,22 +26,9 @@ import org.sirio5.utils.LI;
  *
  * @author Nicola De Nisco
  */
-public class IconTool implements ApplicationTool
+public class IconTool extends I18nTool
 {
   private modelliXML __mdl;
-  private RigelI18nInterface i18n;
-
-  @Override
-  public void init(Object data)
-  {
-    if(i18n == null && data != null && data instanceof CoreRunData)
-      i18n = new RigelHtmlI18n((CoreRunData) data);
-  }
-
-  @Override
-  public void refresh()
-  {
-  }
 
   private modelliXML getService()
   {
@@ -55,54 +38,59 @@ public class IconTool implements ApplicationTool
     return __mdl;
   }
 
-  public String getImgIcon(String icon, String title)
+  private String i18n(String title)
   {
-    return LI.getImgIcon(icon, i18(title));
+    return lsrv.getString(null, userLocale, title);
+  }
+
+  public String getImgIcon(String name, String title)
+  {
+    return LI.getImgIcon(name, i18n(title));
   }
 
   public String getImgGlyphicon(String name, String title)
   {
-    return LI.getImgGlyphicon(name, i18(title));
+    return LI.getImgGlyphicon(name, i18n(title));
   }
 
   public String getImgAwesome(String name, String title)
   {
-    return LI.getImgAwesome(name, i18(title));
+    return LI.getImgAwesome(name, i18n(title));
   }
 
   public String getImgAwesomeFas(String name, String title)
   {
-    return LI.getImgAwesomeFas(name, i18(title));
+    return LI.getImgAwesomeFas(name, i18n(title));
   }
 
   public String getImgAwesomeFar(String name, String title)
   {
-    return LI.getImgAwesomeFar(name, i18(title));
+    return LI.getImgAwesomeFar(name, i18n(title));
   }
 
   public String getImgAwesomeFab(String name, String title)
   {
-    return LI.getImgAwesomeFab(name, i18(title));
+    return LI.getImgAwesomeFab(name, i18n(title));
   }
 
   public String getImgAwesomeSpin(String name, String title)
   {
-    return LI.getImgAwesomeSpin(name, i18(title));
+    return LI.getImgAwesomeSpin(name, i18n(title));
   }
 
   public String getImgAwesomeFasSpin(String name, String title)
   {
-    return LI.getImgAwesomeFasSpin(name, i18(title));
+    return LI.getImgAwesomeFasSpin(name, i18n(title));
   }
 
   public String getImgAwesomeFarSpin(String name, String title)
   {
-    return LI.getImgAwesomeFarSpin(name, i18(title));
+    return LI.getImgAwesomeFarSpin(name, i18n(title));
   }
 
   public String getImgAwesomeFabSpin(String name, String title)
   {
-    return LI.getImgAwesomeFabSpin(name, i18(title));
+    return LI.getImgAwesomeFabSpin(name, i18n(title));
   }
 
   public String getImgSelect()
@@ -181,7 +169,7 @@ public class IconTool implements ApplicationTool
   public String getImgHtml(String imgName, String tip)
      throws Exception
   {
-    tip = i18(tip);
+    tip = i18n(tip);
 
     return "<img src=\"" + getImageUrl(imgName)
        + " \" alt=\"" + tip + "\" tip=\"" + tip + "\" title=\"" + tip + "\" border=\"0\">";
@@ -197,10 +185,5 @@ public class IconTool implements ApplicationTool
   public String getImageUrl(String nomeima)
   {
     return LI.getImageUrl(nomeima);
-  }
-
-  private String i18(String title)
-  {
-    return i18n == null ? title : i18n.msg(title);
   }
 }
