@@ -93,7 +93,7 @@ public interface CoreCacheServices extends GlobalCacheService
   public void removeAllObjects(String objClass, String idLeftPart);
 
   /**
-   * Rimuove tutti gli oggetti la cui chiave inizia con una stringa.
+   * Rimuove tutti gli oggetti applicando funzione di test.
    * @param objClass classe della cache
    * @param test funzione di test per la rimozione
    */

@@ -179,6 +179,12 @@ public class SEC
     return getSec().getACL(session);
   }
 
+  public static TurbineAccessControlList getACL(User user)
+     throws DataBackendException, UnknownEntityException
+  {
+    return getSecurity().getACL(user);
+  }
+
   /**
    * Controlla che l'utente loggato possieda almeno uno dei permessi indicati.
    * NOTA: l'utente amministratore ritorna sempre true.

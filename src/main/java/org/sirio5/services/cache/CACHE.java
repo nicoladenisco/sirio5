@@ -351,13 +351,22 @@ public class CACHE
   }
 
   /**
-   * Rimuove tutti gli oggetti la cui chiave inizia con una stringa.
+   * Rimuove tutti gli oggetti applicando funzione di test.
    * @param objClass classe della cache
    * @param test funzione di test per la rimozione
    */
   public static void removeAllObjects(String objClass, CoreCacheServices.testRemoveInterface test)
   {
     getService().removeAllObjects(objClass, test);
+  }
+
+  /**
+   * Rimuove tutti gli oggetti della classe specificata.
+   * @param objClass classe della cache
+   */
+  public static void removeAllObjects(String objClass)
+  {
+    getService().removeAllObjects(objClass, (key, value) -> Boolean.TRUE);
   }
 
   /**
