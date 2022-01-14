@@ -37,6 +37,10 @@ import org.sirio5.utils.TR;
 /**
  * Plugin di stampa per la gestione dei report generati con jasper.
  *
+ * Usa il renderizzatore estreno per produrre il PDF dal reporto jasper.
+ * ATTENZIONE: è necessario il sorgente del reporto (.jrxml) per poter estrarre
+ * le informazioni sui campi utilizzati come parametri.
+ *
  * @author Nicola De Nisco
  */
 public class JasperPlugin extends BasePdfPlugin
