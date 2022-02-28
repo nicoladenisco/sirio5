@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -18,6 +18,7 @@
 package org.sirio5.rigel;
 
 import javax.servlet.http.HttpSession;
+import org.rigel5.RigelI18nInterface;
 import org.rigel5.table.html.AbstractHtmlTablePager;
 import org.rigel5.table.html.RigelHtmlPage;
 import org.rigel5.table.html.RigelHtmlPageComponent;
@@ -42,9 +43,10 @@ public class ToolRigelUIManager extends CoreRigelUIManager
 
   @Override
   protected void generateFuncGoto(RigelHtmlPageComponent javascript,
-     String funcGoto, AbstractHtmlTablePager tp, int numPagine, int limit, String tmp)
+     String funcGoto, AbstractHtmlTablePager tp, int numPagine, int limit,
+     String jumpURL, RigelI18nInterface i18n)
   {
-    tmp = tmp.replace("javascript:", "");
+    jumpURL = jumpURL.replace("javascript:", "");
 
     javascript.append(""
        + "function " + funcGoto + "()\n"
@@ -54,7 +56,7 @@ public class ToolRigelUIManager extends CoreRigelUIManager
        + "    alert('Valore di pagina non consentito.');\n"
        + "  } else {\n"
        + "    rStart = (nPage-1)*" + limit + ";\n"
-       + "    " + tmp + "\n"
+       + "    " + jumpURL + "\n"
        + "  }\n"
        + "}\n"
        + "\n"

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -149,7 +149,7 @@ public class MultipleCheckboxTable extends PeerAppMaintFormTable
   }
 
   @Override
-  protected String doInnerCell(int row, int col)
+  protected String doInnerCell(int row, int col, String cellText, String cellHtml)
      throws Exception
   {
     Info info;
@@ -164,7 +164,7 @@ public class MultipleCheckboxTable extends PeerAppMaintFormTable
         return formatCheckboxQuery(originale, info, getNomeCampo(row, col));
     }
 
-    return super.doInnerCell(row, col);
+    return super.doInnerCell(row, col, cellText, cellHtml);
   }
 
   protected String formatCheckboxPeer(String val, Info info, String nomeCampo)

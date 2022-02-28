@@ -18,6 +18,7 @@
 package org.sirio5.rigel;
 
 import javax.servlet.http.HttpSession;
+import org.rigel5.RigelI18nInterface;
 import org.rigel5.table.html.AbstractHtmlTablePager;
 import org.rigel5.table.html.RigelHtmlPageComponent;
 
@@ -37,8 +38,7 @@ public class DialogRigelUIManager extends CoreRigelUIManager
   }
 
   @Override
-  protected void generateFuncGoto(RigelHtmlPageComponent javascript,
-     String funcGoto, AbstractHtmlTablePager tp, int numPagine, int limit, String tmp)
+  protected void generateFuncGoto(RigelHtmlPageComponent javascript, String funcGoto, AbstractHtmlTablePager tp, int numPagine, int limit, String tmp, RigelI18nInterface i18n)
   {
     tmp = tmp.replace("javascript:", "");
 

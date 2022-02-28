@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@ package org.sirio5.rigel;
 import javax.servlet.http.HttpSession;
 import org.commonlib5.utils.StringOper;
 import org.rigel5.DefaultUIManager;
+import org.rigel5.RigelI18nInterface;
 import org.rigel5.table.html.AbstractHtmlTablePager;
 import org.rigel5.table.html.PageComponentType;
 import org.rigel5.table.html.RigelHtmlPage;
@@ -53,6 +54,7 @@ public class CoreRigelUIManager extends DefaultUIManager
      throws Exception
   {
     String sLeft, sCenter, sRight;
+    RigelI18nInterface i18n = tp.getI18n();
     RigelHtmlPageComponent html = new RigelHtmlPageComponent(PageComponentType.HTML, "nav");
     RigelHtmlPageComponent javascript = new RigelHtmlPageComponent(PageComponentType.JAVASCRIPT, "nav");
 
@@ -105,7 +107,7 @@ public class CoreRigelUIManager extends DefaultUIManager
     String tmp = getJumpUrl(tp, sessione, 9999);
     tmp = StringOper.strReplace(tmp, "9999", "'+rStart+'");
 
-    generateFuncGoto(javascript, funcGoto, tp, numPagine, limit, tmp);
+    generateFuncGoto(javascript, funcGoto, tp, numPagine, limit, tmp, i18n);
 
     javascript.append(""
        + "function " + funcTest + "(e)\n"
@@ -133,17 +135,20 @@ public class CoreRigelUIManager extends DefaultUIManager
   }
 
   protected void generateFuncGoto(RigelHtmlPageComponent javascript,
-     String funcGoto, AbstractHtmlTablePager tp, int numPagine, int limit, String tmp)
+     String funcGoto, AbstractHtmlTablePager tp, int numPagine, int limit,
+     String jumpURL, RigelI18nInterface i18n)
   {
+    String alert = i18n.msg("Valore di pagina non consentito.");
+
     javascript.append(""
        + "function " + funcGoto + "()\n"
        + "{\n"
        + "  var nPage = document." + tp.getFormName() + ".in_" + funcGoto + ".value;\n"
        + "  if(nPage <= 0 || nPage > " + numPagine + ") {\n"
-       + "    alert('Valore di pagina non consentito.');\n"
+       + "    alert('" + alert + "');\n"
        + "  } else {\n"
        + "    rStart = (nPage-1)*" + limit + ";\n"
-       + "    window.location.href = '" + tmp + "'\n"
+       + "    window.location.href = '" + jumpURL + "'\n"
        + "  }\n"
        + "}\n"
        + "\n"

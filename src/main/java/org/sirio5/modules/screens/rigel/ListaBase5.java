@@ -43,7 +43,7 @@ import org.sirio5.utils.tree.CoreMenuTreeNode;
  *
  * @author Nicola De Nisco
  */
-abstract public class ListaBase extends RigelEditBaseScreen
+abstract public class ListaBase5 extends RigelEditBaseScreen
 {
   /**
    * Interroga la cache per verificare se la lista esiste
@@ -196,8 +196,7 @@ abstract public class ListaBase extends RigelEditBaseScreen
     page.buildPart(sb, PageComponentType.COMMENT, "<!--", "-->");
 
     // quindi tutti i javascript
-    page.buildPart(sb, PageComponentType.JAVASCRIPT, "<SCRIPT LANGUAGE=\"JavaScript\">", "</SCRIPT>");
-
+    // page.buildPart(sb, PageComponentType.JAVASCRIPT, "<SCRIPT LANGUAGE=\"JavaScript\">", "</SCRIPT>");
     if(filtro == AbstractHtmlTablePagerFilter.FILTRO_MACHERA)
     {
       // html ricerca avanzata
