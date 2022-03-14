@@ -182,21 +182,24 @@ public class SU extends StringOper
   {
     HashMap htParam = (HashMap) getParMap(data.getRequest());
 
-    ParameterParser request = data.getParameters();
-    Object[] keys = request.getKeys();
+    ParameterParser pp = data.getParameters();
+    Object[] keys = pp.getKeys();
     for(int i = 0; i < keys.length; i++)
     {
       String name = (String) keys[i];
-      String val = request.getString(name);
-      if(val != null)
-        htParam.put(name, val);
+      String[] value = pp.getStrings(name);
 
+      if(value == null || value.length == 0)
+        continue;
+
+      // se contiene un solo valore lo passa come tale, altrimenti passa l'array dei valori
+      if(value.length == 1)
+        htParam.put(name, value[0]);
+      else
+        htParam.put(name, value);
+
+      // NOTA: nelle versioni precedenti qui venivano passati i file items;
       // in Turbine 5 la gestione dei files allegati è molto diversa
-//      request.getParts(name);
-//
-//      FileItem[] fi = request.getFileItems(name);
-//      if(fi != null)
-//        htParam.put(name, fi);
     }
     return htParam;
   }
@@ -225,13 +228,13 @@ public class SU extends StringOper
 
     log.debug("header=" + request.getHeader("Content-type")); // NOI18N
     /*
-     int cl = request.getContentLength();
+     int cl = pp.getContentLength();
      if(cl > 0)
      {
-     log.debug("content type="+request.getContentType());
+     log.debug("content type="+pp.getContentType());
      log.debug("content length="+cl);
 
-     InputStream is = request.getInputStream();
+     InputStream is = pp.getInputStream();
      byte b[] = new byte[cl];
      is.read(b);
      System.out.write(b);
@@ -470,7 +473,7 @@ public class SU extends StringOper
    * @param caller oggetto chiamante
    * @param command comando da eseguire
    * @param data parametri generali della richiesta
-   * @param params mappa di tutti i parametri request più eventuali parametri permanenti
+   * @param params mappa di tutti i parametri pp più eventuali parametri permanenti
    * @param args
    * @return
    * @throws Exception
@@ -528,7 +531,7 @@ public class SU extends StringOper
    * @param caller oggetto chiamante
    * @param command comando da eseguire
    * @param data parametri generali della richiesta
-   * @param params mappa di tutti i parametri request più eventuali parametri permanenti
+   * @param params mappa di tutti i parametri pp più eventuali parametri permanenti
    * @param args
    * @return
    * @throws Exception
