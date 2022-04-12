@@ -19,6 +19,7 @@ package org.sirio5.utils.tree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.function.Predicate;
 import javax.swing.tree.TreeNode;
@@ -228,5 +229,17 @@ public class CoreTreeNodeImpl<T> extends ArrayList<CoreTreeNodeImpl<T>>
 
     CoreTreeNodeImpl<T> pp = (CoreTreeNodeImpl<T>) getParent();
     pp.getAncestor(l);
+  }
+
+  public void sortTree(Comparator<? super T> c, boolean recursive)
+  {
+    if(isLeaf())
+      return;
+
+    sort((a, b) -> c.compare(a.value, b.value));
+
+    if(recursive)
+      for(CoreTreeNodeImpl<T> n : this)
+        n.sortTree(c, recursive);
   }
 }

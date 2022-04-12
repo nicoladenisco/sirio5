@@ -93,13 +93,8 @@ public class SU extends StringOper
       htParam.putAll(saved);
 
     // estrae i parametri della richiesta (anche i campi di input con nome della form)
-    Enumeration enum1 = request.getParameterNames();
-    while(enum1.hasMoreElements())
-    {
-      String name = (String) enum1.nextElement();
-      String val = request.getParameter(name);
-      htParam.put(name, val);
-    }
+    Map<String, String[]> parameterMap = request.getParameterMap();
+    htParam.putAll(parameterMap);
 
     // carica i parametri fissi
     htParam.put(SESSION_ID, request.getSession().getId());
