@@ -17,10 +17,18 @@
  */
 package org.sirio5.services;
 
+import com.workingdogs.village.Record;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.fulcrum.security.entity.Role;
+import org.apache.torque.util.Transaction;
+import org.commonlib5.lambda.LEU;
 import org.commonlib5.utils.JavaLoggingToCommonLoggingRedirector;
+import org.rigel5.db.DbUtils;
 import org.sirio5.utils.SU;
 
 /**
@@ -137,5 +145,60 @@ public class CoreAppSanity
   protected void sanityScheduler(AbstractCoreBaseService service)
      throws Exception
   {
+  }
+
+  protected void grantAllPermission(Role role)
+     throws Exception
+  {
+    String sSQL
+       = "select permission_id\n"
+       + "  from turbine_permission\n"
+       + " where permission_id NOT IN ("
+       + "    select permission_id from turbine_role_permission where role_id=" + role.getId() + ")";
+
+    List<Record> lsRecs = DbUtils.executeQuery(sSQL);
+    if(lsRecs.isEmpty())
+      return;
+
+    int[] roleToGrant = lsRecs.stream()
+       .mapToInt(LEU.rethrowFunctionInt((r) -> r.getValue(1).asInt()))
+       .distinct().sorted().toArray();
+
+    if(roleToGrant.length == 0)
+      return;
+
+    Connection connection = null;
+    try
+    {
+      connection = Transaction.begin();
+      String sINS
+         = "INSERT INTO public.turbine_role_permission(\n"
+         + "	role_id, permission_id)\n"
+         + "	VALUES (?, ?);";
+
+      try (  PreparedStatement ps = connection.prepareStatement(sINS) )
+      {
+        int roleid = (Integer) role.getId();
+        for(int i = 0; i < roleToGrant.length; i++)
+        {
+          int permid = roleToGrant[i];
+
+          ps.clearParameters();
+          ps.setInt(1, roleid);
+          ps.setInt(2, permid);
+          ps.executeUpdate();
+        }
+      }
+
+      Transaction.commit(connection);
+      connection = null;
+    }
+    finally
+    {
+      if(connection != null)
+      {
+        Transaction.safeRollback(connection);
+      }
+    }
   }
 }
