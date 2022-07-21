@@ -127,6 +127,17 @@ public class CoreConst
   public static final String MIME_GIF = "image/gif";
   public static final String EXT_GIF = "gif";
 
+  public static final String MIME_P7M = "application/x-pkcs7-mime";
+  public static final String EXT_P7M = "p7m";
+
+  public static final String MIME_XML = "text/xml";
+  public final static String MIME_CDA = "text/x-cda-r2+xml"; //TipoMime CDA Tabella 2.10-1 AffinityDomain
+
+  public final static String[] MIME_PDFs =
+  {
+    MIME_PDF, EXT_PDF
+  };
+
   public static final String[] MIME_IMAGES =
   {
     MIME_JPG, MIME_GIF, MIME_PNG
