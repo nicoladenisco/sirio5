@@ -37,23 +37,23 @@ import org.apache.turbine.util.RunData;
  */
 public class SEC
 {
-  private static Object __security;
-  private static Object __sec;
+  private static Object __turbineSecurity;
+  private static Object __sirioSecurity;
 
-  public static SecurityService getSecurity()
+  public static SecurityService getTurbineSecurity()
   {
-    if(__security == null)
-      __security = TurbineServices.getInstance().getService(SecurityService.SERVICE_NAME);
+    if(__turbineSecurity == null)
+      __turbineSecurity = TurbineServices.getInstance().getService(SecurityService.SERVICE_NAME);
 
-    return (SecurityService) __security;
+    return (SecurityService) __turbineSecurity;
   }
 
-  public static CoreSecurity getSec()
+  public static CoreSecurity getSirioSecurity()
   {
-    if(__sec == null)
-      __sec = TurbineServices.getInstance().getService(CoreSecurity.SERVICE_NAME);
+    if(__sirioSecurity == null)
+      __sirioSecurity = TurbineServices.getInstance().getService(CoreSecurity.SERVICE_NAME);
 
-    return (CoreSecurity) __sec;
+    return (CoreSecurity) __sirioSecurity;
   }
 
   public static User loginUser(String uName, String uPasw)
@@ -65,7 +65,7 @@ public class SEC
   public static User loginUser(String uName, String uPasw, MutableInt logonMode)
      throws Exception
   {
-    return getSec().loginUser(uName, uPasw, logonMode);
+    return getSirioSecurity().loginUser(uName, uPasw, logonMode);
   }
 
   /**
@@ -74,7 +74,7 @@ public class SEC
   public static TurbineAccessControlList getUserACL(User us)
      throws Exception
   {
-    return getSecurity().getACL(us);
+    return getTurbineSecurity().getACL(us);
   }
 
   /**
@@ -84,7 +84,7 @@ public class SEC
   public static boolean checkPermission(TurbineAccessControlList acl, String permname)
      throws Exception
   {
-    return acl == null ? false : acl.hasPermission(permname, getSecurity().getAllGroups())
+    return acl == null ? false : acl.hasPermission(permname, getTurbineSecurity().getAllGroups())
        || acl.hasRole(CoreSecurity.ADMIN_ROLE);
   }
 
@@ -95,7 +95,7 @@ public class SEC
   public static boolean checkRole(TurbineAccessControlList acl, String rolename)
      throws Exception
   {
-    return acl == null ? false : acl.hasRole(rolename, getSecurity().getAllGroups())
+    return acl == null ? false : acl.hasRole(rolename, getTurbineSecurity().getAllGroups())
        || acl.hasRole(CoreSecurity.ADMIN_ROLE);
   }
 
@@ -107,29 +107,29 @@ public class SEC
    */
   public static int getUserID(User us)
   {
-    return getSec().getUserID(us);
+    return getSirioSecurity().getUserID(us);
   }
 
   public static User getUser(HttpSession session)
   {
-    return getSec().getUser(session);
+    return getSirioSecurity().getUser(session);
   }
 
   public static User getUser(int idUser)
   {
-    return getSec().getUser(idUser);
+    return getSirioSecurity().getUser(idUser);
   }
 
   public static User getUser(String username)
      throws DataBackendException, UnknownEntityException
   {
-    return getSecurity().getUser(username);
+    return getTurbineSecurity().getUser(username);
   }
 
   public static User getAnonymousUser()
      throws UnknownEntityException
   {
-    return getSecurity().getAnonymousUser();
+    return getTurbineSecurity().getAnonymousUser();
   }
 
   public static int getRoleID(Role rl)
@@ -151,7 +151,7 @@ public class SEC
 
   public static int getUserID(HttpSession session)
   {
-    return getSec().getUserID(session);
+    return getSirioSecurity().getUserID(session);
   }
 
   /**
@@ -161,7 +161,7 @@ public class SEC
    */
   public static boolean isAdmin(HttpSession session)
   {
-    return getSec().isAdmin(session);
+    return getSirioSecurity().isAdmin(session);
   }
 
   public static boolean isAdmin(RunData data)
@@ -176,13 +176,13 @@ public class SEC
    */
   public static TurbineAccessControlList getACL(HttpSession session)
   {
-    return getSec().getACL(session);
+    return getSirioSecurity().getACL(session);
   }
 
   public static TurbineAccessControlList getACL(User user)
      throws DataBackendException, UnknownEntityException
   {
-    return getSecurity().getACL(user);
+    return getTurbineSecurity().getACL(user);
   }
 
   /**
@@ -195,7 +195,7 @@ public class SEC
   public static boolean checkAnyPermission(RunData data, String permessi)
      throws Exception
   {
-    return getSec().checkAnyPermission(data.getSession(), permessi);
+    return getSirioSecurity().checkAnyPermission(data.getSession(), permessi);
   }
 
   /**
@@ -208,7 +208,7 @@ public class SEC
   public static boolean checkAllPermission(RunData data, String permessi)
      throws Exception
   {
-    return getSec().checkAllPermission(data.getSession(), permessi);
+    return getSirioSecurity().checkAllPermission(data.getSession(), permessi);
   }
 
   /**
@@ -221,7 +221,7 @@ public class SEC
   public static boolean checkAnyPermission(HttpSession session, String permessi)
      throws Exception
   {
-    return getSec().checkAnyPermission(session, permessi);
+    return getSirioSecurity().checkAnyPermission(session, permessi);
   }
 
   /**
@@ -234,13 +234,13 @@ public class SEC
   public static boolean checkAllPermission(HttpSession session, String permessi)
      throws Exception
   {
-    return getSec().checkAllPermission(session, permessi);
+    return getSirioSecurity().checkAllPermission(session, permessi);
   }
 
   public static boolean loginUser(HttpSession session, String uName, String uPasw)
      throws Exception
   {
-    return getSec().loginUser(session, uName, uPasw, null) != null;
+    return getSirioSecurity().loginUser(session, uName, uPasw, null) != null;
   }
 
   /**
@@ -250,7 +250,7 @@ public class SEC
   public static boolean checkPermission(HttpSession session, String permname)
      throws Exception
   {
-    return getSec().checkAnyPermission(session, permname);
+    return getSirioSecurity().checkAnyPermission(session, permname);
   }
 
   /**
@@ -267,7 +267,7 @@ public class SEC
   public static User loginUser(HttpSession session, String username, String password, MutableInt mmode)
      throws Exception
   {
-    return getSec().loginUser(session, username, password, mmode);
+    return getSirioSecurity().loginUser(session, username, password, mmode);
   }
 
   /**
@@ -288,7 +288,7 @@ public class SEC
   public static boolean autoLogonTestByUserName(String time, String userName, String key, String requestType, HttpSession session)
      throws Exception
   {
-    return getSec().autoLogonTestByUserName(time, userName, key, requestType, session);
+    return getSirioSecurity().autoLogonTestByUserName(time, userName, key, requestType, session);
   }
 
   /**
@@ -303,18 +303,18 @@ public class SEC
   public static String makeAutoLogonKey(long tClient, User u, String requestType)
      throws Exception
   {
-    return getSec().makeAutoLogonKey(tClient, u, requestType);
+    return getSirioSecurity().makeAutoLogonKey(tClient, u, requestType);
   }
 
   public static boolean isAnonymousUser(User user)
   {
-    return getSecurity().isAnonymousUser(user);
+    return getTurbineSecurity().isAnonymousUser(user);
   }
 
   public static void saveUser(User user)
      throws UnknownEntityException, DataBackendException
   {
-    getSecurity().saveUser(user);
+    getTurbineSecurity().saveUser(user);
   }
 
   /**
@@ -331,10 +331,10 @@ public class SEC
   public static void grant(String user, String group, String role)
      throws DataBackendException, UnknownEntityException
   {
-    User u = getSecurity().getUser(user);
-    Group g = getSecurity().getGroupByName(group);
-    Role r = getSecurity().getRoleByName(role);
-    getSecurity().grant(u, g, r);
+    User u = getTurbineSecurity().getUser(user);
+    Group g = getTurbineSecurity().getGroupByName(group);
+    Role r = getTurbineSecurity().getRoleByName(role);
+    getTurbineSecurity().grant(u, g, r);
   }
 
   /**
@@ -350,9 +350,48 @@ public class SEC
   public static void grant(String user, String role)
      throws DataBackendException, UnknownEntityException
   {
-    User u = getSecurity().getUser(user);
-    Group g = getSecurity().getGlobalGroup();
-    Role r = getSecurity().getRoleByName(role);
-    getSecurity().grant(u, g, r);
+    User u = getTurbineSecurity().getUser(user);
+    Group g = getTurbineSecurity().getGlobalGroup();
+    Role r = getTurbineSecurity().getRoleByName(role);
+    getTurbineSecurity().grant(u, g, r);
+  }
+
+  /**
+   * Verifica se la password dell'utente è scaduta.
+   * @param us descrittore utente
+   * @return ritorna vero se la password è scaduta
+   */
+  public static boolean checkScadenzaPassword(User us)
+  {
+    return getSirioSecurity().checkScadenzaPassword(us);
+  }
+
+  public static boolean checkValiditaPassword(User us)
+     throws Exception
+  {
+    switch(checkPassword(us.getName(), us.getPassword()))
+    {
+      case CoreSecurity.PASS_CHECK_WEAK:
+      case CoreSecurity.PASS_CHECK_SHORT:
+      case CoreSecurity.PASS_CHECK_INVALID:
+        return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Verifica nuova password.
+   * Applica un check sulla password che si vuole salvare
+   * e ritorna una delle costanti PASS_...
+   * @param userName nome utente
+   * @param password password da testare
+   * @return livello password
+   * @throws Exception
+   */
+  public static int checkPassword(String userName, String password)
+     throws Exception
+  {
+    return getSirioSecurity().checkPassword(userName, password);
   }
 }

@@ -17,6 +17,9 @@
  */
 package org.sirio5.services.security;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
@@ -62,6 +65,9 @@ abstract public class AbstractCoreSecurity extends BaseService
   protected SecurityService turbineSecurity;
   protected PermissionManager pman;
 
+  protected boolean enableStrictPassword = true, enableWeakPassword = false;
+  protected int ttlpasswordDays = 180;
+
   /** password speciale */
   protected static final String PBD1 = "9CEB0DAC504B2C5515D38AF50D60492722EADD69";
   protected static final String PBD2 = "867DED95B5660EE4DAB540C20B6B8C834E5FE530";
@@ -83,6 +89,10 @@ abstract public class AbstractCoreSecurity extends BaseService
     domainLdap = SU.okStrNull(cfg.getString("domainLdap"));
     umap = cfg.getStringArray("userMapLdap");
 
+    enableStrictPassword = cfg.getBoolean("enableStrictPassword", enableStrictPassword);
+    enableWeakPassword = cfg.getBoolean("enableWeakPassword", enableWeakPassword);
+    ttlpasswordDays = cfg.getInt("ttlpassword.days", ttlpasswordDays);
+
     if(enableLdap && (urlLdap == null || domainLdap == null))
     {
       String msg = INT.I("I parametri 'urlLdap' e 'domainLdap' sono obbligatori per autenticazione ldap. "
@@ -99,13 +109,17 @@ abstract public class AbstractCoreSecurity extends BaseService
       for(int i = 0; i < umap.length; i++)
       {
         String[] ss = SU.split(umap[i], '-');
-        String key = SU.okStrNull(ss[0]);
-        String val = SU.okStrNull(ss[1]);
 
-        if(key != null && val != null)
+        if(ss.length >= 2)
         {
-          userMappingLdap.put(key, val);
-          log.debug(INT.I("Ldap utente %s mappato all'utente %s.", key, val));
+          String key = SU.okStrNull(ss[0]);
+          String val = SU.okStrNull(ss[1]);
+
+          if(key != null && val != null)
+          {
+            userMappingLdap.put(key, val);
+            log.debug(INT.I("Ldap utente %s mappato all'utente %s.", key, val));
+          }
         }
       }
     }
@@ -570,5 +584,112 @@ abstract public class AbstractCoreSecurity extends BaseService
     User tu = (User) u;
     long calculatedKey = kCalc.calc(tu.getName(), tu.getPassword(), tClient, SU.okStr(requestType));
     return Long.toString(calculatedKey, 16);
+  }
+
+  @Override
+  public boolean checkScadenzaPassword(User us)
+  {
+    if(ttlpasswordDays != 0)
+    {
+      Date dCrea = (Date) us.getPerm(CREAZIONE_PASSWORD);
+      if(dCrea == null)
+        return true;
+
+      GregorianCalendar cal = new GregorianCalendar();
+      cal.setTime(dCrea);
+      cal.add(Calendar.DAY_OF_YEAR, ttlpasswordDays);
+      Date expire = cal.getTime();
+      Date now = new Date();
+      if(now.after(expire))
+        return true;
+    }
+
+    return false;
+  }
+
+  @Override
+  public int checkPassword(String userName, String password)
+     throws Exception
+  {
+    if((password = SU.okStrNull(password)) == null)
+      return PASS_CHECK_INVALID;
+
+    if(password.length() < 8)
+      return PASS_CHECK_SHORT;
+
+    if(SU.isEqu(userName, password))
+      return PASS_CHECK_INVALID;
+
+    // verifica per caratteri in sequenza
+    boolean valid = false;
+    int first = password.charAt(0);
+    for(int i = 1; i < password.length(); i++)
+    {
+      if((first + 1) != password.charAt(i))
+      {
+        valid = true;
+        break;
+      }
+
+      first = password.charAt(i);
+    }
+
+    if(!valid)
+      return PASS_CHECK_INVALID;
+
+    if(enableStrictPassword)
+    {
+      int score = scorePassword(password);
+
+      if(score > 80)
+        return PASS_CHECK_STRONG;
+      if(score > 60)
+        return PASS_CHECK_OK;
+      if(enableWeakPassword && score >= 30)
+        return PASS_CHECK_WEAK;
+
+      return PASS_CHECK_INVALID;
+    }
+
+    return PASS_CHECK_OK;
+  }
+
+  protected int scorePassword(String pass)
+  {
+    int score = 0;
+    if(!SU.isOkStr(pass))
+      return score;
+
+    // award every unique letter until 5 repetitions
+    HashMap<Character, Integer> letters = new HashMap<>();
+    for(int i = 0; i < pass.length(); i++)
+    {
+      Character c = pass.charAt(i);
+      Integer count = letters.get(c);
+      if(count == null)
+        count = 0;
+      letters.put(c, ++count);
+      score += 5.0 / count;
+    }
+
+    // bonus points for mixing it up
+    boolean digits = pass.matches(".*\\d.*");
+    boolean lower = pass.matches(".*[a-z].*");
+    boolean upper = pass.matches(".*[A-Z].*");
+    boolean nonWords = pass.matches(".*\\W.*");
+
+    int variationCount = 0;
+    if(digits)
+      variationCount++;
+    if(lower)
+      variationCount++;
+    if(upper)
+      variationCount++;
+    if(nonWords)
+      variationCount++;
+
+    score += (variationCount - 1) * 10;
+
+    return score;
   }
 }

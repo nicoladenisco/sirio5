@@ -20,6 +20,7 @@ package org.sirio5.services.security;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.fulcrum.security.model.turbine.TurbineAccessControlList;
+import org.apache.fulcrum.security.util.PermissionSet;
 import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.Service;
 
@@ -43,6 +44,21 @@ public interface CoreSecurity extends Service
   public static final String ASSISTENZA_GROUP_NAME = "Assistenza";
   public static final String ALL_PERMISSION_CACHE_KEY = "ALL_PERMISSION_CACHE_KEY";
   //
+  public static final String CREAZIONE_PASSWORD = "creazionePassword";
+  public static final int PASS_CHECK_OK = 0;
+  public static final int PASS_CHECK_STRONG = 1;
+  public static final int PASS_CHECK_SHORT = 2;
+  public static final int PASS_CHECK_WEAK = 3;
+  public static final int PASS_CHECK_INVALID = 4;
+
+  // chiave nel profilo utente per abilitazione login con password (vedi CaleidoLogin.java)
+  public static final String ENABLED_PASSWORD_LOGON = "ENABLED_PASSWORD_LOGON";
+
+  // chiave nel profilo utente per selezionare il profilo di accesso al logon
+  public static final String USER_PROFILE_LOGON = "USER_PROFILE_LOGON";
+
+  // usata per forzare una logout se l'operazione fallisce (viene salvata in parmap)
+  public static final String LOGOUT_ON_FAIL = "LOGOUT_ON_FAIL";
 
   /**
    * Autentica l'utente come da credenziali.
@@ -120,6 +136,20 @@ public interface CoreSecurity extends Service
   public void salvaPermessi(String permessi);
 
   /**
+   * Salvataggio automatico permesso non presente.
+   * @param permesso permesso da salvare
+   */
+  public void salvaPermesso(String permesso);
+
+  /**
+   * Recupera tutti i permessi (bufferata).
+   * @return tutti i permessi
+   * @throws Exception
+   */
+  public PermissionSet getAllPermissions()
+     throws Exception;
+
+  /**
    * Controlla che l'utente loggato possieda tutti i permessi indicati.
    * NOTA: l'utente amministratore ritorna sempre true.
    * @param session
@@ -169,5 +199,24 @@ public interface CoreSecurity extends Service
    * @throws Exception
    */
   public String makeAutoLogonKey(long tClient, User u, String requestType)
+     throws Exception;
+
+  /**
+   * Verifica se la password dell'utente è scaduta.
+   * @param us descrittore utente
+   * @return ritorna vero se la password è scaduta
+   */
+  public boolean checkScadenzaPassword(User us);
+
+  /**
+   * Verifica nuova password.
+   * Applica un check sulla password che si vuole salvare
+   * e ritorna una delle costanti PASS_...
+   * @param userName nome utente
+   * @param password password da testare
+   * @return livello password
+   * @throws Exception
+   */
+  public int checkPassword(String userName, String password)
      throws Exception;
 }
