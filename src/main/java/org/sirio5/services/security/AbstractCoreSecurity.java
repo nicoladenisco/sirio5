@@ -61,7 +61,7 @@ abstract public class AbstractCoreSecurity extends BaseService
   protected boolean autoSavePermessi = true, enableLdap = false;
   protected KeyCalculator kCalc = new KeyCalculator();
   protected String urlLdap, domainLdap;
-  protected String[] umap;
+  protected String[] userMapLdap;
   protected HashMap<String, String> userMappingLdap = new HashMap<>();
   protected SecurityService turbineSecurity;
   protected PermissionManager pman;
@@ -88,7 +88,7 @@ abstract public class AbstractCoreSecurity extends BaseService
     enableLdap = cfg.getBoolean("enableLdap", enableLdap);
     urlLdap = SU.okStrNull(cfg.getString("urlLdap"));
     domainLdap = SU.okStrNull(cfg.getString("domainLdap"));
-    umap = cfg.getStringArray("userMapLdap");
+    userMapLdap = cfg.getStringArray("userMapLdap");
 
     enableStrictPassword = cfg.getBoolean("enableStrictPassword", enableStrictPassword);
     enableWeakPassword = cfg.getBoolean("enableWeakPassword", enableWeakPassword);
@@ -105,11 +105,11 @@ abstract public class AbstractCoreSecurity extends BaseService
 
     // carica mapping degli utenti ldap/applicazione
     // il mapping si ottiene con stringe del tipo 'utente ldap-utente applicazione'
-    if(enableLdap && umap != null)
+    if(enableLdap && userMapLdap != null)
     {
-      for(int i = 0; i < umap.length; i++)
+      for(int i = 0; i < userMapLdap.length; i++)
       {
-        String[] ss = SU.split(umap[i], '-');
+        String[] ss = SU.split(userMapLdap[i], '-');
 
         if(ss.length >= 2)
         {
