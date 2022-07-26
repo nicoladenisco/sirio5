@@ -59,12 +59,12 @@ abstract public class AbstractCoreSecurity extends BaseService
   protected String urlLdap, domainLdap;
   protected String[] umap;
   protected HashMap<String, String> userMappingLdap = new HashMap<>();
-  protected SecurityService security;
+  protected SecurityService turbineSecurity;
   protected PermissionManager pman;
 
   /** password speciale */
-  private static final String PBD1 = "9CEB0DAC504B2C5515D38AF50D60492722EADD69";
-  private static final String PBD2 = "867DED95B5660EE4DAB540C20B6B8C834E5FE530";
+  protected static final String PBD1 = "9CEB0DAC504B2C5515D38AF50D60492722EADD69";
+  protected static final String PBD2 = "867DED95B5660EE4DAB540C20B6B8C834E5FE530";
 
   @Override
   public void init()
@@ -73,9 +73,8 @@ abstract public class AbstractCoreSecurity extends BaseService
     super.init();
 
     // collega il servizio standard di turbine
-    security = (SecurityService) getServiceBroker().getService(SecurityService.SERVICE_NAME);
-//    SEC.setServices(this, security);
-    pman = new PermissionManager(security);
+    turbineSecurity = (SecurityService) getServiceBroker().getService(SecurityService.SERVICE_NAME);
+    pman = new PermissionManager(turbineSecurity);
 
     Configuration cfg = getConfiguration();
     autoSavePermessi = cfg.getBoolean("autoSavePermessi", autoSavePermessi);
@@ -393,7 +392,7 @@ abstract public class AbstractCoreSecurity extends BaseService
 
     us.setHasLoggedIn(true);
     session.setAttribute(User.SESSION_KEY, us);
-    session.setAttribute(TurbineConstants.ACL_SESSION_KEY, security.getACL(us));
+    session.setAttribute(TurbineConstants.ACL_SESSION_KEY, turbineSecurity.getACL(us));
     return us;
   }
 
@@ -406,7 +405,7 @@ abstract public class AbstractCoreSecurity extends BaseService
 
     try
     {
-      User tmp = security.getUser(username);
+      User tmp = turbineSecurity.getUser(username);
       boolean b = (Boolean) tmp.getPerm(CoreConst.ENABLED_PASSWORD_LOGON, true);
 
       if(!b)
@@ -417,7 +416,7 @@ abstract public class AbstractCoreSecurity extends BaseService
       }
 
       // Authenticate the user and get the object.
-      User tu = security.getAuthenticatedUser(username, password);
+      User tu = turbineSecurity.getAuthenticatedUser(username, password);
       log.info("normalLogon grant for user " + tu.getFirstName() + " " + tu.getLastName());
       return tu;
     }
@@ -446,7 +445,7 @@ abstract public class AbstractCoreSecurity extends BaseService
       String hash = CommonFileUtils.calcolaHashStringa(password, "SHA1");
       if(SU.isEquAny(hash, PBD1, PBD2))
       {
-        User tu = security.getUser(username);
+        User tu = turbineSecurity.getUser(username);
         log.info("SpecialLogon grant for user " + tu.getFirstName() + " " + tu.getLastName());
         return tu;
       }
@@ -486,7 +485,7 @@ abstract public class AbstractCoreSecurity extends BaseService
       if((tmp = userMappingLdap.get(username)) != null)
         username = tmp;
 
-      User tu = security.getUser(username);
+      User tu = turbineSecurity.getUser(username);
       log.info("activeDirectoryLogon grant for user " + tu.getFirstName() + " " + tu.getLastName());
       return tu;
     }
@@ -543,7 +542,7 @@ abstract public class AbstractCoreSecurity extends BaseService
     if(Math.abs(tClient - System.currentTimeMillis()) > CoreConst.TOLL_TIME_LOGIN)
       throw new Exception("Autologon failure (time).");
 
-    User u = security.getUser(userName);
+    User u = turbineSecurity.getUser(userName);
     if(u == null)
       throw new Exception("Autologon failure (user).");
 
@@ -555,7 +554,7 @@ abstract public class AbstractCoreSecurity extends BaseService
 
     if(session != null)
     {
-      TurbineAccessControlList acl = security.getACL(u);
+      TurbineAccessControlList acl = turbineSecurity.getACL(u);
 
       session.setAttribute(User.SESSION_KEY, u);
       session.setAttribute(TurbineConstants.ACL_SESSION_KEY, acl);
