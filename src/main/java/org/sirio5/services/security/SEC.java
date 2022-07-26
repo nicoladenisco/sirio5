@@ -394,4 +394,22 @@ public class SEC
   {
     return getSirioSecurity().checkPassword(userName, password);
   }
+
+  /**
+   * Salvataggio automatico permessi non presenti.
+   * @param permessi lista di permessi separati da ',;' o spazio
+   */
+  public static void salvaPermessi(String permessi)
+  {
+    getSirioSecurity().salvaPermessi(permessi);
+  }
+
+  /**
+   * Salvataggio automatico permesso non presente.
+   * @param permesso permesso da salvare
+   */
+  public static void salvaPermesso(String permesso)
+  {
+    getSirioSecurity().salvaPermesso(permesso);
+  }
 }

@@ -33,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fulcrum.security.model.turbine.TurbineAccessControlList;
 import org.apache.fulcrum.security.util.PasswordMismatchException;
+import org.apache.fulcrum.security.util.PermissionSet;
 import org.apache.turbine.TurbineConstants;
 import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.BaseService;
@@ -358,6 +359,19 @@ abstract public class AbstractCoreSecurity extends BaseService
       if(p.length() > 0)
         pman.salvaPermesso(p);
     }
+  }
+
+  @Override
+  public void salvaPermesso(String permesso)
+  {
+    pman.salvaPermesso(permesso);
+  }
+
+  @Override
+  public PermissionSet getAllPermissions()
+     throws Exception
+  {
+    return turbineSecurity.getAllPermissions();
   }
 
   @Override
