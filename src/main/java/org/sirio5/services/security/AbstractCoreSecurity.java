@@ -491,9 +491,9 @@ abstract public class AbstractCoreSecurity extends BaseService
 
   /**
    * Logon attraverso server LDAP (Active Directory).
-   * @param data
+   * @param username
+   * @param password
    * @return
-   * @throws Exception
    */
   protected User activeDirectoryLogon(String username, String password)
   {
@@ -548,6 +548,7 @@ abstract public class AbstractCoreSecurity extends BaseService
     {
       // Authenticate the logon user
       DirContext ctx = new InitialDirContext(env);
+      log.debug("LDAP success: " + ctx.toString());
 
       // Once the above line was executed successfully, the user is said to be
       // authenticated and the InitialDirContext object will be created.
