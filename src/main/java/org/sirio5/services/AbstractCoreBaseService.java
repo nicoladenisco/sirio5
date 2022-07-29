@@ -47,7 +47,7 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
   protected static int aziendaId = 0;
   protected static String aziendaNome = null;
   protected static String server = null, address = null;
-  private static final ArrayList<InfoSetupInterface> arInfoSetup = new ArrayList<InfoSetupInterface>();
+  private static final ArrayList<InfoSetupInterface> arInfoSetup = new ArrayList<>();
   /** path di riferimento */
   protected static String pathWork = null;
   private static String pathWorkTmp = null;
@@ -62,7 +62,7 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
   private static String pathConfStylesheets = null;
   private static String pathConfReports = null;
   private static String pathConfCert = null;
-  /** UUID unica di questa istanza di PCSDM */
+  /** UUID unica di questa istanza di applicazione */
   private static String AppUUID = null;
 
   protected String normalizeWindowsExecutable(String sPath)

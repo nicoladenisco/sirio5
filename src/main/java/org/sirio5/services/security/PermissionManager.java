@@ -36,7 +36,9 @@ import org.sirio5.utils.SU;
 public class PermissionManager
 {
   private static final Log log = LogFactory.getLog(PermissionManager.class);
-  protected SecurityService security;
+
+  protected final SecurityService security;
+  protected Role adminRole;
 
   PermissionManager(SecurityService security)
   {
@@ -56,18 +58,7 @@ public class PermissionManager
       if(allPerm.containsName(pp))
         return;
 
-      // recupera o crea se non presente il ruolo amministratore
-      Role adminRole;
-      try
-      {
-        adminRole = security.getRoleByName(ADMIN_ROLE);
-      }
-      catch(UnknownEntityException ee)
-      {
-        adminRole = security.getRoleInstance();
-        adminRole.setName(ADMIN_ROLE);
-        security.addRole(adminRole);
-      }
+      loadAdminRole();
 
       // crea la permission e la assegna al ruolo amministratore
       Permission perm = security.getPermissionInstance();
@@ -82,6 +73,25 @@ public class PermissionManager
     catch(Exception ex)
     {
       log.error("Errore generico:", ex);
+    }
+  }
+
+  protected void loadAdminRole()
+     throws Exception
+  {
+    // recupera o crea se non presente il ruolo amministratore
+    if(adminRole == null)
+    {
+      try
+      {
+        adminRole = security.getRoleByName(ADMIN_ROLE);
+      }
+      catch(UnknownEntityException ee)
+      {
+        adminRole = security.getRoleInstance();
+        adminRole.setName(ADMIN_ROLE);
+        security.addRole(adminRole);
+      }
     }
   }
 }

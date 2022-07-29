@@ -28,6 +28,7 @@ import org.apache.velocity.util.ClassUtils;
 import org.rigel5.SetupHolder;
 import org.rigel5.glue.table.AlternateColorTableAppBase;
 import org.rigel5.table.html.AbstractHtmlTablePagerFilter;
+import org.rigel5.table.html.RigelHtmlPage;
 import org.rigel5.table.html.wrapper.HtmlWrapperBase;
 import org.rigel5.table.peer.PeerBuilderRicercaGenerica;
 import org.rigel5.table.peer.html.PeerTableModel;
@@ -192,7 +193,6 @@ public class ToolRenderListeRigel extends ListaBase
 
     // costruisce tutti i componenti di pagina
     buildCtx(data, ctx);
-    ctx.put("htpage", uim.getLastPageLista());
 
     // salva il context in sessione per le successive chiamate dalla servlet ajax
     data.getSession().setAttribute(unique, ctx);
@@ -206,7 +206,7 @@ public class ToolRenderListeRigel extends ListaBase
     if(alternatePath == null)
     {
       // renderizzazione Velocity con il modello caricato da risorsa
-      try (InputStream is = ClassUtils.getResourceAsStream(getClass(), "/org/sirio2/resources/ToolLista.vm"))
+      try ( InputStream is = ClassUtils.getResourceAsStream(getClass(), "/org/sirio2/resources/ToolLista.vm"))
       {
         InputStreamReader reader = new InputStreamReader(is, "UTF-8");
 
@@ -222,5 +222,13 @@ public class ToolRenderListeRigel extends ListaBase
 
     // rimaneggia javascript sostituendo submit con funzione specifica
     return SU.strReplace(writer.toString(), "document." + formName + ".submit();", funcNameSubmit + "();");
+  }
+
+  @Override
+  public void formatHtmlLista(int filtro, RigelHtmlPage page, Context context)
+     throws Exception
+  {
+    context.put("filtro", filtro);
+    context.put("htpage", page);
   }
 }
