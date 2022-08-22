@@ -24,6 +24,7 @@ import org.apache.fulcrum.security.entity.Role;
 import org.apache.fulcrum.security.model.turbine.TurbineAccessControlList;
 import org.apache.fulcrum.security.torque.om.TorqueTurbineRole;
 import org.apache.fulcrum.security.util.DataBackendException;
+import org.apache.fulcrum.security.util.PermissionSet;
 import org.apache.fulcrum.security.util.UnknownEntityException;
 import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.TurbineServices;
@@ -411,5 +412,39 @@ public class SEC
   public static void salvaPermesso(String permesso)
   {
     getSirioSecurity().salvaPermesso(permesso);
+  }
+
+  /**
+   * Recupera tutti i permessi (bufferata).
+   * @return tutti i permessi
+   * @throws Exception
+   */
+  public static PermissionSet getAllPermissions()
+     throws Exception
+  {
+    return getSirioSecurity().getAllPermissions();
+  }
+
+  /**
+   * Ritorna vero se attiva autenticazione via LDAP.
+   * @return vero per ldap (Active Directory)
+   */
+  public static boolean haveLdapAuth()
+  {
+    return getSirioSecurity().haveLdapAuth();
+  }
+
+  /**
+   * Cambia la password per l'utente specificato.
+   * @param u utente a cui cambiare password
+   * @param oldPass vecchia password
+   * @param newPass nuova password
+   * @param mode tipo di logon
+   * @throws Exception
+   */
+  public static void cambiaPassword(User u, String oldPass, String newPass, int mode)
+     throws Exception
+  {
+    getSirioSecurity().cambiaPassword(u, oldPass, newPass, mode);
   }
 }

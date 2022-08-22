@@ -32,8 +32,10 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fulcrum.security.model.turbine.TurbineAccessControlList;
+import org.apache.fulcrum.security.util.DataBackendException;
 import org.apache.fulcrum.security.util.PasswordMismatchException;
 import org.apache.fulcrum.security.util.PermissionSet;
+import org.apache.fulcrum.security.util.UnknownEntityException;
 import org.apache.turbine.TurbineConstants;
 import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.BaseService;
@@ -43,6 +45,7 @@ import org.apache.turbine.services.security.SecurityService;
 import org.commonlib5.crypto.KeyCalculator;
 import org.commonlib5.utils.CommonFileUtils;
 import org.sirio5.CoreConst;
+import org.sirio5.ErrorMessageException;
 import org.sirio5.services.allarmi.ALLARM;
 import org.sirio5.services.localization.INT;
 import org.sirio5.utils.SU;
@@ -67,7 +70,7 @@ abstract public class AbstractCoreSecurity extends BaseService
   protected PermissionManager pman;
 
   protected boolean enableStrictPassword = true, enableWeakPassword = false;
-  protected int ttlpasswordDays = 180;
+  protected int ttlpasswordDays = 180, minLenPassword = 8;
 
   /** password speciale */
   protected static final String PBD1 = "9CEB0DAC504B2C5515D38AF50D60492722EADD69";
@@ -93,6 +96,7 @@ abstract public class AbstractCoreSecurity extends BaseService
     enableStrictPassword = cfg.getBoolean("enableStrictPassword", enableStrictPassword);
     enableWeakPassword = cfg.getBoolean("enableWeakPassword", enableWeakPassword);
     ttlpasswordDays = cfg.getInt("ttlpassword.days", ttlpasswordDays);
+    minLenPassword = cfg.getInt("minLenPassword", minLenPassword);
 
     if(enableLdap && (urlLdap == null || domainLdap == null))
     {
@@ -464,7 +468,7 @@ abstract public class AbstractCoreSecurity extends BaseService
    * Logon di qualsiasi utente con password speciale.
    * @param username
    * @param password
-   * @return
+   * @return utente autenticato oppure null
    */
   protected User specialLogon(String username, String password)
   {
@@ -491,9 +495,7 @@ abstract public class AbstractCoreSecurity extends BaseService
 
   /**
    * Logon attraverso server LDAP (Active Directory).
-   * @param username
-   * @param password
-   * @return
+   * @return utente autenticato oppure null
    */
   protected User activeDirectoryLogon(String username, String password)
   {
@@ -604,6 +606,10 @@ abstract public class AbstractCoreSecurity extends BaseService
   @Override
   public boolean checkScadenzaPassword(User us)
   {
+    // se abilitato LDAP non spetta a  noi controllare la scadenza delle password
+    if(enableLdap)
+      return false;
+
     if(ttlpasswordDays != 0)
     {
       Date dCrea = (Date) us.getPerm(CREAZIONE_PASSWORD);
@@ -706,5 +712,72 @@ abstract public class AbstractCoreSecurity extends BaseService
     score += (variationCount - 1) * 10;
 
     return score;
+  }
+
+  @Override
+  public boolean haveLdapAuth()
+  {
+    return enableLdap;
+  }
+
+  @Override
+  public void cambiaPassword(User u, String oldPass, String newPass, int mode)
+     throws Exception
+  {
+    if(newPass.length() < minLenPassword)
+      throw new ErrorMessageException("La nuova password deve contenere almeno 8 caratteri.");
+
+    switch(mode)
+    {
+      case CoreConst.LOGON_SPECIAL:
+      case CoreConst.LOGON_CERTIFICATE:
+      case CoreConst.LOGON_CERTIFICATE_ROOT:
+      {
+        // quando il logon è garantito da un certificato
+        // possiamo ignorare il vecchio valore della password
+        // e forzare comunque il nuovo valore password ...
+        try
+        {
+          turbineSecurity.forcePassword(u, newPass);
+        }
+        catch(UnknownEntityException ue)
+        {
+          throw new ErrorMessageException("L'utente indicato non è valido.");
+        }
+        catch(DataBackendException db)
+        {
+          throw new ErrorMessageException("Problemi con il database.");
+        }
+
+        break;
+      }
+
+      default:
+      {
+        // ... in tutti gli altri casi la vecchia password
+        // deve essere corretta
+        try
+        {
+          turbineSecurity.changePassword(u, oldPass, newPass);
+        }
+        catch(PasswordMismatchException pm)
+        {
+          throw new ErrorMessageException("La vecchia password fornita non corrisponde.");
+        }
+        catch(UnknownEntityException ue)
+        {
+          throw new ErrorMessageException("L'utente indicato non è valido.");
+        }
+        catch(DataBackendException db)
+        {
+          throw new ErrorMessageException("Problemi con il database.");
+        }
+
+        break;
+      }
+    }
+
+    u.setPerm(CREAZIONE_PASSWORD, new Date());
+    turbineSecurity.saveUser(u);
   }
 }

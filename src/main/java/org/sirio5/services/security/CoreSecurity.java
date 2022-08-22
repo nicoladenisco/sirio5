@@ -219,4 +219,21 @@ public interface CoreSecurity extends Service
    */
   public int checkPassword(String userName, String password)
      throws Exception;
+
+  /**
+   * Ritorna vero se attiva autenticazione via LDAP.
+   * @return vero per ldap (Active Directory)
+   */
+  public boolean haveLdapAuth();
+
+  /**
+   * Cambia la password per l'utente specificato.
+   * @param u utente a cui cambiare password
+   * @param oldPass vecchia password
+   * @param newPass nuova password
+   * @param mode tipo di logon
+   * @throws Exception
+   */
+  public void cambiaPassword(User u, String oldPass, String newPass, int mode)
+     throws Exception;
 }
