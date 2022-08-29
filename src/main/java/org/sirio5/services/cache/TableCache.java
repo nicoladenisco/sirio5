@@ -415,10 +415,10 @@ public class TableCache<T extends ColumnAccessByName> implements Iterable<T>
   public TableCacheData reload()
      throws Exception
   {
-    getTableName();
+    String tname = getTableName();
     TableCacheData data = new TableCacheData();
     data.populateData(cls);
-    CACHE.addObject(TABLE_CACHE_CLASS, getTableName(), new CachedObject(data));
+    CACHE.addObject(TABLE_CACHE_CLASS, tname, new CachedObject(data));
     return data;
   }
 
@@ -434,16 +434,18 @@ public class TableCache<T extends ColumnAccessByName> implements Iterable<T>
   private TableCacheData getFromCache()
      throws Exception
   {
+    final String tname = getTableName();
+
     try
     {
-      return (TableCacheData) CACHE.getObject(TABLE_CACHE_CLASS, getTableName()).getContents();
+      return (TableCacheData) CACHE.getObject(TABLE_CACHE_CLASS, tname).getContents();
     }
     catch(ObjectExpiredException ei)
     {
       synchronized(semaforo)
       {
         // ritenta un prelievo dalla cache: l'attesa del semaforo poteva consentire ad altri di passare
-        TableCacheData rv = (TableCacheData) CACHE.getContentQuiet(TABLE_CACHE_CLASS, getTableName());
+        TableCacheData rv = (TableCacheData) CACHE.getContentQuiet(TABLE_CACHE_CLASS, tname);
         if(rv != null)
           return rv;
 

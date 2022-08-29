@@ -104,7 +104,7 @@ public class CoreBaseAction extends VelocitySecureAction
     return true;
   }
 
-  protected boolean isAuthorizedAll(RunData data, String permissions)
+  protected boolean isAuthorizedAll(CoreRunData data, String permissions)
      throws Exception
   {
     if(SEC.checkAllPermission(data, permissions))
@@ -113,7 +113,7 @@ public class CoreBaseAction extends VelocitySecureAction
     return redirectUnauthorized(data);
   }
 
-  protected boolean isAuthorizedAny(RunData data, String permissions)
+  protected boolean isAuthorizedAny(CoreRunData data, String permissions)
      throws Exception
   {
     if(SEC.checkAnyPermission(data, permissions))
@@ -122,7 +122,7 @@ public class CoreBaseAction extends VelocitySecureAction
     return redirectUnauthorized(data);
   }
 
-  protected boolean isAuthorizedOne(RunData data, String permissions)
+  protected boolean isAuthorizedOne(CoreRunData data, String permissions)
      throws Exception
   {
     if(SEC.checkAnyPermission(data, permissions))
@@ -131,7 +131,7 @@ public class CoreBaseAction extends VelocitySecureAction
     return redirectUnauthorized(data);
   }
 
-  protected boolean redirectUnauthorized(RunData data)
+  protected boolean redirectUnauthorized(CoreRunData data)
      throws Exception
   {
     if(data.getUser().hasLoggedIn())

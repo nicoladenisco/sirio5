@@ -18,7 +18,6 @@
 package org.sirio5.modules.actions.rigel;
 
 import java.util.Map;
-import org.apache.turbine.util.RunData;
 import org.apache.velocity.context.Context;
 import org.rigel5.glue.WrapperCacheBase;
 import org.rigel5.table.html.wrapper.HtmlWrapperBase;
@@ -164,7 +163,7 @@ abstract public class RigelEditBaseAction extends CoreBaseAction
     return isAuthorizedAll(data, "modifica_dati_generale");
   }
 
-  protected boolean isAuthorizedDelete(RunData data)
+  protected boolean isAuthorizedDelete(CoreRunData data)
      throws Exception
   {
     return isAuthorizedAll(data, "cancella_manutenzione");

@@ -133,6 +133,8 @@ public class CoreConst
   public static final String MIME_XML = "text/xml";
   public final static String MIME_CDA = "text/x-cda-r2+xml"; //TipoMime CDA Tabella 2.10-1 AffinityDomain
 
+  public static final String MIME_BINARY = "application/binary";
+
   public final static String[] MIME_PDFs =
   {
     MIME_PDF, EXT_PDF
