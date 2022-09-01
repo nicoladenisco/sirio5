@@ -147,48 +147,21 @@ public class CoreAppSanity
   {
   }
 
+  /**
+   * Assegna tutti i permessi al ruolo indicato.
+   * @param role ruolo amministratore
+   * @throws Exception
+   */
   protected void grantAllPermission(Role role)
      throws Exception
   {
-    String sSQL
-       = "select permission_id\n"
-       + "  from turbine_permission\n"
-       + " where permission_id NOT IN ("
-       + "    select permission_id from turbine_role_permission where role_id=" + role.getId() + ")";
-
-    List<Record> lsRecs = DbUtils.executeQuery(sSQL);
-    if(lsRecs.isEmpty())
-      return;
-
-    int[] roleToGrant = lsRecs.stream()
-       .mapToInt(LEU.rethrowFunctionInt((r) -> r.getValue(1).asInt()))
-       .distinct().sorted().toArray();
-
-    if(roleToGrant.length == 0)
-      return;
-
     Connection connection = null;
     try
     {
       connection = Transaction.begin();
-      String sINS
-         = "INSERT INTO public.turbine_role_permission(\n"
-         + "	role_id, permission_id)\n"
-         + "	VALUES (?, ?);";
 
-      try (  PreparedStatement ps = connection.prepareStatement(sINS) )
-      {
-        int roleid = (Integer) role.getId();
-        for(int i = 0; i < roleToGrant.length; i++)
-        {
-          int permid = roleToGrant[i];
-
-          ps.clearParameters();
-          ps.setInt(1, roleid);
-          ps.setInt(2, permid);
-          ps.executeUpdate();
-        }
-      }
+      if(grantAllPermission(role, connection))
+        return;
 
       Transaction.commit(connection);
       connection = null;
@@ -200,5 +173,106 @@ public class CoreAppSanity
         Transaction.safeRollback(connection);
       }
     }
+  }
+
+  private boolean grantAllPermission(Role role, Connection connection)
+     throws Exception
+  {
+    String sSQL
+       = "select permission_id\n"
+       + "  from turbine_permission\n"
+       + " where permission_id NOT IN ("
+       + "    select permission_id from turbine_role_permission where role_id=" + role.getId() + ")";
+    List<Record> lsRecs = DbUtils.executeQuery(sSQL, connection);
+    if(lsRecs.isEmpty())
+      return true;
+
+    int[] permissionToGrant = lsRecs.stream()
+       .mapToInt(LEU.rethrowFunctionInt((r) -> r.getValue(1).asInt()))
+       .distinct().sorted().toArray();
+    if(permissionToGrant.length == 0)
+      return true;
+
+    String sINS
+       = "INSERT INTO turbine_role_permission(\n"
+       + "	role_id, permission_id)\n"
+       + "	VALUES (?, ?);";
+    try ( PreparedStatement ps = connection.prepareStatement(sINS))
+    {
+      int roleid = (Integer) role.getId();
+      for(int i = 0; i < permissionToGrant.length; i++)
+      {
+        int permid = permissionToGrant[i];
+
+        ps.clearParameters();
+        ps.setInt(1, roleid);
+        ps.setInt(2, permid);
+        ps.executeUpdate();
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Crea ruoli se non esistono.
+   * @param roleNames elenco di nomi di ruolo
+   * @throws Exception
+   */
+  protected void createRoles(String... roleNames)
+     throws Exception
+  {
+    Connection connection = null;
+    try
+    {
+      connection = Transaction.begin();
+
+      if(createRoles(roleNames, connection))
+        return;
+
+      Transaction.commit(connection);
+      connection = null;
+    }
+    finally
+    {
+      if(connection != null)
+      {
+        Transaction.safeRollback(connection);
+      }
+    }
+  }
+
+  private boolean createRoles(String[] roleNames, Connection con)
+     throws Exception
+  {
+    String sSQL
+       = "SELECT *"
+       + "  FROM turbine_role";
+    List<Record> lsRecs = DbUtils.executeQuery(sSQL, con);
+
+    int roleid = lsRecs.stream().mapToInt(
+       LEU.rethrowFunctionInt((r) -> r.getValue("role_id").asInt())).max().orElse(0) + 1;
+
+    String sINS
+       = "INSERT INTO turbine_role(\n"
+       + "	role_id, role_name, objectdata)\n"
+       + "	VALUES (?, ?, NULL);";
+    try ( PreparedStatement ps = con.prepareStatement(sINS))
+    {
+      for(int i = 0; i < roleNames.length; i++)
+      {
+        String roleName = roleNames[i];
+        if(lsRecs.stream()
+           .anyMatch(LEU.rethrowPredicate((r) -> SU.isEqu(roleName, r.getValue("role_name").asString()))))
+          continue;
+
+        ps.clearParameters();
+        ps.setInt(1, roleid++);
+        ps.setString(2, roleName);
+        ps.executeUpdate();
+      }
+    }
+
+    return false;
   }
 }
