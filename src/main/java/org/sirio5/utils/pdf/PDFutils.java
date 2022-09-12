@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -22,11 +22,10 @@ import com.itextpdf.text.html.simpleparser.HTMLWorker;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import java.io.*;
-
+import java.util.Collection;
+import java.util.List;
 import java.util.zip.GZIPOutputStream;
 import javax.servlet.http.*;
-
-import java.util.List;
 import org.commonlib5.utils.CommonFileUtils;
 
 /**
@@ -49,7 +48,7 @@ public class PDFutils
   public static void convertHtlm2Pdf(File inHtml, File outPdf)
      throws Exception
   {
-    try (FileReader in = new FileReader(inHtml))
+    try ( FileReader in = new FileReader(inHtml))
     {
       convertHtlm2Pdf(in, outPdf);
     }
@@ -130,7 +129,7 @@ public class PDFutils
       }
     }
 
-    try (FileInputStream fis = new FileInputStream(fPdf))
+    try ( FileInputStream fis = new FileInputStream(fPdf))
     {
       CommonFileUtils.copyStream(fis, output);
 
@@ -145,10 +144,17 @@ public class PDFutils
     }
   }
 
+  public static void mergePDF(Collection<File> pdfInput, File pdfOutput)
+     throws Exception
+  {
+    File[] arFiles = pdfInput.toArray(new File[pdfInput.size()]);
+    mergePDF(arFiles, pdfOutput);
+  }
+
   public static void mergePDF(File[] pdfInput, File pdfOutput)
      throws Exception
   {
-    try (FileOutputStream fos = new FileOutputStream(pdfOutput))
+    try ( FileOutputStream fos = new FileOutputStream(pdfOutput))
     {
       mergePDF(pdfInput, fos);
       fos.flush();
@@ -161,6 +167,13 @@ public class PDFutils
    * @param pdfOutput
    * @throws java.lang.Exception
    */
+  public static void mergePDF(Collection<File> pdfInput, OutputStream pdfOutput)
+     throws Exception
+  {
+    File[] arFiles = pdfInput.toArray(new File[pdfInput.size()]);
+    mergePDF(arFiles, pdfOutput);
+  }
+
   public static void mergePDF(File[] pdfInput, OutputStream pdfOutput)
      throws Exception
   {
@@ -173,7 +186,7 @@ public class PDFutils
     {
       File pdfDoc = pdfInput[i];
 
-      try (InputStream is = new FileInputStream(pdfDoc))
+      try ( InputStream is = new FileInputStream(pdfDoc))
       {
         PdfReader reader = new PdfReader(is);
         if(document == null)
@@ -198,8 +211,7 @@ public class PDFutils
       document.close();
   }
 
-  public static void sendFileAsPDFDoubleA3(HttpServletRequest request,
-     HttpServletResponse response, File fPdf)
+  public static void sendFileAsPDFDoubleA3(HttpServletRequest request, HttpServletResponse response, File fPdf)
      throws Exception
   {
     // invio del file pdf come risposta
@@ -207,60 +219,56 @@ public class PDFutils
     //response.setContentLength((int) (fPdf.length()));
     OutputStream output = response.getOutputStream();
 
-    FileInputStream fis = new FileInputStream(fPdf);
-    int pow2 = 1;
-    // we create a reader for a certain document
-    PdfReader reader = new PdfReader(fis);
-    // we retrieve the total number of pages and the page size
-    int total = reader.getNumberOfPages();
-    //   Rectangle pageSize = reader.getPageSize(1);
-    //   Rectangle newSize = (pow2 % 2) == 0 ? new Rectangle(pageSize.width()-18, pageSize.height()-18) : new Rectangle(pageSize.height()-18, pageSize.width()-18);
-    Rectangle pageSize = PageSize.A4;
-    Rectangle newSize = new Rectangle(pageSize.getHeight(), pageSize.getWidth());
-    // unit size : il primo parametro è la larghezza del documeto A5 , (-18 riesce a fare in modo
-    // da per lasciare un po di margine sopra e sotto e non tagliare il footer)
-    Rectangle unitSize = new Rectangle(pageSize.getHeight() / 2 - 18, pageSize.getWidth());
+    try ( FileInputStream fis = new FileInputStream(fPdf))
+    {
+      int pow2 = 1;
+      // we create a reader for a certain document
+      PdfReader reader = new PdfReader(fis);
+      // we retrieve the total number of pages and the page size
+      int total = reader.getNumberOfPages();
+      //   Rectangle pageSize = reader.getPageSize(1);
+      //   Rectangle newSize = (pow2 % 2) == 0 ? new Rectangle(pageSize.width()-18, pageSize.height()-18) : new Rectangle(pageSize.height()-18, pageSize.width()-18);
+      Rectangle pageSize = PageSize.A4;
+      Rectangle newSize = new Rectangle(pageSize.getHeight(), pageSize.getWidth());
+      // unit size : il primo parametro è la larghezza del documeto A5 , (-18 riesce a fare in modo
+      // da per lasciare un po di margine sopra e sotto e non tagliare il footer)
+      Rectangle unitSize = new Rectangle(pageSize.getHeight() / 2 - 18, pageSize.getWidth());
 
-    Rectangle currentSize;
-    int n = 2;
-    //                       PipedInputStream pdf_in = new PipedInputStream();
-    //                       PipedOutputStream pdf_out = new PipedOutputStream();
+      Rectangle currentSize;
+      int n = 2;
+      //                       PipedInputStream pdf_in = new PipedInputStream();
+      //                       PipedOutputStream pdf_out = new PipedOutputStream();
 //                        pdf_in.connect(pdf_out);
-    // step 1: creation of a document-object
-    Document document = new Document(newSize, 0, 0, 0, 0);
-    // step 2: we create a writer that listens to the document
-    PdfWriter writer = PdfWriter.getInstance(document, output);
-    // step 3: we open the document
-    document.open();
-    // step 4: adding the content
-    PdfContentByte cb = writer.getDirectContent();
-    PdfImportedPage page;
-    float offsetX, offsetY, factor;
-    int p;
-    for(int i = 0; i < total; i++)
-    {
-      document.newPage();
-      p = i + 1;
-      offsetX = 0;
-      offsetY = 0;
-      currentSize = reader.getPageSize(p);
-      page = writer.getImportedPage(reader, p);
-      factor = Math.min(unitSize.getWidth() / currentSize.getWidth(), unitSize.getHeight() / currentSize.getHeight());
-      offsetX += (unitSize.getWidth() - (currentSize.getWidth() * factor)) / 2f;
-      offsetY += (unitSize.getHeight() - (currentSize.getHeight() * factor)) / 2f;
-      cb.addTemplate(page, factor, 0, 0, factor, offsetX, offsetY);
-      // pagina di copia
-      offsetX += pageSize.getHeight() / 2;
-      cb.addTemplate(page, factor, 0, 0, factor, offsetX, offsetY);
-    }
-    // step 5: we close the document
-    document.close();
+      // step 1: creation of a document-object
+      Document document = new Document(newSize, 0, 0, 0, 0);
+      // step 2: we create a writer that listens to the document
+      PdfWriter writer = PdfWriter.getInstance(document, output);
+      // step 3: we open the document
+      document.open();
+      // step 4: adding the content
+      PdfContentByte cb = writer.getDirectContent();
+      PdfImportedPage page;
+      float offsetX, offsetY, factor;
+      int p;
+      for(int i = 0; i < total; i++)
+      {
+        document.newPage();
+        p = i + 1;
+        offsetX = 0;
+        offsetY = 0;
+        currentSize = reader.getPageSize(p);
+        page = writer.getImportedPage(reader, p);
+        factor = Math.min(unitSize.getWidth() / currentSize.getWidth(), unitSize.getHeight() / currentSize.getHeight());
+        offsetX += (unitSize.getWidth() - (currentSize.getWidth() * factor)) / 2f;
+        offsetY += (unitSize.getHeight() - (currentSize.getHeight() * factor)) / 2f;
+        cb.addTemplate(page, factor, 0, 0, factor, offsetX, offsetY);
+        // pagina di copia
+        offsetX += pageSize.getHeight() / 2;
+        cb.addTemplate(page, factor, 0, 0, factor, offsetX, offsetY);
+      }
 
-    // cattura eccezione se il file e' stato gia' chiuso
-    try
-    {
-      output.flush();
-      fis.close();
+      // step 5: we close the document
+      document.close();
     }
     catch(Exception ex)
     {

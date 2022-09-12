@@ -27,6 +27,7 @@ import org.apache.turbine.services.TurbineServices;
 import org.sirio5.services.localization.INT;
 import org.sirio5.services.print.AsyncPdfRunningException;
 import org.sirio5.services.print.PdfPrint;
+import org.sirio5.services.security.SEC;
 import org.sirio5.utils.LI;
 import org.sirio5.utils.SU;
 import org.sirio5.utils.pdf.PDFutils;
@@ -262,6 +263,7 @@ public class pdfmaker extends HttpServlet
      throws Exception
   {
     Map params = SU.getParMap(request);
+    int idUser = authRequest(request);
 
     String mappaParametri = null;
     if((mappaParametri = request.getParameter("special_map")) == null)
@@ -289,13 +291,13 @@ public class pdfmaker extends HttpServlet
     PdfPrint.JobInfo info = null;
     if((pos = sRequest.indexOf('/')) == -1)
     {
-      info = pp.generatePrintJob(0, sRequest, params);
+      info = pp.generatePrintJob(idUser, sRequest, params);
     }
     else
     {
       pluginName = sRequest.substring(0, pos);
       reportName = sRequest.substring(pos + 1);
-      info = pp.generatePrintJob(0, pluginName, reportName, null, params);
+      info = pp.generatePrintJob(idUser, pluginName, reportName, null, params);
     }
 
     if(info == null)
@@ -311,6 +313,21 @@ public class pdfmaker extends HttpServlet
     }
 
     return info;
+  }
+
+  /**
+   * Autentica la richiesta.
+   * Determina l'utente che ha generato la richiesta.
+   * Ridefinibile in classi derivate.
+   * @param request parametri della richiesta
+   * @return id utente
+   * @throws java.lang.Exception
+   */
+  protected int authRequest(HttpServletRequest request)
+     throws Exception
+  {
+    int idUser = SEC.getUserID(request.getSession());
+    return idUser == -1 ? 0 : idUser;
   }
 
   private PdfPrint.JobInfo checkJobCompleted(String jobCode)
