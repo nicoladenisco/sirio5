@@ -118,7 +118,6 @@ public class BaseXmlRpcClient
    * Verifica asserzione.
    * @param test condizione da verificare
    * @param cause testo del messaggio eccezione
-   * @throws Exception
    */
   public void ASSERT(boolean test, String cause)
   {
