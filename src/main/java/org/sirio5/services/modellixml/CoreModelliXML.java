@@ -183,8 +183,10 @@ public class CoreModelliXML extends AbstractCoreBaseService
      throws Exception
   {
     File f = getConfMainFile(fileName);
-    ASSERT_FILE(f);
-    vFilesXml.add(f);
+    if(f.canRead())
+      vFilesXml.add(f);
+    else
+      log.warn("Il file " + f.getAbsolutePath() + " non può essere letto: ignorato.");
   }
 
   @Override
