@@ -112,6 +112,9 @@ public class CoreRunData extends DefaultTurbineRunData
   public String formatDataEta(Date data)
      throws Exception
   {
+    if(data == null)
+      return "&nbsp;";
+
     return DT.getEtaDescrizione(data, " " + i18n("anni"), " " + i18n("mesi"), " " + i18n("giorni"));
   }
 

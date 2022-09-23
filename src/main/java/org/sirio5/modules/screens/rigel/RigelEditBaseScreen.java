@@ -37,6 +37,7 @@ import org.rigel5.table.peer.html.*;
 import org.sirio5.beans.menu.MenuItemBean;
 import org.sirio5.modules.screens.CoreBaseScreen;
 import org.sirio5.services.modellixml.MDL;
+import org.sirio5.services.security.SEC;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.LI;
 import org.sirio5.utils.SU;
@@ -177,7 +178,7 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
   protected boolean isAuthorizedDelete(CoreRunData data)
      throws Exception
   {
-    return isAuthorizedAll(data, "cancella_manutenzione");
+    return SEC.checkAllPermission(data, "cancella_manutenzione");
   }
 
   protected List<CoreMenuTreeNode> makeHeaderButtons(RunData data, HtmlWrapperBase lso, String baseUri)

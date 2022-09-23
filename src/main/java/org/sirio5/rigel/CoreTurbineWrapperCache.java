@@ -105,6 +105,16 @@ public class CoreTurbineWrapperCache extends WrapperCacheBase
     this.properties.putAll(properties);
   }
 
+  public void addProperty(String chiave, String valore)
+  {
+    properties.put(chiave, valore);
+  }
+
+  public void clearProperty(String chiave)
+  {
+    properties.remove(chiave);
+  }
+
   @Override
   public void populateTableModelProperties(RigelTableModel tm)
   {
