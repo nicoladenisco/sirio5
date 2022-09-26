@@ -19,6 +19,7 @@ package org.sirio5.services.print;
 
 import java.io.*;
 import java.util.*;
+import javax.servlet.http.HttpSession;
 import org.apache.fulcrum.cache.CachedObject;
 import org.sirio5.services.CoreServiceExtension;
 
@@ -83,11 +84,12 @@ public interface PdfPrint extends CoreServiceExtension
    * @param idUser
    * @param codiceStampa codice dalla stampa richiesta
    * @param params parametri accessori del plugin
+   * @param sessione
    * @return il descrittore informazioni sul job
    * @throws java.lang.Exception errore durante la stampa
    * @throws IllegalAccessException utente non autorizzato
    */
-  public JobInfo generatePrintJob(int idUser, String codiceStampa, Map params)
+  public JobInfo generatePrintJob(int idUser, String codiceStampa, Map params, HttpSession sessione)
      throws Exception, IllegalAccessException;
 
   /**
@@ -97,12 +99,13 @@ public interface PdfPrint extends CoreServiceExtension
    * @param reportName nome del report richiesto
    * @param reportInfo informazioni supplementari per il plugin
    * @param params parametri accessori del plugin
+   * @param sessione
    * @return il descrittore informazioni sul job
    * @throws java.lang.Exception errore durante la stampa
    * @throws IllegalAccessException utente non autorizzato
    */
   public JobInfo generatePrintJob(int idUser, String pluginName,
-     String reportName, String reportInfo, Map params)
+     String reportName, String reportInfo, Map params, HttpSession sessione)
      throws Exception, IllegalAccessException;
 
   /**

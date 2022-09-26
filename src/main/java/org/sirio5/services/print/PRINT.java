@@ -19,6 +19,7 @@ package org.sirio5.services.print;
 
 import java.util.Iterator;
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 import org.apache.fulcrum.cache.CachedObject;
 import org.apache.turbine.services.TurbineServices;
 import org.sirio5.services.print.PdfPrint.JobInfo;
@@ -45,16 +46,16 @@ public class PRINT
     return getService().getParameters(idUser, codiceStampa, params);
   }
 
-  public static JobInfo generatePrintJob(int idUser, String codiceStampa, Map params)
+  public static JobInfo generatePrintJob(int idUser, String codiceStampa, Map params, HttpSession sessione)
      throws Exception, IllegalAccessException
   {
-    return getService().generatePrintJob(idUser, codiceStampa, params);
+    return getService().generatePrintJob(idUser, codiceStampa, params, sessione);
   }
 
-  public static JobInfo generatePrintJob(int idUser, String pluginName, String reportName, String reportInfo, Map params)
+  public static JobInfo generatePrintJob(int idUser, String pluginName, String reportName, String reportInfo, Map params, HttpSession sessione)
      throws Exception, IllegalAccessException
   {
-    return getService().generatePrintJob(idUser, pluginName, reportName, reportInfo, params);
+    return getService().generatePrintJob(idUser, pluginName, reportName, reportInfo, params, sessione);
   }
 
   public static JobInfo refreshInfo(String jobCode)

@@ -23,6 +23,7 @@ import java.util.*;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.Query;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.*;
@@ -63,9 +64,7 @@ public class FopPlugin extends BasePdfPlugin
   }
 
   @Override
-  public void buildPdf(PdfPrint.JobInfo job, int idUser,
-     String reportName, String reportInfo, Map params,
-     AbstractReportParametersInfo pbean, File pdfToGen)
+  public void buildPdf(PdfPrint.JobInfo job, int idUser, String reportName, String reportInfo, Map params, AbstractReportParametersInfo pbean, File pdfToGen, HttpSession sessione)
      throws Exception
   {
     // estrae i soli parametri relativi al report sotto forma di stringa

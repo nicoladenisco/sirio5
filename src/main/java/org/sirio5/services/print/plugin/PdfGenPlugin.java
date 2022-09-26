@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,11 +17,12 @@
  */
 package org.sirio5.services.print.plugin;
 
-import org.sirio5.services.print.PdfPrint;
-import org.sirio5.services.print.AbstractReportParametersInfo;
 import java.io.File;
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
+import org.sirio5.services.print.AbstractReportParametersInfo;
+import org.sirio5.services.print.PdfPrint;
 
 /**
  * Interfaccia di un plugin per la generazione di pdf.
@@ -62,10 +63,11 @@ public interface PdfGenPlugin
    * @param params
    * @param pbean
    * @param pdfToGen
+   * @param sessione
    * @throws Exception
    */
   public void buildPdf(PdfPrint.JobInfo job, int idUser,
      String reportName, String reportInfo, Map params,
-     AbstractReportParametersInfo pbean, File pdfToGen)
+     AbstractReportParametersInfo pbean, File pdfToGen, HttpSession sessione)
      throws Exception;
 }

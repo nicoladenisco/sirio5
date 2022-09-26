@@ -291,13 +291,13 @@ public class pdfmaker extends HttpServlet
     PdfPrint.JobInfo info = null;
     if((pos = sRequest.indexOf('/')) == -1)
     {
-      info = pp.generatePrintJob(idUser, sRequest, params);
+      info = pp.generatePrintJob(idUser, sRequest, params, request.getSession());
     }
     else
     {
       pluginName = sRequest.substring(0, pos);
       reportName = sRequest.substring(pos + 1);
-      info = pp.generatePrintJob(idUser, pluginName, reportName, null, params);
+      info = pp.generatePrintJob(idUser, pluginName, reportName, null, params, request.getSession());
     }
 
     if(info == null)

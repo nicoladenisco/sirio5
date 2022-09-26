@@ -19,6 +19,7 @@ package org.sirio5.services.print.plugin;
 
 import java.io.*;
 import java.util.*;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.*;
@@ -78,7 +79,7 @@ public class JasperPlugin extends BasePdfPlugin
   @Override
   public void buildPdf(PdfPrint.JobInfo job, int idUser,
      String reportName, String reportInfo, Map params,
-     AbstractReportParametersInfo pbean, File pdfToGen)
+     AbstractReportParametersInfo pbean, File pdfToGen, HttpSession sessione)
      throws Exception
   {
     File reportFile = getFileReport(reportName, reportInfo);
@@ -141,13 +142,13 @@ public class JasperPlugin extends BasePdfPlugin
     {
       PropertyManager pm = new PropertyManager();
       pm.addAll(reportParams);
-      try (FileOutputStream fos = new FileOutputStream(tmpParams.getAbsolutePath() + ".debug"))
+      try ( FileOutputStream fos = new FileOutputStream(tmpParams.getAbsolutePath() + ".debug"))
       {
         pm.save(fos);
       }
     }
 
-    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tmpParams)))
+    try ( ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tmpParams)))
     {
       oos.writeObject(reportParams);
     }

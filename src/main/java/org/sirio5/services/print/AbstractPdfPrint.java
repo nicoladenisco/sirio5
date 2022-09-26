@@ -19,6 +19,7 @@ package org.sirio5.services.print;
 
 import java.io.*;
 import java.util.*;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.*;
 import org.apache.fulcrum.cache.CachedObject;
@@ -79,24 +80,24 @@ abstract public class AbstractPdfPrint extends AbstractCoreBaseService
   }
 
   @Override
-  public JobInfo generatePrintJob(int idUser, String codiceStampa, Map params)
+  public JobInfo generatePrintJob(int idUser, String codiceStampa, Map params, HttpSession sessione)
      throws Exception
   {
     JobInfo info = new JobInfo();
     info.idUser = idUser;
     AbstractReportParametersInfo ri = getParameters(idUser, codiceStampa, params);
-    info.filePdf = makePdf(info, idUser, ri.getPlugin(), ri.getNome(), ri.getInfo(), params, ri);
+    info.filePdf = makePdf(info, idUser, ri.getPlugin(), ri.getNome(), ri.getInfo(), params, ri, sessione);
     info.percCompleted = 100;
     return info;
   }
 
   @Override
-  public JobInfo generatePrintJob(int idUser, String pluginName, String reportName, String reportInfo, Map params)
+  public JobInfo generatePrintJob(int idUser, String pluginName, String reportName, String reportInfo, Map params, HttpSession sessione)
      throws Exception
   {
     JobInfo info = new JobInfo();
     info.idUser = idUser;
-    info.filePdf = makePdf(info, idUser, pluginName, reportName, reportInfo, params, null);
+    info.filePdf = makePdf(info, idUser, pluginName, reportName, reportInfo, params, null, sessione);
     info.percCompleted = 100;
     return info;
   }
@@ -116,7 +117,7 @@ abstract public class AbstractPdfPrint extends AbstractCoreBaseService
 
   protected File makePdf(JobInfo job,
      int idUser, String pluginName, String reportName, String reportInfo,
-     Map params, AbstractReportParametersInfo pbean)
+     Map params, AbstractReportParametersInfo pbean, HttpSession sessione)
      throws Exception
   {
     log.info("Avvita elaborazione job per plugin=" + pluginName + " reportName=" + reportName);
@@ -134,7 +135,7 @@ abstract public class AbstractPdfPrint extends AbstractCoreBaseService
       job.saveName = reportName + ".pdf";
 
     File pdfFile = getTmpFile();
-    plg.buildPdf(job, idUser, reportName, reportInfo, params, pbean, pdfFile);
+    plg.buildPdf(job, idUser, reportName, reportInfo, params, pbean, pdfFile, sessione);
     log.info("Elaborazione job per plugin=" + pluginName + " reportName=" + reportName
        + " conclusa con successo.");
 

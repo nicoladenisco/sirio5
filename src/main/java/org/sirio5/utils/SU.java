@@ -94,7 +94,20 @@ public class SU extends StringOper
 
     // estrae i parametri della richiesta (anche i campi di input con nome della form)
     Map<String, String[]> parameterMap = request.getParameterMap();
-    htParam.putAll(parameterMap);
+    for(Map.Entry<String, String[]> entry : parameterMap.entrySet())
+    {
+      String name = entry.getKey();
+      String[] value = entry.getValue();
+
+      if(value == null || value.length == 0)
+        continue;
+
+      // se contiene un solo valore lo passa come tale, altrimenti passa l'array dei valori
+      if(value.length == 1)
+        htParam.put(name, value[0]);
+      else
+        htParam.put(name, value);
+    }
 
     // carica i parametri fissi
     htParam.put(SESSION_ID, request.getSession().getId());

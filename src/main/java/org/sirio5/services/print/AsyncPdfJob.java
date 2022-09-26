@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -19,6 +19,7 @@ package org.sirio5.services.print;
 
 import java.util.Date;
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.commonlib5.exec.ExecHelper;
@@ -44,10 +45,11 @@ public class AsyncPdfJob
   protected String pluginName, reportName, reportInfo;
   protected Map params = null;
   protected AbstractReportParametersInfo ri = null;
+  protected HttpSession sessione = null;
 
   public void init(AbstractAsyncPdfPrint service, int idUser, String pluginName,
      String reportName, String reportInfo, Map params,
-     AbstractReportParametersInfo ri)
+     AbstractReportParametersInfo ri, HttpSession sessione)
      throws Exception
   {
     this.service = service;
@@ -56,6 +58,7 @@ public class AsyncPdfJob
     this.reportInfo = reportInfo;
     this.params = params;
     this.ri = ri;
+    this.sessione = sessione;
 
     info = new JobInfo();
     info.jobCode = generateJobCode();
@@ -89,7 +92,7 @@ public class AsyncPdfJob
     try
     {
       info.filePdf = service.makePdf(info, info.idUser,
-         pluginName, reportName, reportInfo, params, ri);
+         pluginName, reportName, reportInfo, params, ri, sessione);
       info.percCompleted = 100;
 
       if(info.printer != null)

@@ -19,6 +19,7 @@ package org.sirio5.services.print;
 
 import java.util.Iterator;
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -82,16 +83,16 @@ abstract public class AbstractAsyncPdfPrint extends AbstractPdfPrint
    * @throws java.lang.Exception
    */
   @Override
-  public JobInfo generatePrintJob(int idUser, String codiceStampa, Map params)
+  public JobInfo generatePrintJob(int idUser, String codiceStampa, Map params, HttpSession sessione)
      throws Exception
   {
     if(SU.checkTrueFalse(params.get("SYNC_REQUEST"), false))
-      return super.generatePrintJob(idUser, codiceStampa, params);
+      return super.generatePrintJob(idUser, codiceStampa, params, sessione);
 
     AsyncPdfJob job = createJob();
     AbstractReportParametersInfo ri = getParameters(idUser, codiceStampa, params);
 
-    job.init(this, idUser, ri.getPlugin(), ri.getNome(), ri.getInfo(), params, ri);
+    job.init(this, idUser, ri.getPlugin(), ri.getNome(), ri.getInfo(), params, ri, sessione);
     job.start();
     job.join(tWaitSeconds * 1000);
 
@@ -112,16 +113,15 @@ abstract public class AbstractAsyncPdfPrint extends AbstractPdfPrint
    * @throws java.lang.Exception
    */
   @Override
-  public JobInfo generatePrintJob(int idUser, String pluginName,
-     String reportName, String reportInfo, Map params)
+  public JobInfo generatePrintJob(int idUser, String pluginName, String reportName, String reportInfo, Map params, HttpSession sessione)
      throws Exception
   {
     if(SU.checkTrueFalse(params.get("SYNC_REQUEST"), false))
-      return super.generatePrintJob(idUser, pluginName, reportName, reportInfo, params);
+      return super.generatePrintJob(idUser, pluginName, reportName, reportInfo, params, sessione);
 
     AsyncPdfJob job = createJob();
 
-    job.init(this, idUser, pluginName, reportName, reportInfo, params, null);
+    job.init(this, idUser, pluginName, reportName, reportInfo, params, null, sessione);
     job.start();
     job.join(tWaitSeconds * 1000);
 
