@@ -175,7 +175,7 @@ public class CoreAppSanity
     }
   }
 
-  private boolean grantAllPermission(Role role, Connection connection)
+  protected boolean grantAllPermission(Role role, Connection connection)
      throws Exception
   {
     String sSQL
@@ -242,7 +242,7 @@ public class CoreAppSanity
     }
   }
 
-  private boolean createRoles(String[] roleNames, Connection con)
+  protected boolean createRoles(String[] roleNames, Connection con)
      throws Exception
   {
     String sSQL
@@ -269,6 +269,137 @@ public class CoreAppSanity
         ps.clearParameters();
         ps.setInt(1, roleid++);
         ps.setString(2, roleName);
+        ps.executeUpdate();
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Crea permessi se non esistono.
+   * @param permissionNames elenco di nomi di ruolo
+   * @throws Exception
+   */
+  protected void createPermissions(String... permissionNames)
+     throws Exception
+  {
+    Connection connection = null;
+    try
+    {
+      connection = Transaction.begin();
+
+      if(createPermissions(permissionNames, connection))
+        return;
+
+      Transaction.commit(connection);
+      connection = null;
+    }
+    finally
+    {
+      if(connection != null)
+      {
+        Transaction.safeRollback(connection);
+      }
+    }
+  }
+
+  protected boolean createPermissions(String[] permissionNames, Connection con)
+     throws Exception
+  {
+    String sSQL
+       = "SELECT *"
+       + "  FROM turbine_permission";
+    List<Record> lsRecs = DbUtils.executeQuery(sSQL, con);
+
+    int permissionid = lsRecs.stream().mapToInt(
+       LEU.rethrowFunctionInt((r) -> r.getValue("permission_id").asInt())).max().orElse(0) + 1;
+
+    String sINS
+       = "INSERT INTO turbine_permission(\n"
+       + "	permission_id, permission_name, objectdata)\n"
+       + "	VALUES (?, ?, NULL);";
+    try ( PreparedStatement ps = con.prepareStatement(sINS))
+    {
+      for(int i = 0; i < permissionNames.length; i++)
+      {
+        String permissionName = permissionNames[i];
+        if(lsRecs.stream()
+           .anyMatch(LEU.rethrowPredicate((r) -> SU.isEqu(permissionName, r.getValue("permission_name").asString()))))
+          continue;
+
+        ps.clearParameters();
+        ps.setInt(1, permissionid++);
+        ps.setString(2, permissionName);
+        ps.executeUpdate();
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Assegna permessi al ruolo indicato.
+   * @param role ruolo
+   * @param permissions elenco permessi
+   * @throws Exception
+   */
+  protected void grantPermission(Role role, String... permissions)
+     throws Exception
+  {
+    Connection connection = null;
+    try
+    {
+      connection = Transaction.begin();
+
+      if(grantPermission(role, connection, permissions))
+        return;
+
+      Transaction.commit(connection);
+      connection = null;
+    }
+    finally
+    {
+      if(connection != null)
+      {
+        Transaction.safeRollback(connection);
+      }
+    }
+  }
+
+  protected boolean grantPermission(Role role, Connection connection, String... permissions)
+     throws Exception
+  {
+    String sSQL
+       = "select permission_id,permission_name\n"
+       + "  from turbine_permission\n"
+       + " where permission_id NOT IN ("
+       + "    select permission_id from turbine_role_permission where role_id=" + role.getId() + ")";
+    List<Record> lsRecs = DbUtils.executeQuery(sSQL, connection);
+    if(lsRecs.isEmpty())
+      return true;
+
+    String sINS
+       = "INSERT INTO turbine_role_permission(\n"
+       + "	role_id, permission_id)\n"
+       + "	VALUES (?, ?);";
+    try ( PreparedStatement ps = connection.prepareStatement(sINS))
+    {
+      int roleid = (Integer) role.getId();
+      for(String perm : permissions)
+      {
+        Record rPerm = lsRecs.stream()
+           .filter(LEU.rethrowPredicate((r) -> perm.equals(r.getValue(2).asString())))
+           .findFirst().orElse(null);
+
+        if(rPerm == null)
+          continue;
+
+        int permid = rPerm.getValue(1).asInt();
+
+        ps.clearParameters();
+        ps.setInt(1, roleid);
+        ps.setInt(2, permid);
         ps.executeUpdate();
       }
     }
