@@ -24,10 +24,12 @@ import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.util.RunData;
 import org.rigel5.glue.PeerObjectSaver;
+import org.rigel5.glue.RecordObjectSaver;
 import org.rigel5.glue.WrapperCacheBase;
 import org.rigel5.glue.table.AlternateColorTableAppBase;
 import org.rigel5.glue.table.HeditTableApp;
 import org.rigel5.glue.table.PeerAppMaintFormTable;
+import org.rigel5.glue.table.SqlAppMaintFormTable;
 import org.rigel5.table.RigelTableModel;
 import org.sirio5.services.modellixml.modelliXML;
 import org.sirio5.utils.CoreRunData;
@@ -71,15 +73,27 @@ public class CoreTurbineWrapperCache extends WrapperCacheBase
   }
 
   @Override
-  public PeerAppMaintFormTable buildDefaultTableForm()
+  public PeerAppMaintFormTable buildDefaultPeerTableForm()
   {
     return new PeerAppMaintFormTable();
   }
 
   @Override
-  public PeerObjectSaver buildDefaultSaver()
+  public SqlAppMaintFormTable buildDefaultSqlTableForm()
+  {
+    return new SqlAppMaintFormTable();
+  }
+
+  @Override
+  public PeerObjectSaver buildDefaultPeerSaver()
   {
     return new CoreObjectSaver();
+  }
+
+  @Override
+  public RecordObjectSaver buildDefaultRecordSaver()
+  {
+    return new CoreRecordObjectSaver();
   }
 
   @Override

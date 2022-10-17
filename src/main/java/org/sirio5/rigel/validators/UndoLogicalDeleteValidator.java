@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -56,29 +56,37 @@ public class UndoLogicalDeleteValidator implements PostParseValidator
   }
 
   @Override
-  public boolean validate(Persistent obj, RigelTableModel tableModel, hEditTable table, int row, HttpSession session, Map param, RigelI18nInterface i18n, Connection dbCon, Object custom)
+  public boolean validate(Object __obj,
+     RigelTableModel tableModel, hEditTable table,
+     int row, HttpSession session, Map param,
+     RigelI18nInterface i18n, Connection dbCon, Map custom)
      throws Exception
   {
-    if(obj.isNew()
-       && ((elKeys != null && !elKeys.isEmpty()) || (elUnique != null && !elUnique.isEmpty())))
+    if(__obj instanceof Persistent)
     {
-      Class peerClass = getClassByObject(obj);
-      Method msel = peerClass.getMethod("doSelect", Criteria.class, Connection.class);
-      Method mtmp = peerClass.getMethod("getTableMap");
+      Persistent obj = (Persistent) __obj;
 
-      TableMap tm = (TableMap) mtmp.invoke(null);
-      TableMapHelper tmTo = new TableMapHelper(tm);
-
-      for(Element eKey : elKeys)
+      if(obj.isNew()
+         && ((elKeys != null && !elKeys.isEmpty()) || (elUnique != null && !elUnique.isEmpty())))
       {
-        if(testForUndo1(eKey, obj, msel, tmTo, dbCon))
-          break;
-      }
+        Class peerClass = getClassByObject(obj);
+        Method msel = peerClass.getMethod("doSelect", Criteria.class, Connection.class);
+        Method mtmp = peerClass.getMethod("getTableMap");
 
-      for(Element eKey : elUnique)
-      {
-        if(testForUndo2(eKey, obj, msel, tmTo, dbCon))
-          break;
+        TableMap tm = (TableMap) mtmp.invoke(null);
+        TableMapHelper tmTo = new TableMapHelper(tm);
+
+        for(Element eKey : elKeys)
+        {
+          if(testForUndo1(eKey, obj, msel, tmTo, dbCon))
+            break;
+        }
+
+        for(Element eKey : elUnique)
+        {
+          if(testForUndo2(eKey, obj, msel, tmTo, dbCon))
+            break;
+        }
       }
     }
 

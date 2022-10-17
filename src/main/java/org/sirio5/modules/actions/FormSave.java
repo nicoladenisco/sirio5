@@ -20,6 +20,7 @@ package org.sirio5.modules.actions;
 import java.util.*;
 import org.apache.torque.om.Persistent;
 import org.apache.velocity.context.*;
+import org.commonlib5.utils.ArrayOper;
 import org.rigel5.RigelCacheManager;
 import org.rigel5.RigelI18nInterface;
 import org.rigel5.SetupHolder;
@@ -88,12 +89,14 @@ public class FormSave extends RigelEditBaseAction
       }
     }
 
+    Map validateMap = ArrayOper.asMapFromPair("rundata", data);
+
     PeerAppMaintFormTable pfe = (PeerAppMaintFormTable) (pwl.getTbl());
     boolean isNewObject = pfe.isNewObject();
 
     // imposta credenziali e aggiorna dati
     pfe.setUserInfo(SEC.getUserID(data), SEC.isAdmin(data));
-    pfe.aggiornaDati(data.getSession(), params, saveDB, saveTmp, data);
+    pfe.aggiornaDati(data.getSession(), params, saveDB, saveTmp, validateMap);
     Persistent objInEdit = pfe.getLastObjectInEdit();
     RigelI18nInterface i18n = new RigelHtmlI18n(data);
 
@@ -105,12 +108,12 @@ public class FormSave extends RigelEditBaseAction
         throw new Exception(data.i18n("Manca dettaglio nella definizione master-detail. Controllare lista.xml."));
 
       doWorkDetail(data, context, params, type, dettType, pwl, objInEdit, i18n,
-         saveDB, saveTmp, nuovoDetail, cancellaDetail);
+         saveDB, saveTmp, nuovoDetail, cancellaDetail, validateMap);
 
       // attiva le azioni di post parsing eventualmente presenti nel blocco <master-detail/> del master
       Validator.postParseValidate(pwl.getMdInfo().getEleXml(),
          objInEdit, pwl.getPtm(), null, 0,
-         data.getSession(), params, i18n, null, data);
+         data.getSession(), params, i18n, null, validateMap);
     }
 
     // aggancio per classi derivate
@@ -118,7 +121,7 @@ public class FormSave extends RigelEditBaseAction
 
     // Attiva le azioni di post save
     params.put("SAVED_ON_DATABASE", saveDB);
-    Validator.postSaveAction(pwl.getEleXml(), objInEdit, pwl.getPtm(), pfe, 0, data.getSession(), params, i18n, data);
+    Validator.postSaveAction(pwl.getEleXml(), objInEdit, pwl.getPtm(), pfe, 0, data.getSession(), params, i18n, validateMap);
 
     if(saveDB)
     {
@@ -156,7 +159,7 @@ public class FormSave extends RigelEditBaseAction
   protected void doWorkDetail(CoreRunData data, Context context,
      Map params, String type, String dettType, PeerWrapperFormHtml pwl, Persistent objInEdit,
      RigelI18nInterface i18n,
-     boolean saveDB, boolean saveTmp, boolean nuovoDetail, boolean cancellaDetail)
+     boolean saveDB, boolean saveTmp, boolean nuovoDetail, boolean cancellaDetail, Map validateMap)
      throws Exception
   {
     PeerWrapperEditHtml eh = (PeerWrapperEditHtml) getLista(data, dettType);
@@ -221,10 +224,10 @@ public class FormSave extends RigelEditBaseAction
 
     // aggiorna e salva i dati sul db
     PeerTablePagerEditApp peh = (PeerTablePagerEditApp) (eh.getPager());
-    peh.aggiornaDati(data.getSession(), params, nuovoDetail, saveDB, data, linkParams);
+    peh.aggiornaDati(data.getSession(), params, nuovoDetail, saveDB, validateMap, linkParams);
 
     // oggetti modificati
-    List<Persistent> objectsDetail = ((PeerTableModel) eh.getPtm()).getVBuf();
+    List objectsDetail = ((PeerTableModel) eh.getPtm()).getVBuf();
     if(objectsDetail != null)
     {
       context.put("objDet", objectsDetail);
@@ -241,7 +244,7 @@ public class FormSave extends RigelEditBaseAction
     Validator.postSaveMasterDetail(pwl.getMdInfo().getEleXml(),
        objInEdit, pwl.getPtm(), (hEditTable) pwl.getTbl(), 0,
        objectsDetail, eh.getPtm(), (hEditTable) eh.getTbl(),
-       data.getSession(), params, i18n, null, data);
+       data.getSession(), params, i18n, null, validateMap);
   }
 
   /**

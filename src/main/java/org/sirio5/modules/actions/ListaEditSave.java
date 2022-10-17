@@ -19,6 +19,7 @@ package org.sirio5.modules.actions;
 
 import java.util.*;
 import org.apache.velocity.context.*;
+import org.commonlib5.utils.ArrayOper;
 import org.rigel5.RigelCacheManager;
 import org.rigel5.SetupHolder;
 import org.rigel5.exceptions.MissingListException;
@@ -121,13 +122,14 @@ public class ListaEditSave extends RigelEditBaseAction
       return;
     }
 
+    Map validateMap = ArrayOper.asMapFromPair("rundata", data);
     AbstractHtmlTablePager peh = (AbstractHtmlTablePager) (eh.getPager());
 
     // aggiorna e salva i dati sul db
     if(peh instanceof PeerTablePagerEditApp)
     {
       ((PeerTablePagerEditApp) peh).aggiornaDati(data.getSession(),
-         params, nuovoDetail, saveDB, data, null);
+         params, nuovoDetail, saveDB, validateMap, null);
 
       if(saveDB)
       {
