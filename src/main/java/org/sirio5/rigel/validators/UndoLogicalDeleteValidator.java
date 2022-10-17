@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpSession;
+import org.apache.torque.criteria.Criteria;
 import org.apache.torque.map.ColumnMap;
 import org.apache.torque.map.TableMap;
 import org.apache.torque.om.ColumnAccessByName;
 import org.apache.torque.om.Persistent;
-import org.apache.torque.util.Criteria;
 import org.jdom2.Element;
 import org.rigel5.RigelI18nInterface;
 import org.rigel5.db.torque.TableMapHelper;
@@ -169,7 +169,7 @@ public class UndoLogicalDeleteValidator implements PostParseValidator
       if(cmap == null)
         throw new Exception(INT.I("Campo %s non trovato in alternate-key/field; rivedere liste.xml.", nomeCampo));
 
-      c.add(cmap.getFullyQualifiedName(), cab.getByName(cmap.getJavaName()));
+      c.and(cmap.getFullyQualifiedName(), cab.getByName(cmap.getJavaName()));
     }
 
     List lsFound = (List) m.invoke(null, c, dbCon);
