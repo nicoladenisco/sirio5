@@ -21,7 +21,6 @@ import java.util.Map;
 import org.apache.velocity.context.Context;
 import org.rigel5.glue.WrapperCacheBase;
 import org.rigel5.table.html.wrapper.HtmlWrapperBase;
-import org.rigel5.table.peer.html.PeerWrapperFormHtml;
 import org.sirio5.CoreConst;
 import org.sirio5.modules.actions.CoreBaseAction;
 import org.sirio5.services.modellixml.MDL;
@@ -142,7 +141,7 @@ abstract public class RigelEditBaseAction extends CoreBaseAction
   abstract protected void doClear(CoreRunData data, String type)
      throws Exception;
 
-  protected PeerWrapperFormHtml getForm(CoreRunData data, String type)
+  protected HtmlWrapperBase getForm(CoreRunData data, String type)
      throws Exception
   {
     WrapperCacheBase wpc = MDL.getWrapperCache(data);

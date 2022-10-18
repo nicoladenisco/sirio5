@@ -17,6 +17,7 @@
  */
 package org.sirio5.modules.actions;
 
+import com.workingdogs.village.Record;
 import java.util.*;
 import org.apache.torque.om.Persistent;
 import org.apache.velocity.context.*;
@@ -27,8 +28,10 @@ import org.rigel5.SetupHolder;
 import org.rigel5.exceptions.MissingListException;
 import org.rigel5.glue.pager.PeerTablePagerEditApp;
 import org.rigel5.glue.table.PeerAppMaintFormTable;
+import org.rigel5.glue.table.SqlAppMaintFormTable;
 import org.rigel5.glue.validators.Validator;
 import org.rigel5.table.html.hEditTable;
+import org.rigel5.table.html.wrapper.HtmlWrapperBase;
 import org.rigel5.table.peer.html.*;
 import org.sirio5.modules.actions.rigel.RigelEditBaseAction;
 import org.sirio5.rigel.RigelHtmlI18n;
@@ -52,7 +55,7 @@ public class FormSave extends RigelEditBaseAction
      boolean saveDB, boolean saveTmp, boolean nuovoDetail, boolean cancellaDetail)
      throws Exception
   {
-    PeerWrapperFormHtml pwl = getForm(data, type);
+    HtmlWrapperBase pwl = getForm(data, type);
     if(pwl == null)
       throw new Exception(data.i18n("Inizializzazione non corretta."));
 
@@ -91,6 +94,24 @@ public class FormSave extends RigelEditBaseAction
 
     Map validateMap = ArrayOper.asMapFromPair("rundata", data);
 
+    if(pwl.getTbl() instanceof PeerAppMaintFormTable)
+    {
+      salvaPeerModel(data, context, type, pwl, params, saveDB, saveTmp, nuovoDetail, cancellaDetail, validateMap);
+    }
+    else if(pwl.getTbl() instanceof SqlAppMaintFormTable)
+    {
+      salvaSqlModel(data, context, type, pwl, params, saveDB, saveTmp, nuovoDetail, cancellaDetail, validateMap);
+    }
+    else
+      throw new Exception(data.i18n("Tipo di tabella rigel non supportata."));
+  }
+
+  private void salvaPeerModel(CoreRunData data, Context context,
+     String type, HtmlWrapperBase pwl, Map params,
+     boolean saveDB, boolean saveTmp, boolean nuovoDetail, boolean cancellaDetail,
+     Map validateMap)
+     throws Exception
+  {
     PeerAppMaintFormTable pfe = (PeerAppMaintFormTable) (pwl.getTbl());
     boolean isNewObject = pfe.isNewObject();
 
@@ -140,6 +161,49 @@ public class FormSave extends RigelEditBaseAction
     context.put("obj", objInEdit);
   }
 
+  private void salvaSqlModel(CoreRunData data, Context context,
+     String type, HtmlWrapperBase pwl, Map params,
+     boolean saveDB, boolean saveTmp, boolean nuovoDetail, boolean cancellaDetail,
+     Map validateMap)
+     throws Exception
+  {
+    SqlAppMaintFormTable pfe = (SqlAppMaintFormTable) (pwl.getTbl());
+    boolean isNewObject = pfe.isNewObject();
+
+    // imposta credenziali e aggiorna dati
+    pfe.setUserInfo(SEC.getUserID(data), SEC.isAdmin(data));
+    pfe.aggiornaDati(data.getSession(), params, saveDB, saveTmp, validateMap);
+    Record objInEdit = pfe.getLastObjectInEdit();
+    RigelI18nInterface i18n = new RigelHtmlI18n(data);
+
+    // verifica per master/detail
+    if(!isNewObject && pwl.getMdInfo() != null)
+      throw new Exception(i18n.msg("Master/detail non ammesso per form SQL."));
+
+    // aggancio per classi derivate
+    doPostSave(data, context, params, type, saveDB, objInEdit);
+
+    // Attiva le azioni di post save
+    params.put("SAVED_ON_DATABASE", saveDB);
+    Validator.postSaveAction(pwl.getEleXml(), objInEdit, pwl.getPtm(), pfe, 0, data.getSession(), params, i18n, validateMap);
+
+    if(saveDB)
+    {
+      // invalida le cache di Rigel interessate dalla tabella modificata
+      RigelCacheManager cm = SetupHolder.getCacheManager();
+      cm.purgeTabella(pwl.getNomeTabella());
+
+      BusContext bc = new BusContext(params);
+      bc.setI18n(i18n);
+      bc.put("obj", objInEdit);
+      bc.put("isNewObject", isNewObject);
+
+      BUS.sendMessageAsync(BusMessages.GENERIC_OBJECT_SAVED, this, bc);
+    }
+
+    context.put("obj", objInEdit);
+  }
+
   /**
    * Salva eventuale detail del form.
    * @param data
@@ -154,10 +218,11 @@ public class FormSave extends RigelEditBaseAction
    * @param saveTmp
    * @param nuovoDetail
    * @param cancellaDetail the value of cancellaDetail
+   * @param validateMap
    * @throws Exception
    */
   protected void doWorkDetail(CoreRunData data, Context context,
-     Map params, String type, String dettType, PeerWrapperFormHtml pwl, Persistent objInEdit,
+     Map params, String type, String dettType, HtmlWrapperBase pwl, Persistent objInEdit,
      RigelI18nInterface i18n,
      boolean saveDB, boolean saveTmp, boolean nuovoDetail, boolean cancellaDetail, Map validateMap)
      throws Exception
@@ -220,7 +285,11 @@ public class FormSave extends RigelEditBaseAction
     eh.populateParametri(params);
 
     // estae i parametri di collegamento dal master
-    Map linkParams = pwl.makeMapMasterDetail(0);
+    Map linkParams = null;
+    if(pwl instanceof PeerWrapperFormHtml)
+    {
+      linkParams = ((PeerWrapperFormHtml) pwl).makeMapMasterDetail(0);
+    }
 
     // aggiorna e salva i dati sul db
     PeerTablePagerEditApp peh = (PeerTablePagerEditApp) (eh.getPager());
@@ -273,7 +342,7 @@ public class FormSave extends RigelEditBaseAction
    * @throws Exception
    */
   protected void doPostSave(CoreRunData data, Context context,
-     Map params, String type, boolean saveDB, Persistent objInEdit)
+     Map params, String type, boolean saveDB, Object objInEdit)
      throws Exception
   {
   }

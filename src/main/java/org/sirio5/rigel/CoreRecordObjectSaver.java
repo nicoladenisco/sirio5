@@ -129,12 +129,12 @@ public class CoreRecordObjectSaver implements RecordObjectSaver
      throws Exception
   {
     sc = Schema.schema(con, tableName);
-    colIdAzienda = sc.findInSchemaIgnoreCaseQuiet("IdAzienda");
-    colIdApplicativi = sc.findInSchemaIgnoreCaseQuiet("IdApplicativi");
-    colIdUser = sc.findInSchemaIgnoreCaseQuiet("IdUser");
-    colIdUcrea = sc.findInSchemaIgnoreCaseQuiet("IdUcrea");
-    colStatoRec = sc.findInSchemaIgnoreCaseQuiet("StatoRec");
-    colUltmodif = sc.findInSchemaIgnoreCaseQuiet("Ultodif");
+    colIdAzienda = sc.findInSchemaIgnoreCaseQuiet("Id_Azienda");
+    colIdApplicativi = sc.findInSchemaIgnoreCaseQuiet("Id_Applicativi");
+    colIdUser = sc.findInSchemaIgnoreCaseQuiet("Id_User");
+    colIdUcrea = sc.findInSchemaIgnoreCaseQuiet("Id_Ucrea");
+    colStatoRec = sc.findInSchemaIgnoreCaseQuiet("Stato_Rec");
+    colUltmodif = sc.findInSchemaIgnoreCaseQuiet("Ult_modif");
     colCreazione = sc.findInSchemaIgnoreCaseQuiet("Creazione");
     colUuid = sc.findInSchemaIgnoreCaseQuiet("Uuid");
   }
@@ -391,16 +391,19 @@ public class CoreRecordObjectSaver implements RecordObjectSaver
     boolean adminFlag = userID == 0;
     Schema s = obj.schema();
     if(!s.isSingleTable())
-      throw new InvalidObjectException("The record must refert a single table.");
+      throw new InvalidObjectException("The record must refer a single table.");
+
+    if(!s.getTableName().equals(sc.getTableName()))
+      throw new InvalidObjectException(String.format(
+         "The record refer to table '%s' but the saver is initialized for table '%s'.",
+         s.getTableName(), sc.getTableName()
+      ));
 
     if(!obj.toBeSavedWithInsert())
     {
-      Column primaryKey = null;
       List<Column> lsColPrimary = s.getPrimaryKeys();
-      if(lsColPrimary.size() == 1)
-        primaryKey = lsColPrimary.get(0);
 
-      if(!((colStatoRec == null && colUltmodif == null) || primaryKey == null))
+      if(!((colStatoRec == null && colUltmodif == null) || lsColPrimary.isEmpty()))
       {
         // recupero del record dal database
         // attraverso la sua chiave primaria

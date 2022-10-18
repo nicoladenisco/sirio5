@@ -28,6 +28,7 @@ import org.rigel5.glue.WrapperCacheBase;
 import org.rigel5.glue.custom.CustomButtonFactory;
 import org.rigel5.glue.table.PeerAppMaintDispTable;
 import org.rigel5.glue.table.PeerAppMaintFormTable;
+import org.rigel5.glue.table.SqlAppMaintFormTable;
 import org.rigel5.table.html.hEditTable;
 import org.rigel5.table.html.hTable;
 import org.rigel5.table.html.wrapper.CustomButtonInfo;
@@ -59,7 +60,7 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
 
   abstract protected String makeSelfUrl(RunData data, String type);
 
-  protected PeerWrapperFormHtml getForm(CoreRunData data, String type)
+  protected HtmlWrapperBase getForm(CoreRunData data, String type)
      throws Exception
   {
     WrapperCacheBase wpc = MDL.getWrapperCache(data);
@@ -115,20 +116,19 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
      HtmlWrapperBase pwl, Map params, HttpSession session, boolean forceNew, Map extraParams)
      throws Exception
   {
-    hTable table = pwl.getTbl();
-    synchronized(table)
+    if(pwl.getTbl() instanceof SqlAppMaintFormTable)
     {
-      table.setPopup(isPopup());
-      table.setEditPopup(isEditPopup());
-      table.setExtraParamsUrls(extraParams);
-      return pwl.getHtmlForm(params, session);
+      SqlAppMaintFormTable table = (SqlAppMaintFormTable) (pwl.getTbl());
+      synchronized(table)
+      {
+        table.setPopup(isPopup());
+        table.setEditPopup(isEditPopup());
+        table.setExtraParamsUrls(extraParams);
+        String html = table.getHtml(session, params, forceNew);
+        context.put("objInEdit", table.getLastObjectInEdit());
+        return html;
+      }
     }
-  }
-
-  protected String getHtmlEdit(RunData data, Context context,
-     PeerWrapperFormHtml pwl, Map params, HttpSession session, boolean forceNew, Map extraParams)
-     throws Exception
-  {
     if(pwl.getTbl() instanceof PeerAppMaintFormTable)
     {
       PeerAppMaintFormTable table = (PeerAppMaintFormTable) (pwl.getTbl());
@@ -154,8 +154,17 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
         return html;
       }
     }
-
-    return "???";
+    else
+    {
+      hTable table = pwl.getTbl();
+      synchronized(table)
+      {
+        table.setPopup(isPopup());
+        table.setEditPopup(isEditPopup());
+        table.setExtraParamsUrls(extraParams);
+        return pwl.getHtmlForm(params, session);
+      }
+    }
   }
 
   protected String getScriptTest(RunData data, Context context,

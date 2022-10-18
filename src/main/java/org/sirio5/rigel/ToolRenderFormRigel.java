@@ -26,7 +26,7 @@ import org.apache.velocity.context.Context;
 import org.apache.velocity.util.ClassUtils;
 import org.rigel5.SetupHolder;
 import org.rigel5.table.RigelTableModel;
-import org.rigel5.table.peer.html.PeerWrapperFormHtml;
+import org.rigel5.table.html.wrapper.HtmlWrapperBase;
 import org.sirio5.CoreConst;
 import org.sirio5.modules.screens.rigel.FormBase;
 import org.sirio5.services.localization.INT;
@@ -67,7 +67,7 @@ public class ToolRenderFormRigel extends FormBase
 
   @Override
   protected void makeContextHtml(boolean forceNew, boolean duplica, boolean nuovoDetail,
-     Map params, CoreRunData data, Context context, PeerWrapperFormHtml pwl, String type, String baseUri)
+     Map params, CoreRunData data, Context context, HtmlWrapperBase pwl, String type, String baseUri)
      throws Exception
   {
     CoreCustomUrlBuilder ub = (CoreCustomUrlBuilder) SetupHolder.getUrlBuilder();
@@ -207,7 +207,7 @@ public class ToolRenderFormRigel extends FormBase
     if(alternatePath == null)
     {
       // renderizzazione Velocity con il modello caricato da risorsa
-      try (InputStream is = ClassUtils.getResourceAsStream(getClass(), "/org/sirio2/resources/" + modello))
+      try ( InputStream is = ClassUtils.getResourceAsStream(getClass(), "/org/sirio2/resources/" + modello))
       {
         InputStreamReader reader = new InputStreamReader(is, "UTF-8");
 

@@ -24,6 +24,7 @@ import org.commonlib5.utils.ClassOper;
 import org.rigel5.exceptions.MissingListException;
 import org.rigel5.glue.pager.PeerTablePagerEditApp;
 import org.rigel5.glue.table.PeerAppMaintFormTable;
+import org.rigel5.table.html.wrapper.HtmlWrapperBase;
 import org.rigel5.table.peer.html.*;
 import org.sirio5.CoreConst;
 import org.sirio5.rigel.RigelUtils;
@@ -46,7 +47,7 @@ abstract public class FormBase extends RigelEditBaseScreen
     if(type == null)
       throw new Exception("Errore interno: parametro type non definito; rivedere flusso.");
 
-    PeerWrapperFormHtml pwl = getForm(data, type);
+    HtmlWrapperBase pwl = getForm(data, type);
     Map params = SU.getParMap(data);
     boolean forceNew = false, duplica = false, nuovoDetail = false;
     String baseUri = makeSelfUrl(data, type);
@@ -98,7 +99,7 @@ abstract public class FormBase extends RigelEditBaseScreen
   }
 
   protected void makeContextHtml(boolean forceNew, boolean duplica, boolean nuovoDetail,
-     Map params, CoreRunData data, Context context, PeerWrapperFormHtml pwl, String type, String baseUri)
+     Map params, CoreRunData data, Context context, HtmlWrapperBase pwl, String type, String baseUri)
      throws Exception
   {
     HttpSession session = data.getSession();
@@ -163,13 +164,13 @@ abstract public class FormBase extends RigelEditBaseScreen
 
         // in caso di nuovi dettail aggiunti dall'action non esegue
         // la rebind per preservare il contenuto del table model
-        if(!nuovoDetail)
+        if(!nuovoDetail && pwl instanceof PeerWrapperFormHtml)
         {
           // carica eventuale filtro sul detail
           eh.populateParametri(params);
 
           // estae i parametri di collegamento dal master
-          Map linkParams = pwl.makeMapMasterDetail(0);
+          Map linkParams = ((PeerWrapperFormHtml) pwl).makeMapMasterDetail(0);
           ((PeerTablePagerEditApp) (eh.getPager())).setBaseSelfUrl(baseUri);
           ((PeerTablePagerEditApp) (eh.getPager())).rebindMasterDetail(linkParams);
         }
@@ -195,7 +196,7 @@ abstract public class FormBase extends RigelEditBaseScreen
     }
   }
 
-  protected void enableEditSaveNew(CoreRunData data, Context context, Map params, PeerWrapperFormHtml pwl)
+  protected void enableEditSaveNew(CoreRunData data, Context context, Map params, HtmlWrapperBase pwl)
      throws Exception
   {
     if(pwl.isEditEnabled())
