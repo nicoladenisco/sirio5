@@ -92,7 +92,10 @@ public class CoreBaseScreen extends VelocitySecureScreen
 
   protected boolean isValidSession(RunData data)
   {
-    if(!data.getUser().hasLoggedIn() || data.getSession().isNew())
+    // il controllo sulla sessione nuova blocca l'autologon da cookie
+    //if(!data.getUser().hasLoggedIn() || data.getSession().isNew())
+
+    if(!data.getUser().hasLoggedIn())
     {
       // autorizzazione non concessa
       String loginScreen = TR.getString("template.login", "Login.vm"); // NOI18N
