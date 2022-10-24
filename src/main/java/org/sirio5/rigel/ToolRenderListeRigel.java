@@ -108,6 +108,7 @@ public class ToolRenderListeRigel extends ListaBase
     act.setPopupEditFunction(funcNameEdit);
     act.setUrlBuilder(urb);
     urb.setFunc(li.func);
+    urb.setType(li.type);
 
     AbstractHtmlTablePagerFilter flt = (AbstractHtmlTablePagerFilter) lso.getPager();
     flt.setFormName(formName);

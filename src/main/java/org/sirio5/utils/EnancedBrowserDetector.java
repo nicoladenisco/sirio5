@@ -51,7 +51,7 @@ public class EnancedBrowserDetector extends CorrectedBrowserDetector
     int pos = s.indexOf("Firefox");
     if(pos != -1)
     {
-      firefoxVersion = Float.valueOf(s.substring(pos + 8));
+      firefoxVersion = Float.parseFloat(s.substring(pos + 8));
     }
 
     if(s.contains("Android") || s.contains("Mobile Safari"))

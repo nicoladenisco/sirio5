@@ -75,6 +75,7 @@ public class ToolRenderFormRigel extends FormBase
     urb.setBaseMainList(ub.getBaseMainList());
     urb.setBasePopupForm(ub.getBasePopupForm());
     urb.setBasePopupList(ub.getBasePopupList());
+    urb.setType(type);
 
     context.put("unique", unique);
     context.put("formName", formName);

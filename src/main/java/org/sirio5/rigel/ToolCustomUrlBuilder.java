@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@ package org.sirio5.rigel;
 import java.util.Map;
 import org.rigel5.table.RigelColumnDescriptor;
 import org.rigel5.table.RigelTableModel;
+import org.sirio5.utils.SU;
 
 /**
  * Implementazione speciale dedicata ai Tool.
@@ -28,7 +29,7 @@ import org.rigel5.table.RigelTableModel;
  */
 public class ToolCustomUrlBuilder extends CoreCustomUrlBuilder
 {
-  private String func;
+  private String func, type;
 
   public String getFunc()
   {
@@ -38,6 +39,16 @@ public class ToolCustomUrlBuilder extends CoreCustomUrlBuilder
   public void setFunc(String func)
   {
     this.func = func;
+  }
+
+  public String getType()
+  {
+    return type;
+  }
+
+  public void setType(String type)
+  {
+    this.type = type;
   }
 
   @Override
@@ -54,5 +65,14 @@ public class ToolCustomUrlBuilder extends CoreCustomUrlBuilder
      throws Exception
   {
     return "javascript:impostaValori('" + func + "'," + inputUrl + ")";
+  }
+
+  @Override
+  public String buildUrlCancellaRecord(boolean popup, String inputUrl,
+     RigelTableModel tableModel, RigelColumnDescriptor cd, String fldName, int row, Map<String, String> extraParams)
+     throws Exception
+  {
+    String s = SU.purge(type);
+    return "javascript:cancellaElemento_" + s + "('" + inputUrl + "')";
   }
 }
