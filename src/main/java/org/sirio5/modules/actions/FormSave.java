@@ -306,6 +306,13 @@ public class FormSave extends RigelEditBaseAction
         // invalida le cache di Rigel interessate dalla tabella modificata
         RigelCacheManager cm = SetupHolder.getCacheManager();
         cm.purgeTabella(eh.getNomeTabella());
+
+        BusContext bc = new BusContext(params);
+        bc.setI18n(i18n);
+        bc.put("obj", objInEdit);
+        bc.put("details", objectsDetail);
+
+        BUS.sendMessageAsync(BusMessages.GENERIC_OBJECTS_SAVED, this, bc);
       }
     }
 

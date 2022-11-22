@@ -212,6 +212,15 @@ public class SU extends StringOper
     return htParam;
   }
 
+  public static Object removeParam(HttpSession session, String key)
+  {
+    HashMap saved = (HashMap) session.getAttribute(PERM_PAR_KEY);
+    if(saved == null)
+      return null;
+
+    return saved.remove(key);
+  }
+
   /**
    * Dump dei parametri di richiesta su stdout
    * @param request
