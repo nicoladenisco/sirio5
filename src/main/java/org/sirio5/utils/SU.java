@@ -208,6 +208,7 @@ public class SU extends StringOper
 
       // NOTA: nelle versioni precedenti qui venivano passati i file items;
       // in Turbine 5 la gestione dei files allegati è molto diversa
+      // vedi data.getParameters().getParts()
     }
     return htParam;
   }
