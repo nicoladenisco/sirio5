@@ -45,7 +45,7 @@ import org.sirio5.utils.SU;
  */
 public class TableRelationCache2<T extends Persistent, O extends Persistent> extends ArrayList<T>
 {
-  private Map<ObjectKey, Persistent> mapValues = new HashMap<ObjectKey, Persistent>();
+  private final Map<ObjectKey, Persistent> mapValues = new HashMap<>();
 
   /**
    * Costruttore e caricatore dei dati da detail.
@@ -62,7 +62,8 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
      throws Exception
   {
     // recupera tutte le chiavi primarie dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<Integer>();
+    HashSet<Integer> primaryKeys = new HashSet<>(lsDettails.size());
+
     for(O obj : lsDettails)
       primaryKeys.add((Integer) getLinkM.invoke(obj));
 
@@ -84,6 +85,53 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
    * @param cls classe del peer dell'oggetto di ritorno (ES: se AnAnagrafiche sarà AnAnagrafichePeer.class)
    * @param lsDettails lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param campoLink campo degli oggetti in lsMasters per estrarre la chiave primaria; può contentere sia il nome campo
+   * Torque oppure il nome del campo tabella (usando il prefisso PEER:): Idaccettazioni oppure PEER:ID_ACCETTAZIONI
+   * @param con eventuale connessione al db (può essere null)
+   * @throws Exception
+   */
+  public TableRelationCache2(Class cls, Collection<O> lsDettails, String campoLink, Connection con)
+     throws Exception
+  {
+    // recupera tutte le chiavi primarie dalla lista oggetti
+    HashSet<Integer> primaryKeys = new HashSet<>(lsDettails.size());
+
+    if(campoLink.startsWith("PEER:"))
+    {
+      campoLink = campoLink.substring(5);
+      for(O obj : lsDettails)
+      {
+        ColumnAccessByName can = (ColumnAccessByName) obj;
+        primaryKeys.add((Integer) can.getByPeerName(campoLink));
+      }
+    }
+    else
+    {
+      for(O obj : lsDettails)
+      {
+        ColumnAccessByName can = (ColumnAccessByName) obj;
+        primaryKeys.add((Integer) can.getByName(campoLink));
+      }
+    }
+
+    if(primaryKeys.isEmpty())
+      return;
+
+    List<ObjectKey> pks = primaryKeys.stream()
+       .map((i) -> SimpleKey.keyFor(i))
+       .collect(Collectors.toList());
+
+    if(!primaryKeys.isEmpty())
+      loadDataFromDetail(cls, pks, con);
+  }
+
+  /**
+   * Costruttore e caricatore dei dati da detail.
+   * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
+   * Gli oggetti passati devono essere detail dei master che si stanno cercando
+   * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
+   * @param cls classe del peer dell'oggetto di ritorno (ES: se AnAnagrafiche sarà AnAnagrafichePeer.class)
+   * @param lsDettails lista di oggetti da ispezionare alla ricerca di chiavi primarie
    * @param fnMap funzione di collegamento (probabilmente una lambda expression) che ritorna l'id del detail
    * da cercare poi nel master; è la chiave esterna del detail che corrispone alla primary key del master
    * @param con eventuale connessione al db (può essere null)
@@ -93,7 +141,8 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
      throws Exception
   {
     // recupera tutte le chiavi primarie dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<Integer>();
+    HashSet<Integer> primaryKeys = new HashSet<>(lsDettails.size());
+
     for(O obj : lsDettails)
       primaryKeys.add(fnMap.apply(obj));
 
@@ -112,7 +161,8 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
      throws Exception
   {
     // recupera tutte le chiavi primarie dalla lista oggetti
-    HashSet<ObjectKey> primaryKeys = new HashSet<ObjectKey>();
+    HashSet<ObjectKey> primaryKeys = new HashSet<>(lsDettails.size());
+
     for(O obj : lsDettails)
       primaryKeys.add(fnMap.apply(obj));
 
@@ -148,10 +198,50 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
      throws Exception
   {
     // recupera tutti i valori dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<Integer>();
+    HashSet<Integer> primaryKeys = new HashSet<>(lsMasters.size());
+
     for(O obj : lsMasters)
-    {
       primaryKeys.add((Integer) getLinkM.invoke(obj));
+
+    if(!primaryKeys.isEmpty())
+      loadDataFromMaster(nomeCampo, primaryKeys, cls, con);
+  }
+
+  /**
+   * Costruttore e caricatore dei dati da master.
+   * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
+   * Gli oggetti passati devono essere master dei detail che si stanno cercando
+   * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
+   * @param cls classe del peer dell'oggetto di ritorno (ES: se AnAnagrafiche sarà AnAnagrafichePeer.class)
+   * @param nomeCampo nome del campo sulla tabella detail che collega la tabella master
+   * @param lsMasters lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param campoLink campo degli oggetti in lsMasters per estrarre la chiave primaria; può contentere sia il nome campo
+   * Torque oppure il nome del campo tabella (usando il prefisso PEER:): Idaccettazioni oppure PEER:ID_ACCETTAZIONI
+   * @param con eventuale connessione al db (può essere null)
+   * @throws Exception
+   */
+  public TableRelationCache2(Class cls, ColumnMap nomeCampo, Collection<O> lsMasters, String campoLink, Connection con)
+     throws Exception
+  {
+    // recupera tutti i valori dalla lista oggetti
+    HashSet<Integer> primaryKeys = new HashSet<>(lsMasters.size());
+
+    if(campoLink.startsWith("PEER:"))
+    {
+      campoLink = campoLink.substring(5);
+      for(O obj : lsMasters)
+      {
+        ColumnAccessByName can = (ColumnAccessByName) obj;
+        primaryKeys.add((Integer) can.getByPeerName(campoLink));
+      }
+    }
+    else
+    {
+      for(O obj : lsMasters)
+      {
+        ColumnAccessByName can = (ColumnAccessByName) obj;
+        primaryKeys.add((Integer) can.getByName(campoLink));
+      }
     }
 
     if(!primaryKeys.isEmpty())
@@ -176,11 +266,10 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
      throws Exception
   {
     // recupera tutti i valori dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<Integer>();
+    HashSet<Integer> primaryKeys = new HashSet<>(lsMasters.size());
+
     for(O obj : lsMasters)
-    {
       primaryKeys.add(fnMap.apply(obj));
-    }
 
     if(!primaryKeys.isEmpty())
       loadDataFromMaster(nomeCampo, primaryKeys, cls, con);
