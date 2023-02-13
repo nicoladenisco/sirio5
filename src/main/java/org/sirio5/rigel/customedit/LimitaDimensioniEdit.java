@@ -58,11 +58,10 @@ public class LimitaDimensioniEdit implements CustomColumnEdit
   }
 
   @Override
-  public String getHtmlEdit(RigelColumnDescriptor cd, TableModel model, int row, int col,
-     String formattedValue, String nomeCampo, RigelI18nInterface i18n)
+  public String getHtmlEdit(RigelColumnDescriptor cd, TableModel model, int row, int col, String cellText, String cellHtml, String nomeCampo, RigelI18nInterface i18n)
      throws Exception
   {
-    return formattedValue;
+    return cellText;
   }
 
   @Override
