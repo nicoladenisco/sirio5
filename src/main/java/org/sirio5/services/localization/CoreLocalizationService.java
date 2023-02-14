@@ -61,7 +61,9 @@ public class CoreLocalizationService extends DefaultLocalizationService
   protected boolean outputUnknowKey = false;
   protected Map<String, Map<Locale, ResourceBundle>> bundles = new HashMap<>();
 
-  public CoreLocalizationService()
+  @Override
+  public void initialize()
+     throws Exception
   {
     Configuration conf = Turbine.getConfiguration();
     xmlPath = conf.getString("locale.xmlFile", null);
@@ -81,6 +83,8 @@ public class CoreLocalizationService extends DefaultLocalizationService
 
     // imposta emissione log delle stringe non localizzate
     outputUnknowKey = conf.getBoolean("outputUnknowKey", outputUnknowKey);
+
+    super.initialize();
   }
 
   /**
@@ -223,10 +227,29 @@ public class CoreLocalizationService extends DefaultLocalizationService
       locale = displayLocale;
     }
 
+    if((value = translateFromXml(locale, key)) != null)
+      return value;
+
+    if((value = translateFromBundle(bundleName, locale, key)) != null)
+      return value;
+
+    if((value = subTranslation(key, locale)) != null)
+      return value;
+
+    if(outputUnknowKey)
+      log.debug("Missing localization for [" + key + "] " + locale);
+
+    return key;
+  }
+
+  protected String translateFromXml(Locale locale, String key)
+  {
+    String value = null, mapKey = null;
+
     if(xmlPath != null)
     {
       // nota: la chiave è senza spazi per evitare incoerenze di formattazione
-      String mapKey = StringUtils.deleteWhitespace(key);
+      mapKey = StringUtils.deleteWhitespace(key);
 
       if(defaultSet.contains(mapKey))
       {
@@ -246,6 +269,13 @@ public class CoreLocalizationService extends DefaultLocalizationService
       }
     }
 
+    return null;
+  }
+
+  protected String translateFromBundle(String bundleName, Locale locale, String key)
+  {
+    String value;
+
     // aggiusta eventuale bundle name al default se null
     bundleName = SU.okStr(bundleName, getDefaultBundleName());
 
@@ -259,7 +289,8 @@ public class CoreLocalizationService extends DefaultLocalizationService
     String[] bNames = getBundleNames();
     if(bNames.length > 1)
     {
-      for(int i = 0; i < bNames.length; i++)
+      for(int i = 0; i < bNames.length;
+         i++)
       {
         String bn = bNames[i];
         if(!bn.equals(bundleName))
@@ -271,10 +302,7 @@ public class CoreLocalizationService extends DefaultLocalizationService
       }
     }
 
-    if(outputUnknowKey)
-      log.debug("Missing localization for [" + key + "] " + locale);
-
-    return key;
+    return null;
   }
 
   /**
@@ -515,5 +543,18 @@ public class CoreLocalizationService extends DefaultLocalizationService
     {
       return null;
     }
+  }
+
+  /**
+   * Ultima possibilità di traduzione.
+   * In questa implementazione è vuota (ritorna null); è un segnaposto per classi derivate.
+   * @param key la stringa da tradurre
+   * @param locale la locale desiderata
+   * @return la stringa tradotta o null
+   * @throws Exception
+   */
+  protected String subTranslation(String key, Locale locale)
+  {
+    return null;
   }
 }

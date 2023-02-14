@@ -89,6 +89,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
     <dependency>
       <groupId>com.itextpdf</groupId>
@@ -132,6 +133,12 @@
       <artifactId>commons-configuration2</artifactId>
       <version>2.4</version>
       <type>jar</type>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.auth</groupId>
+      <artifactId>google-auth-library-oauth2-http</artifactId>
+      <version>1.15.0</version>
     </dependency>
   </dependencies>
 
