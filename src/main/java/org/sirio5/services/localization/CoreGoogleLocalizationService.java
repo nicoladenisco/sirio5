@@ -70,8 +70,6 @@ public class CoreGoogleLocalizationService extends CoreLocalizationService
   protected String subTranslation(String key, Locale locale)
   {
     initGoogle();
-    if(gt == null)
-      return null;
 
     try
     {
@@ -101,12 +99,13 @@ public class CoreGoogleLocalizationService extends CoreLocalizationService
   protected String subTransSingle(String key, Locale locale)
      throws Exception
   {
-    String value;
+    if(gt == null)
+      return null;
+
     List<Pair<String, String>> testi = new ArrayList<>();
     testi.add(new Pair<>(key, null));
     gt.traduci(testi, originLocale.getLanguage(), locale.getLanguage(), "html");
-    value = testi.get(0).second;
-    return value;
+    return testi.get(0).second;
   }
 
   protected final void initGoogle()
