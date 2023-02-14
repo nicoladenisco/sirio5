@@ -108,7 +108,7 @@ public class CoreGoogleLocalizationService extends CoreLocalizationService
     return testi.get(0).second;
   }
 
-  protected final void initGoogle()
+  protected void initGoogle()
   {
     if(initialized)
       return;
