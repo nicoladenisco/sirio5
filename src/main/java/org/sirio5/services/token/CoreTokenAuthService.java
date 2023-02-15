@@ -143,13 +143,13 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
      throws Exception
   {
     if(!allowAnonimousLogon && !allowDebugLogon)
-      die(INT.I("Login anonimo non permesso: occorre una sessione oppure utente e password."));
+      throw new TokenAuthFailureException(INT.I("Login anonimo non permesso: occorre una sessione oppure utente e password."));
 
     SecurityService sec = (SecurityService) getServiceBroker().getService(SecurityService.SERVICE_NAME);
 
     User tu = (User) sec.getUser(anonUser);
     if(tu == null)
-      die(INT.I("Utente per login anonimo non impostato a setup."));
+      throw new TokenAuthFailureException(INT.I("Utente per login anonimo non impostato a setup."));
 
     return addClient(anonUser, tu.getPassword(), expireAction);
   }
@@ -187,7 +187,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     {
       // effettua un altro tentativo con il token speciale
       if((usr = sec.getUser(uName)) == null)
-        die(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
+        throw new TokenAuthFailureException(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
 
       String shHash = CommonFileUtils.calcolaHashStringa(
          uName + "_" + TOKEN_MAGIG + "_" + getAppUUID(), "SHA1");
@@ -196,7 +196,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     }
 
     if(usr == null)
-      die(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
+      throw new TokenAuthFailureException(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
 
     return saveUserToken(usr, sec, expireAction);
   }
@@ -241,7 +241,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
       String userName = sessionID.substring(12);
       User tu = (User) sec.getUser(userName);
       if(tu == null)
-        die(INT.I("Utente per login anonimo non valido."));
+        throw new TokenExpiredException(INT.I("Utente per login anonimo non valido."));
       return addClient(userName, tu.getPassword(), expireAction);
     }
 
