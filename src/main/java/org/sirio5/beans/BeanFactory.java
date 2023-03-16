@@ -18,7 +18,9 @@
 package org.sirio5.beans;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.function.Function;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.ArrayUtils;
@@ -41,6 +43,7 @@ public class BeanFactory
   private static String[] basePaths;
   private static final HashMap<String, String> nameMap = new HashMap<>();
   private static final ArrayList<Function<String, String>> nameResolvers = new ArrayList<>();
+  public static final String BEAN_SESSION_PREFIX = "BEAN:";
 
   /**
    * Ritorna path di base per la costruzione di bean.
@@ -130,13 +133,33 @@ public class BeanFactory
   }
 
   /**
+   * Rimuove tutti i bean precedentemente creati in sessione.
+   * La funzione rimuove solo i bean creadi da BeanFactory.
+   * @param session sessione corrente
+   */
+  public static void removeAllFromSession(HttpSession session)
+  {
+    ArrayList<String> toRemove = new ArrayList<>();
+
+    Enumeration attributeNames = session.getAttributeNames();
+    while(attributeNames.hasMoreElements())
+    {
+      String nome = (String) attributeNames.nextElement();
+      if(nome.startsWith(BEAN_SESSION_PREFIX))
+        toRemove.add(nome);
+    }
+
+    toRemove.forEach((nome) -> session.removeAttribute(nome));
+  }
+
+  /**
    * Determina il nome dell'attributo di sessione a partire dalla classe richiesta.
    * @param beanClass classe del bean
    * @return stringa nome attributo di sessione
    */
   public static String createSessionAttributeName(Class beanClass)
   {
-    return "BEAN:" + beanClass.getName();
+    return BEAN_SESSION_PREFIX + beanClass.getName();
   }
 
   /**
@@ -310,6 +333,25 @@ public class BeanFactory
   public static void removeFromToken(TokenAuthItem data, Class beanClass)
   {
     data.removeAttribute(createSessionAttributeName(beanClass));
+  }
+
+  /**
+   * Rimuove tutti i bean precedentemente creati nel token.
+   * La funzione rimuove solo i bean creati da BeanFactory.
+   * @param data oggetto rundata con relativa sessione
+   */
+  public static void removeAllFromToken(TokenAuthItem data)
+  {
+    ArrayList<String> toRemove = new ArrayList<>();
+
+    for(Iterator<String> it = data.getAttributeNames(); it.hasNext();)
+    {
+      String nome = it.next();
+      if(nome.startsWith(BEAN_SESSION_PREFIX))
+        toRemove.add(nome);
+    }
+
+    toRemove.forEach((nome) -> data.removeAttribute(nome));
   }
 
   /**

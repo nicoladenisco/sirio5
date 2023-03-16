@@ -305,6 +305,28 @@ public class SirioGenericContext extends HashMap<String, Object>
     return getAsDate(key, null);
   }
 
+  public Date getAsDateInizioGiorno(String key)
+  {
+    return getAsDateInizioGiorno(key, null);
+  }
+
+  public Date getAsDateFineGiorno(String key)
+  {
+    return getAsDateFineGiorno(key, null);
+  }
+
+  public Date getAsDateInizioGiorno(String key, Date defVal)
+  {
+    Date d = getAsDate(key, defVal);
+    return d == null ? defVal : DT.inizioGiorno(d);
+  }
+
+  public Date getAsDateFineGiorno(String key, Date defVal)
+  {
+    Date d = getAsDate(key, defVal);
+    return d == null ? defVal : DT.fineGiorno(d);
+  }
+
   public String getAsString(String key, String defVal)
   {
     return SU.okStr(get(key), defVal);

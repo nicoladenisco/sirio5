@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,53 +17,32 @@
  */
 package org.sirio5.utils.format;
 
-import java.text.*;
-import org.sirio5.services.formatter.ValutaFormatter;
 import org.apache.turbine.services.TurbineServices;
+import org.sirio5.services.formatter.ValutaFormatter;
 
 /**
- * Formattatore della data e ora.
+ * Formattatore della valuta.
  * Viene utilizzato in liste.xml.
  *
  * @author Nicola De Nisco
  * @version 1.0
  */
-public class ValutaServiceFormat extends Format
+public class ValutaServiceFormat extends AbstractDoubleFormat
 {
-  private ValutaFormatter df = null;
+  private final ValutaFormatter vf = (ValutaFormatter) (TurbineServices.getInstance()
+     .getService(ValutaFormatter.SERVICE_NAME));
 
-  public ValutaServiceFormat()
+  @Override
+  public Number parseInternal(String source)
+     throws Exception
   {
-    df = (ValutaFormatter) (TurbineServices.getInstance().getService(ValutaFormatter.SERVICE_NAME));
+    return vf.parseValuta(source);
   }
 
   @Override
-  public Object parseObject(String source, ParsePosition status)
+  public String formatInternal(double value)
+     throws Exception
   {
-    try
-    {
-      Object rv = df.parseValuta(source);
-      status.setIndex(source.length());
-      return rv;
-    }
-    catch(Exception e)
-    {
-    }
-    return null;
-  }
-
-  @Override
-  public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos)
-  {
-    try
-    {
-      String sFmt = df.fmtValuta(((Double) obj));
-      toAppendTo.append(sFmt);
-      return toAppendTo;
-    }
-    catch(Exception e)
-    {
-    }
-    return null;
+    return vf.fmtValuta(value);
   }
 }

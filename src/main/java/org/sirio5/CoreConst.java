@@ -190,8 +190,8 @@ public class CoreConst
   public static final Pattern eMail
      = Pattern.compile("[\\w\\-\\.]*[\\w\\.]\\@[\\w\\.]*[\\w\\-\\.]+[\\w\\-]+[\\w]\\.+[\\w]+[\\w]");
 
-  public static final String eMail2
-     = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+  public static final Pattern eMail2
+     = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
 
   // numero di millisecondi di tolleranza per eguaglianza date
   public static final int TIME_MILLIS_EQUAL = 1000; // 1 sec.

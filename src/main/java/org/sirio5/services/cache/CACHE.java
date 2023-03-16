@@ -40,14 +40,14 @@ import org.sirio5.utils.SU;
  */
 public class CACHE
 {
-  private static Object mb;
+  private static Object __mb;
 
   public static CoreCacheServices getService()
   {
-    if(mb == null)
-      mb = TurbineServices.getInstance().getService(GlobalCacheService.ROLE);
+    if(__mb == null)
+      __mb = TurbineServices.getInstance().getService(GlobalCacheService.ROLE);
 
-    return (CoreCacheServices) mb;
+    return (CoreCacheServices) __mb;
   }
 
   /**
@@ -56,6 +56,7 @@ public class CACHE
    * @param objClass classe degli oggetti
    * @param id The String id for the object.
    * @return A CachedObject.
+   * @throws org.apache.fulcrum.cache.ObjectExpiredException
    * @exception ObjectExpiredException, if the object has expired in
    * the cache or not found.
    */
@@ -633,7 +634,7 @@ public class CACHE
     getSignaled().add(codice);
   }
 
-  public static final String CACHE_SIGNALED = "StandardScanner:CACHE_SIGNALED";
+  public static final String CACHE_SIGNALED = "CACHE_SIGNALED_ENTRY";
 
   public static Set<String> getSignaled()
   {
@@ -643,9 +644,37 @@ public class CACHE
     }
     catch(ObjectExpiredException ex)
     {
-      HashSet<String> set = new HashSet<String>();
+      HashSet<String> set = new HashSet<>();
       CACHE.addObject(CACHE_SIGNALED, new CachedObject(set, CoreConst.ONE_DAY_MILLIS));
       return set;
+    }
+  }
+
+  /**
+   * Aggiunta e recupero veloce di una entry di cache.
+   * La chiave viene utilizzata per recupere dalla cache il risultato.
+   * Se non presente la funzione lambda viene chiamata per produrre il risultato da inserire.
+   * Il risultato ottenuto viene inserito nella cache prima di essere ritornato.
+   * Il tempo di permanenza nella cache è quello di default.
+   * @param <R> tipo di valore ritornato
+   * @param key chiave da utilizzare per recupero/memorizzazione
+   * @param expires tempo di permanenza in cache (millisecondi)
+   * @param fun funzione per produrre il risultato da inserire in cache
+   * @return risultato prodotto o recuperato dalla cache
+   * @throws Exception
+   */
+  public static <R> R fastEntryExpires(String key, long expires, Callable<R> fun)
+     throws Exception
+  {
+    try
+    {
+      return (R) getService().getObject(key).getContents();
+    }
+    catch(ObjectExpiredException ex)
+    {
+      R toStore = fun.call();
+      getService().addObject(key, new CachedObject(toStore, expires));
+      return toStore;
     }
   }
 }

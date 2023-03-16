@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,9 +17,8 @@
  */
 package org.sirio5.utils.format;
 
-import java.text.*;
-import org.sirio5.services.formatter.NumFormatter;
 import org.apache.turbine.services.TurbineServices;
+import org.sirio5.services.formatter.NumFormatter;
 
 /**
  * Formattatore della data e ora.
@@ -28,52 +27,33 @@ import org.apache.turbine.services.TurbineServices;
  * @author Nicola De Nisco
  * @version 1.0
  */
-public class NumeroServiceFormat extends Format
+public class NumeroServiceFormat extends AbstractDoubleFormat
 {
-  private int numInt = 0,  numDec = 0;
-  private NumFormatter nf = null;
+  private int numInt = 0, numDec = 0;
+  private final NumFormatter nf = (NumFormatter) (TurbineServices.getInstance()
+     .getService(NumFormatter.SERVICE_NAME));
 
   public NumeroServiceFormat()
   {
-    nf = (NumFormatter) (TurbineServices.getInstance().getService(NumFormatter.SERVICE_NAME));
   }
 
   public NumeroServiceFormat(int numInt, int numDec)
   {
     this.numInt = numInt;
     this.numDec = numDec;
-    nf = (NumFormatter) (TurbineServices.getInstance().getService(NumFormatter.SERVICE_NAME));
   }
 
   @Override
-  public Object parseObject(String source, ParsePosition status)
+  public Number parseInternal(String source)
+     throws Exception
   {
-    try
-    {
-      Object rv = nf.parseDouble(source, numInt, numDec);
-      status.setIndex(source.length());
-      return rv;
-    }
-    catch(Exception e)
-    {
-    }
-    return null;
+    return nf.parseDouble(source, numInt, numDec);
   }
 
   @Override
-  public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos)
+  public String formatInternal(double value)
+     throws Exception
   {
-    try
-    {
-      String sFmt = nf.format(((Double) obj), numInt, numDec);
-      toAppendTo.append(sFmt);
-      return toAppendTo;
-    }
-    catch(Exception e)
-    {
-    }
-    return null;
+    return nf.format(value, numInt, numDec);
   }
 }
-
-

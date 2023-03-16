@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -87,5 +87,10 @@ public class NavigationStackTool implements RunDataApplicationTool
      throws Exception
   {
     nsb.clear();
+  }
+
+  public String getNavdata()
+  {
+    return nsb.getNavdata();
   }
 }

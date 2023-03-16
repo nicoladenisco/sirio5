@@ -23,6 +23,7 @@ import org.rigel5.RigelCustomUrlBuilder;
 import org.rigel5.table.RigelColumnDescriptor;
 import org.rigel5.table.RigelTableModel;
 import org.rigel5.table.html.wrapper.CustomButtonInfo;
+import static org.sirio5.CoreConst.APP_PREFIX;
 import org.sirio5.utils.LI;
 
 /**
@@ -38,7 +39,7 @@ public class CoreCustomUrlBuilder implements RigelCustomUrlBuilder
   public CoreCustomUrlBuilder()
   {
     ctxPath = LI.getContextPath();
-    ctxPathTempl = ctxPath + "app/template/";
+    ctxPathTempl = ctxPath + APP_PREFIX + "/template/";
   }
 
   public CoreCustomUrlBuilder(String ctxp)
@@ -51,7 +52,7 @@ public class CoreCustomUrlBuilder implements RigelCustomUrlBuilder
     else
       ctxPath = ctxp + "/";
 
-    ctxPathTempl = ctxPath + "app/template/";
+    ctxPathTempl = ctxPath + APP_PREFIX + "/template/";
   }
 
   /**

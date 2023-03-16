@@ -87,7 +87,7 @@ public class DT extends DateTime
     if(toParse instanceof Date)
       return (Date) toParse;
 
-    return parseData(toParse.toString(), defVal);
+    return parseData(toParse.toString().trim(), defVal);
   }
 
   /**

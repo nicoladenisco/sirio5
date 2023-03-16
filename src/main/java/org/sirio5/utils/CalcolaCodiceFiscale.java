@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -333,7 +333,10 @@ public class CalcolaCodiceFiscale
       if(giorno > 40)
         giorno -= 40;
 
-      if(mese == -1 || giorno <= 0 || giorno >= 31)
+      // 30 giorni ha Novembre con April, Giugno e Settembre
+      // di 28 (0 29) ce n'è uno, tutto il resto ne ha 31
+      // giorno=31 è valore accettabile
+      if(mese == -1 || giorno <= 0 || giorno > 31)
         return null;
 
       GregorianCalendar c = new GregorianCalendar();

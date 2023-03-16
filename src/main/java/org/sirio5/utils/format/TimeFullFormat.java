@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,10 +17,7 @@
  */
 package org.sirio5.utils.format;
 
-import java.text.*;
 import java.util.Date;
-import org.sirio5.services.formatter.DataFormatter;
-import org.apache.turbine.services.TurbineServices;
 
 /**
  * Formattatore della data e ora.
@@ -29,41 +26,19 @@ import org.apache.turbine.services.TurbineServices;
  * @author Nicola De Nisco
  * @version 1.0
  */
-public class TimeFullFormat extends Format
+public class TimeFullFormat extends AbstractDateFormat
 {
-  private DataFormatter df = null;
-
-  public TimeFullFormat()
+  @Override
+  public Date parseInternal(String source)
+     throws Exception
   {
-    df = (DataFormatter) (TurbineServices.getInstance().getService(DataFormatter.SERVICE_NAME));
+    return df.parseTimeFull(source);
   }
 
   @Override
-  public Object parseObject(String source, ParsePosition status)
+  public String formatInternal(Date value)
+     throws Exception
   {
-    try
-    {
-      Object rv = df.parseTimeFull(source);
-      status.setIndex(source.length());
-      return rv;
-    }
-    catch(Exception e)
-    {
-    }
-    return null;
-  }
-
-  @Override
-  public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos)
-  {
-    try
-    {
-      toAppendTo.append(df.formatTimeFull((Date) obj));
-      return toAppendTo;
-    }
-    catch(Exception e)
-    {
-    }
-    return null;
+    return df.formatTimeFull(value);
   }
 }

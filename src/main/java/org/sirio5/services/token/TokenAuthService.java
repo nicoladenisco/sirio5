@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -18,6 +18,8 @@
 package org.sirio5.services.token;
 
 import java.awt.event.ActionListener;
+import javax.servlet.http.HttpServletRequest;
+import org.json.JSONObject;
 import org.sirio5.services.CoreServiceExtension;
 
 /**
@@ -114,4 +116,33 @@ public interface TokenAuthService extends CoreServiceExtension
    */
   public TokenAuthItem getClient(String id)
      throws Exception;
+
+  /**
+   * Genera token OAuth2 a partire da un item.
+   * Viene prodotto un JSON con i dati principali del token;
+   * questo JSON viene crittografato con la chiave privata e convertito in base64.
+   * @param req richiesta HTTP per la generazione del token
+   * @param ti token già autenticato (vedi addClient)
+   * @return token OAuth2
+   * @throws Exception
+   */
+  public String encryptTokenOauth2(HttpServletRequest req, TokenAuthItem ti)
+     throws Exception;
+
+  /**
+   * Decodifica token OAuth2.
+   * Decodifica il token prodotto con encryptTokenOauth2 ritornando il JSON originario.
+   * @param req richiesta HTTP per la ricostruzione del token
+   * @param token token OAuth2
+   * @return JSON contenuto nel token
+   * @throws Exception
+   */
+  public JSONObject decriptTokenOauth2(HttpServletRequest req, String token)
+     throws Exception;
+
+  /**
+   * Ritorna chiave RSA pubblica.
+   * @return la chiave codificata in base64
+   */
+  public String getPublicKeyBase64();
 }

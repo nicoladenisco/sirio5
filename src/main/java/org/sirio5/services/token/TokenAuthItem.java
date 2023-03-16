@@ -145,6 +145,11 @@ public class TokenAuthItem
     htAttr.clear();
   }
 
+  public Iterator<String> getAttributeNames()
+  {
+    return htAttr.keySet().iterator();
+  }
+
   public void setLastAccess(java.util.Date newLastAccess)
   {
     lastAccess = newLastAccess;
