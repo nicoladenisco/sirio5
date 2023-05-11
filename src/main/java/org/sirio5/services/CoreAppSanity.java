@@ -49,6 +49,7 @@ public class CoreAppSanity
     sanityDatabase(service);
     sanitySecurity(service);
     sanityScheduler(service);
+    sanityDir(service);
   }
 
   /**
@@ -138,6 +139,17 @@ public class CoreAppSanity
   }
 
   /**
+   * Verifica e regolarizza il file system.
+   * Cancella eventuali directory temporanee o cose simili.
+   * @param service
+   * @throws Exception
+   */
+  protected void sanityDir(AbstractCoreBaseService service)
+     throws Exception
+  {
+  }
+
+  /**
    * Verifica presenza e setup dei job dello scheduler.
    * @param service servizio che ha richiesto l'operazione
    * @throws Exception
@@ -197,7 +209,7 @@ public class CoreAppSanity
        = "INSERT INTO turbine_role_permission(\n"
        + "	role_id, permission_id)\n"
        + "	VALUES (?, ?);";
-    try ( PreparedStatement ps = connection.prepareStatement(sINS))
+    try(PreparedStatement ps = connection.prepareStatement(sINS))
     {
       int roleid = (Integer) role.getId();
       for(int i = 0; i < permissionToGrant.length; i++)
@@ -257,7 +269,7 @@ public class CoreAppSanity
        = "INSERT INTO turbine_role(\n"
        + "	role_id, role_name, objectdata)\n"
        + "	VALUES (?, ?, NULL);";
-    try ( PreparedStatement ps = con.prepareStatement(sINS))
+    try(PreparedStatement ps = con.prepareStatement(sINS))
     {
       for(int i = 0; i < roleNames.length; i++)
       {
@@ -319,7 +331,7 @@ public class CoreAppSanity
        = "INSERT INTO turbine_permission(\n"
        + "	permission_id, permission_name, objectdata)\n"
        + "	VALUES (?, ?, NULL);";
-    try ( PreparedStatement ps = con.prepareStatement(sINS))
+    try(PreparedStatement ps = con.prepareStatement(sINS))
     {
       for(int i = 0; i < permissionNames.length; i++)
       {
@@ -383,7 +395,7 @@ public class CoreAppSanity
        = "INSERT INTO turbine_role_permission(\n"
        + "	role_id, permission_id)\n"
        + "	VALUES (?, ?);";
-    try ( PreparedStatement ps = connection.prepareStatement(sINS))
+    try(PreparedStatement ps = connection.prepareStatement(sINS))
     {
       int roleid = (Integer) role.getId();
       for(String perm : permissions)
