@@ -41,13 +41,13 @@ import org.rigel5.table.sql.xml.SqlWrapperListaXml;
  */
 public class MDL
 {
-  private static Object mb = null;
+  private static Object __mx = null;
 
   public static modelliXML getService()
   {
-    if(mb == null)
-      mb = TurbineServices.getInstance().getService(modelliXML.SERVICE_NAME);
-    return (modelliXML) mb;
+    if(__mx == null)
+      __mx = TurbineServices.getInstance().getService(modelliXML.SERVICE_NAME);
+    return (modelliXML) __mx;
   }
 
   public static Document getDocument()

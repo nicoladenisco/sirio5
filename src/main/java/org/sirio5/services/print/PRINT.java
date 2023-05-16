@@ -31,13 +31,13 @@ import org.sirio5.services.print.PdfPrint.JobInfo;
  */
 public class PRINT
 {
-  private static Object mb = null;
+  private static Object __pp = null;
 
   public static PdfPrint getService()
   {
-    if(mb == null)
-      mb = TurbineServices.getInstance().getService(PdfPrint.SERVICE_NAME);
-    return (PdfPrint) mb;
+    if(__pp == null)
+      __pp = TurbineServices.getInstance().getService(PdfPrint.SERVICE_NAME);
+    return (PdfPrint) __pp;
   }
 
   public static AbstractReportParametersInfo getParameters(int idUser, String codiceStampa, Map params)
