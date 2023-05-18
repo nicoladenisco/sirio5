@@ -17,13 +17,21 @@
  */
 package org.sirio5.services.contatori;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.commonlib5.utils.ArraySet;
 import org.sirio5.services.AbstractCoreBaseService;
+import org.sirio5.services.bus.BUS;
+import org.sirio5.services.bus.BusContext;
+import org.sirio5.services.bus.BusMessages;
+import org.sirio5.services.bus.MessageBusListener;
 
 /**
  * Implementazione standard del LockService.
@@ -31,19 +39,26 @@ import org.sirio5.services.AbstractCoreBaseService;
  * @author Nicola De Nisco
  */
 public class CoreLockService extends AbstractCoreBaseService
-   implements LockService
+   implements LockService, MessageBusListener
 {
+  /** Logging */
+  private static final Log log = LogFactory.getLog(CoreLockService.class);
+
   protected final Map<String, LockResourceBlock> mapResources = new HashMap<>();
 
   @Override
   public void coreInit()
      throws Exception
   {
+    BUS.registerEventListner(this);
   }
 
   @Override
   public synchronized void createResource(String tipo, int maxLocks, boolean allowMulti)
   {
+    if(mapResources.containsKey(tipo))
+      return;
+
     LockResourceBlock block = new LockResourceBlock();
     block.maxLocks = maxLocks;
     block.allowMulti = allowMulti;
@@ -90,6 +105,9 @@ public class CoreLockService extends AbstractCoreBaseService
     {
       LockResourceItem item = findCreateItem(tipo, idRisorsa);
 
+      if(item.verificaUtente(idUtente))
+        return;
+
       item.sem.acquire();
       item.idUtenti.add(idUtente);
       item.blocker = Thread.currentThread();
@@ -113,9 +131,17 @@ public class CoreLockService extends AbstractCoreBaseService
   public synchronized void lockResourceMulti(String tipo, int idRisorsa, Set<Integer> idUtenti)
      throws LockException
   {
+    checkMultiAllowed(tipo);
+
     try
     {
       LockResourceItem item = findCreateItem(tipo, idRisorsa);
+
+      if(item.verificaUtenti(idUtenti))
+      {
+        item.idUtenti.addAll(idUtenti);
+        return;
+      }
 
       item.sem.acquire();
       item.idUtenti.addAll(idUtenti);
@@ -132,6 +158,8 @@ public class CoreLockService extends AbstractCoreBaseService
   public synchronized void lockResourcesMulti(String tipo, Set<Integer> idRisorse, Set<Integer> idUtenti)
      throws LockException
   {
+    checkMultiAllowed(tipo);
+
     for(Integer id : idRisorse)
       lockResourceMulti(tipo, id, idUtenti);
   }
@@ -164,6 +192,7 @@ public class CoreLockService extends AbstractCoreBaseService
   public synchronized void unlockResourceMulti(String tipo, int idRisorsa, Set<Integer> idUtenti)
      throws LockException
   {
+    checkMultiAllowed(tipo);
     LockResourceItem item = getItem(tipo, idRisorsa);
 
     if(item != null)
@@ -173,7 +202,7 @@ public class CoreLockService extends AbstractCoreBaseService
         if(item.idUtenti.contains(ute))
         {
           item.sem.release();
-          item.idUtenti.removeAll(idUtenti);
+          item.idUtenti.clear();
           return;
         }
       }
@@ -186,6 +215,7 @@ public class CoreLockService extends AbstractCoreBaseService
   public synchronized void unlockResourcesMulti(String tipo, Set<Integer> idRisorse, Set<Integer> idUtenti)
      throws LockException
   {
+    checkMultiAllowed(tipo);
     for(Integer id : idRisorse)
       unlockResourceMulti(tipo, id, idUtenti);
   }
@@ -197,6 +227,9 @@ public class CoreLockService extends AbstractCoreBaseService
     try
     {
       LockResourceItem item = findCreateItem(tipo, idRisorsa);
+
+      if(item.verificaUtente(idUtente))
+        return true;
 
       if(item.sem.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS))
       {
@@ -242,9 +275,17 @@ public class CoreLockService extends AbstractCoreBaseService
   public synchronized boolean tryLockResourceMulti(String tipo, int idRisorsa, Set<Integer> idUtenti, long timeoutMillis)
      throws LockException
   {
+    checkMultiAllowed(tipo);
+
     try
     {
       LockResourceItem item = findCreateItem(tipo, idRisorsa);
+
+      if(item.verificaUtenti(idUtenti))
+      {
+        item.idUtenti.addAll(idUtenti);
+        return true;
+      }
 
       if(item.sem.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS))
       {
@@ -266,6 +307,7 @@ public class CoreLockService extends AbstractCoreBaseService
   public synchronized boolean tryLockResourcesMulti(String tipo, Set<Integer> idRisorse, Set<Integer> idUtenti, long timeoutMillis)
      throws LockException
   {
+    checkMultiAllowed(tipo);
     Set<Integer> acquisiti = new ArraySet<>();
 
     for(Integer id : idRisorse)
@@ -284,5 +326,59 @@ public class CoreLockService extends AbstractCoreBaseService
     }
 
     return true;
+  }
+
+  private void checkMultiAllowed(String tipo)
+     throws LockException
+  {
+    LockResourceBlock block = mapResources.get(tipo);
+    if(block == null)
+      throw new LockException("Unknow '" + tipo + "' resource.");
+
+    if(block.allowMulti == false)
+      throw new LockException("The resource '" + tipo + "' don't allow multiple user lock.");
+  }
+
+  @Override
+  public int message(int msgID, Object originator, BusContext context)
+     throws Exception
+  {
+    switch(msgID)
+    {
+      case BusMessages.IDLE_10_MINUTES:
+        rimuoviNonUsati();
+        break;
+    }
+
+    return 0;
+  }
+
+  private synchronized void rimuoviNonUsati()
+  {
+    for(Map.Entry<String, LockResourceBlock> entry : mapResources.entrySet())
+    {
+      String tipo = entry.getKey();
+      LockResourceBlock block = entry.getValue();
+
+      List<Integer> toRemove = new ArrayList<>();
+      for(Map.Entry<Integer, LockResourceItem> entry1 : block.lockMap.entrySet())
+      {
+        int idRisorsa = entry1.getKey();
+        LockResourceItem item = entry1.getValue();
+
+        if(item.sem.availablePermits() == block.maxLocks)
+        {
+          // candidato alla rimozione: nessun blocco attivo per questo item
+          toRemove.add(idRisorsa);
+        }
+      }
+
+      if(!toRemove.isEmpty())
+      {
+        for(Integer i : toRemove)
+          block.lockMap.remove(i);
+        log.debug("Rimossi " + toRemove.size() + " risorse del tipo " + tipo);
+      }
+    }
   }
 }

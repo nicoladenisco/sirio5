@@ -1,0 +1,52 @@
+<!--
+SIRIO SERVLET.
+Servlet da inserire nel web.xml dell'applicazione ospite.
+Copiare questo file e incollarlo all'interno di web.xml
+dentro la sezione web-app.
+-->
+
+<servlet>
+  <servlet-name>logout</servlet-name>
+  <servlet-class>org.sirio.servlets.logout</servlet-class>
+  <load-on-startup>2</load-on-startup>
+</servlet>
+<servlet>
+  <servlet-name>pdfmaker</servlet-name>
+  <servlet-class>org.sirio.servlets.pdfmaker</servlet-class>
+  <load-on-startup>3</load-on-startup>
+</servlet>
+<servlet>
+  <servlet-name>LogsViewerServlet</servlet-name>
+  <servlet-class>org.sirio.servlets.LogsViewerServlet</servlet-class>
+</servlet>
+<servlet>
+  <servlet-name>cache</servlet-name>
+  <servlet-class>org.sirio.servlets.FileCacheServlet</servlet-class>
+</servlet>
+<servlet>
+  <servlet-name>rigeltool</servlet-name>
+  <servlet-class>org.sirio.servlets.ToolDirectHtml</servlet-class>
+</servlet>
+
+
+<servlet-mapping>
+  <servlet-name>logout</servlet-name>
+  <url-pattern>/logout</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>pdfmaker</servlet-name>
+  <url-pattern>/pdf/*</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>LogsViewerServlet</servlet-name>
+  <url-pattern>/viewlogs/*</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>cache</servlet-name>
+  <url-pattern>/cache/*</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>rigeltool</servlet-name>
+  <url-pattern>/rigeltool/*</url-pattern>
+</servlet-mapping>
+

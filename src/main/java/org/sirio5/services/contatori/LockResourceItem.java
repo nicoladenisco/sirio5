@@ -17,6 +17,7 @@
  */
 package org.sirio5.services.contatori;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -32,4 +33,19 @@ public class LockResourceItem
   public final Set<Integer> idUtenti = new HashSet<>();
   public Thread blocker = null;
   public int chiaveBloccante;
+
+  public boolean verificaUtente(int idUtente)
+  {
+    return idUtenti.contains(idUtente);
+  }
+
+  public boolean verificaUtenti(Collection<Integer> idUtenti)
+  {
+    for(Integer i : idUtenti)
+    {
+      if(idUtenti.contains(i))
+        return true;
+    }
+    return false;
+  }
 }

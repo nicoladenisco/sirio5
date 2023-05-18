@@ -235,4 +235,26 @@ public class LOCK
   {
     return getService().tryLockResourcesMulti(tipo, idRisorse, idUtenti, timeoutMillis);
   }
+
+  /**
+   * Richiede lo sblocco di una risorsa.
+   * L'utente deve essere lo stesso che ha eseguito il blocco.
+   * Non solleva eccezioni ma ritorna l'esito dell'operazione
+   * @param tipo tipo univoco della risorsa
+   * @param idRisorsa identificativo univoco della risorsa
+   * @param idUtente utente che vuole eseguire il blocco
+   * @return vero se lo sblocco è stato realmente eseguito
+   */
+  public static boolean unlockResourceQuiet(String tipo, int idRisorsa, int idUtente)
+  {
+    try
+    {
+      getService().unlockResource(tipo, idRisorsa, idUtente);
+      return true;
+    }
+    catch(LockException ex)
+    {
+      return false;
+    }
+  }
 }
