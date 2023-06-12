@@ -215,6 +215,7 @@ public class CoreBaseAction extends VelocitySecureAction
     }
     catch(TorqueException ex)
     {
+      // ispeziona la causa per verificare se gestirla come sqlexception
       if(ex.getCause() != null && ex.getCause() instanceof SQLException)
       {
         SQLException sqe = (SQLException) ex.getCause();

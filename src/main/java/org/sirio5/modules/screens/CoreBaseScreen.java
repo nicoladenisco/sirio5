@@ -211,6 +211,7 @@ public class CoreBaseScreen extends VelocitySecureScreen
     }
     catch(TorqueException ex)
     {
+      // ispeziona la causa per verificare se gestirla come sqlexception
       if(ex.getCause() != null && ex.getCause() instanceof SQLException)
       {
         SQLException sqe = (SQLException) ex.getCause();
