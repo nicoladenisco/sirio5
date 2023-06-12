@@ -29,13 +29,13 @@ import org.apache.turbine.services.TurbineServices;
  */
 public class BUS
 {
-  private static Object mb = null;
+  private static Object __mb = null;
 
   public static MessageBus getService()
   {
-    if(mb == null)
-      mb = TurbineServices.getInstance().getService(MessageBus.SERVICE_NAME);
-    return (MessageBus) mb;
+    if(__mb == null)
+      __mb = TurbineServices.getInstance().getService(MessageBus.SERVICE_NAME);
+    return (MessageBus) __mb;
   }
 
   /**

@@ -50,18 +50,18 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
   private static final ArrayList<InfoSetupInterface> arInfoSetup = new ArrayList<>();
   /** path di riferimento */
   protected static String pathWork = null;
-  private static String pathWorkTmp = null;
-  private static String pathWorkSpool = null;
-  private static String pathWorkCache = null;
-  private static String pathWorkDocs = null;
-  private static String pathWorkReport = null;
-  private static String pathWorkStylesheets = null;
-  private static String pathConf = null;
-  private static String pathConfSchemas = null;
-  private static String pathConfSetup = null;
-  private static String pathConfStylesheets = null;
-  private static String pathConfReports = null;
-  private static String pathConfCert = null;
+  protected static String pathWorkTmp = null;
+  protected static String pathWorkSpool = null;
+  protected static String pathWorkCache = null;
+  protected static String pathWorkDocs = null;
+  protected static String pathWorkReport = null;
+  protected static String pathWorkStylesheets = null;
+  protected static String pathConf = null;
+  protected static String pathConfSchemas = null;
+  protected static String pathConfSetup = null;
+  protected static String pathConfStylesheets = null;
+  protected static String pathConfReports = null;
+  protected static String pathConfCert = null;
   /** UUID unica di questa istanza di applicazione */
   private static String AppUUID = null;
 

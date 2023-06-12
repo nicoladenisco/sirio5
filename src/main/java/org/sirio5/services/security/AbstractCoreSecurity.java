@@ -614,7 +614,11 @@ abstract public class AbstractCoreSecurity extends BaseService
     {
       Date dCrea = (Date) us.getPerm(CREAZIONE_PASSWORD);
       if(dCrea == null)
+      {
+        // per le chiamate successive il tempo si conta da adesso
+        us.setPerm(CREAZIONE_PASSWORD, new Date());
         return true;
+      }
 
       GregorianCalendar cal = new GregorianCalendar();
       cal.setTime(dCrea);

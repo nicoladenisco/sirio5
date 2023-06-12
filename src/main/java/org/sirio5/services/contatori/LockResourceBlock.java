@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Nicola De Nisco
+ * Copyright (C) 2023 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,30 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.sirio5.utils.format;
+package org.sirio5.services.contatori;
 
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Formattatore della data e ora.
- * Viene utilizzato in liste.xml.
+ * Definizione di una risorsa condivisa.
  *
  * @author Nicola De Nisco
- * @version 1.0
  */
-public class TimeOnlyFormat extends AbstractDateFormat
+public class LockResourceBlock
 {
-  @Override
-  public Date parseInternal(String source)
-     throws Exception
-  {
-    return df.parseTime(source);
-  }
-
-  @Override
-  public String formatInternal(Date value)
-     throws Exception
-  {
-    return df.formatTime(value);
-  }
+  public int maxLocks;
+  public boolean allowMulti;
+  public final Map<Integer, LockResourceItem> lockMap = new HashMap<>();
 }

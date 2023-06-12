@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -23,7 +23,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import org.commonlib5.lambda.LEU;
 import org.commonlib5.utils.ArrayMap;
 import org.rigel5.HtmlUtils;
 import org.sirio5.utils.CoreRunData;
@@ -38,7 +40,7 @@ final public class NavigationStackBean extends CoreBaseBean
 {
   // costanti
   public static final String BEAN_KEY = "NavigationStackBean:BEAN_KEY";
-  private LinkedList<NavInfo> uriStack = new LinkedList<>();
+  private final LinkedList<NavInfo> uriStack = new LinkedList<>();
 
   public static class NavInfo
   {
@@ -59,6 +61,12 @@ final public class NavigationStackBean extends CoreBaseBean
       int hash = 3;
       hash = 59 * hash + Objects.hashCode(this.uri);
       return hash;
+    }
+
+    @Override
+    public String toString()
+    {
+      return "NavInfo{uri=" + uri + '}';
     }
   }
 
@@ -242,6 +250,15 @@ final public class NavigationStackBean extends CoreBaseBean
       return true;
 
     return false;
+  }
+
+  public String getNavdata()
+  {
+    List<String> lsDes = LEU.asStream(uriIterator())
+       .filter((ni) -> SU.isOkStr(ni.descrizione))
+       .map((ni) -> ni.descrizione)
+       .collect(Collectors.toList());
+    return lsDes.isEmpty() ? "" : SU.join(lsDes.iterator(), '/');
   }
 
   /**

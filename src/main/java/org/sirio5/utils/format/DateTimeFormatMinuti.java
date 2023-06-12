@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,12 +17,7 @@
  */
 package org.sirio5.utils.format;
 
-import org.sirio5.services.formatter.DataFormatter;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.ParsePosition;
 import java.util.Date;
-import org.apache.turbine.services.TurbineServices;
 
 /**
  * Formattatore della data e ora con troncamento ai minuti.
@@ -30,46 +25,25 @@ import org.apache.turbine.services.TurbineServices;
  *
  * @author Nicola De Nisco
  */
-public class DateTimeFormatMinuti extends Format
+public class DateTimeFormatMinuti extends AbstractDateFormat
 {
-  private DataFormatter df = null;
-
-  public DateTimeFormatMinuti()
+  @Override
+  public Date parseInternal(String source)
+     throws Exception
   {
-    df = (DataFormatter) (TurbineServices.getInstance().getService(DataFormatter.SERVICE_NAME));
+    return df.parseDataFull(source);
   }
 
   @Override
-  public Object parseObject(String source, ParsePosition status)
+  public String formatInternal(Date value)
+     throws Exception
   {
-    try
+    String s = df.formatDataFull(value);
+    if(s != null && s.length() > 3)
     {
-      Object rv = df.parseDataFull(source);
-      status.setIndex(source.length());
-      return rv;
+      s = s.substring(0, s.length() - 3);
     }
-    catch(Exception e)
-    {
-    }
-    return null;
-  }
 
-  @Override
-  public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos)
-  {
-    try
-    {
-      String s = df.formatDataFull((Date) obj);
-      if(s != null && s.length() > 3)
-      {
-        s = s.substring(0, s.length() - 3);
-        toAppendTo.append(s);
-      }
-      return toAppendTo;
-    }
-    catch(Exception e)
-    {
-    }
-    return null;
+    return s;
   }
 }

@@ -19,7 +19,12 @@ package org.sirio5.services.token;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.security.KeyPair;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.*;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +33,10 @@ import org.apache.fulcrum.security.util.DataBackendException;
 import org.apache.fulcrum.security.util.UnknownEntityException;
 import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.security.SecurityService;
+import org.commonlib5.crypto.KeyUtils;
+import org.commonlib5.crypto.RSAEncryptUtils;
 import org.commonlib5.utils.CommonFileUtils;
+import org.json.JSONObject;
 import org.sirio5.services.AbstractCoreBaseService;
 import org.sirio5.services.bus.BUS;
 import org.sirio5.services.bus.BusContext;
@@ -48,17 +56,24 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
 {
   /** Logging */
   private static final Log log = LogFactory.getLog(CoreTokenAuthService.class);
-  private long tExpiries = 1000;
-  private String anonUser;
-  private boolean allowAnonimousLogon = false;
-  private boolean allowDebugLogon = false;
-  private boolean allowMagicLogon = true;
-  private final HashSet<String> usersMagicAllowed = new HashSet<>();
-  private final HashMap<String, TokenBean> htUsers = new HashMap<String, TokenBean>();
+
+  protected long tExpiries = 1000;
+  protected String anonUser;
+  protected boolean allowAnonimousLogon = false;
+  protected boolean allowDebugLogon = false;
+  protected boolean allowMagicLogon = true;
+  protected final HashSet<String> usersMagicAllowed = new HashSet<>();
+  protected final Hashtable<String, TokenBean> htUsers = new Hashtable<>();
+  protected File publicKeyFile, privateKeyFile;
+  protected RSAPublicKey puk;
+  protected RSAPrivateKey prk;
   //
   public static final String TOKEN_AUTH_CACHE_CLASS = "TOKEN_AUTH_CACHE_CLASS"; // NOI18N
   public static final String LOGIN_DEBUG_SESSIONID = "LOGIN_DEBUG"; // NOI18N
   public static final String TOKEN_MAGIG = "MDQOWHF!IWEQRGHUYRWVQNCWOEQ$DKPOQKEPO.QJEFWQE;UFNCLWRHV:OIWUERHFUISXJKLMql"; // NOI18N
+
+  public static final String RSA_PUBLIC_FILE = "publicKey.pem";
+  public static final String RSA_PRIVATE_FILE = "privateKey.pem";
 
   public static class TokenCachedObject extends CoreCachedObject
   {
@@ -111,8 +126,36 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     // registrazione sul bus messaggi
     BUS.registerEventListner(this);
 
+    // inizializza chiavi RSA per generazione token OAuth2
+    inizializzaChiaviRSA();
+
     // servizio inizializzato correttamente
     setInit(true);
+  }
+
+  protected void inizializzaChiaviRSA()
+     throws Exception
+  {
+    publicKeyFile = getWorkMainFile(RSA_PUBLIC_FILE);
+    privateKeyFile = getWorkMainFile(RSA_PRIVATE_FILE);
+
+    if(privateKeyFile.exists() && publicKeyFile.exists())
+    {
+      puk = KeyUtils.getRSAPublicKeyFromPEM(publicKeyFile);
+      prk = KeyUtils.getRSAPrivateKeyFromPEM(privateKeyFile);
+    }
+    else
+    {
+      publicKeyFile.delete();
+      privateKeyFile.delete();
+
+      KeyPair keys = RSAEncryptUtils.generateKey();
+      puk = (RSAPublicKey) keys.getPublic();
+      prk = (RSAPrivateKey) keys.getPrivate();
+
+      KeyUtils.writeRSAPublicKeyPEM(publicKeyFile, puk);
+      KeyUtils.writeRSAPrivateKeyPEM(privateKeyFile, prk);
+    }
   }
 
   /**
@@ -143,13 +186,13 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
      throws Exception
   {
     if(!allowAnonimousLogon && !allowDebugLogon)
-      die(INT.I("Login anonimo non permesso: occorre una sessione oppure utente e password."));
+      throw new TokenAuthFailureException(INT.I("Login anonimo non permesso: occorre una sessione oppure utente e password."));
 
     SecurityService sec = (SecurityService) getServiceBroker().getService(SecurityService.SERVICE_NAME);
 
     User tu = (User) sec.getUser(anonUser);
     if(tu == null)
-      die(INT.I("Utente per login anonimo non impostato a setup."));
+      throw new TokenAuthFailureException(INT.I("Utente per login anonimo non impostato a setup."));
 
     return addClient(anonUser, tu.getPassword(), expireAction);
   }
@@ -187,7 +230,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     {
       // effettua un altro tentativo con il token speciale
       if((usr = sec.getUser(uName)) == null)
-        die(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
+        throw new TokenAuthFailureException(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
 
       String shHash = CommonFileUtils.calcolaHashStringa(
          uName + "_" + TOKEN_MAGIG + "_" + getAppUUID(), "SHA1");
@@ -196,7 +239,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     }
 
     if(usr == null)
-      die(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
+      throw new TokenAuthFailureException(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
 
     return saveUserToken(usr, sec, expireAction);
   }
@@ -241,7 +284,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
       String userName = sessionID.substring(12);
       User tu = (User) sec.getUser(userName);
       if(tu == null)
-        die(INT.I("Utente per login anonimo non valido."));
+        throw new TokenExpiredException(INT.I("Utente per login anonimo non valido."));
       return addClient(userName, tu.getPassword(), expireAction);
     }
 
@@ -333,5 +376,40 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     }
 
     return 0;
+  }
+
+  @Override
+  public String encryptTokenOauth2(HttpServletRequest req, TokenAuthItem ti)
+     throws Exception
+  {
+    JSONObject jo = new JSONObject();
+    jo.put("idclient", ti.getIdClient());
+    jo.put("user", ti.getUsr().getName());
+    jo.put("address", req.getRemoteAddr());
+
+    byte[] input = jo.toString().getBytes("UTF-8");
+    byte[] encrypt = RSAEncryptUtils.encrypt(input, prk);
+    return RSAEncryptUtils.encodeBASE64(encrypt, false);
+  }
+
+  @Override
+  public JSONObject decriptTokenOauth2(HttpServletRequest req, String token)
+     throws Exception
+  {
+    byte[] binToken = RSAEncryptUtils.decodeBASE64(token);
+    byte[] decrypt = RSAEncryptUtils.decrypt(binToken, puk);
+
+    JSONObject jo = new JSONObject(new String(decrypt, "UTF-8"));
+
+    if(!SU.isEqu(jo.get("address"), req.getRemoteAddr()))
+      throw new TokenAuthFailureException("Invalid address in request.");
+
+    return jo;
+  }
+
+  @Override
+  public String getPublicKeyBase64()
+  {
+    return RSAEncryptUtils.encodeBASE64(puk.getEncoded(), false);
   }
 }

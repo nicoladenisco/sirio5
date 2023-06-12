@@ -195,6 +195,20 @@ public class TableCache<T extends ColumnAccessByName> implements Iterable<T>
     }
   }
 
+  public boolean isEmpty()
+     throws Exception
+  {
+    TableCacheData tc = getFromCache();
+    return tc.lsValues.isEmpty();
+  }
+
+  public boolean isEmptyUndeleted()
+     throws Exception
+  {
+    TableCacheData tc = getFromCache();
+    return tc.lsValuesUndeleted.isEmpty();
+  }
+
   public Stream<T> stream()
      throws Exception
   {

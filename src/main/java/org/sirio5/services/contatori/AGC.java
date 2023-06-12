@@ -30,14 +30,14 @@ import org.commonlib5.utils.StringOper;
  */
 public class AGC
 {
-  public static Object ac;
+  public static Object __ac;
 
   public static AggiornaContatori getService()
   {
-    if(ac == null)
-      ac = TurbineServices.getInstance().getService(AggiornaContatori.SERVICE_NAME);
+    if(__ac == null)
+      __ac = TurbineServices.getInstance().getService(AggiornaContatori.SERVICE_NAME);
 
-    return (AggiornaContatori) ac;
+    return (AggiornaContatori) __ac;
   }
 
   /**

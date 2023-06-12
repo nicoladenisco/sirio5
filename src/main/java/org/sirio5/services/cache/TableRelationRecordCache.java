@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.*;
 import java.util.function.Function;
+import org.apache.torque.map.ColumnMap;
 import org.apache.torque.om.ColumnAccessByName;
 import org.apache.torque.om.Persistent;
 import org.commonlib5.utils.StringOper;
@@ -39,6 +40,7 @@ import org.sirio5.utils.SU;
  * NON utilizza la GlobalCache.
  *
  * @author Nicola De Nisco
+ * @param <T> classe di oggetti Torque da usare come origine dei dati
  */
 public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Record>
 {
@@ -50,20 +52,59 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * Gli oggetti passati devono essere detail dei master che si stanno cercando
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
    * @param tableName nome dalla tabella obbiettivo
-   * @param lsObj lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param lsDetails lista di oggetti da ispezionare alla ricerca di chiavi primarie
    * @param getLinkM metodo da applicari su lsObj per estrarre la chiave primaria
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public TableRelationRecordCache(String tableName, List lsObj, Method getLinkM, Connection con)
+  public TableRelationRecordCache(String tableName, Collection<T> lsDetails, Method getLinkM, Connection con)
      throws Exception
   {
     // recupera tutte le chiavi primarie dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<Integer>();
-    for(int i = 0; i < lsObj.size(); i++)
-    {
-      Persistent obj = (Persistent) lsObj.get(i);
+    HashSet<Integer> primaryKeys = new HashSet<>(lsDetails.size());
+
+    for(T obj : lsDetails)
       primaryKeys.add((Integer) getLinkM.invoke(obj));
+
+    if(!primaryKeys.isEmpty())
+      loadDataFromDetail(tableName, primaryKeys, con);
+  }
+
+  /**
+   * Costruttore e caricatore dei dati da detail.
+   * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
+   * Gli oggetti passati devono essere detail dei master che si stanno cercando
+   * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
+   * @param tableName nome dalla tabella obbiettivo
+   * @param lsDettails lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param campoLink campo degli oggetti in lsMasters per estrarre la chiave primaria; può contentere sia il nome campo
+   * Torque oppure il nome del campo tabella (usando il prefisso PEER:): Idaccettazioni oppure PEER:ID_ACCETTAZIONI
+   * @param con eventuale connessione al db (può essere null)
+   * @throws Exception
+   */
+  public TableRelationRecordCache(String tableName,
+     Collection<T> lsDettails, String campoLink, Connection con)
+     throws Exception
+  {
+    // recupera tutte le chiavi primarie dalla lista oggetti
+    HashSet<Integer> primaryKeys = new HashSet<>(lsDettails.size());
+
+    if(campoLink.startsWith("PEER:"))
+    {
+      campoLink = campoLink.substring(5);
+      for(T obj : lsDettails)
+      {
+        ColumnAccessByName can = (ColumnAccessByName) obj;
+        primaryKeys.add((Integer) can.getByPeerName(campoLink));
+      }
+    }
+    else
+    {
+      for(T obj : lsDettails)
+      {
+        ColumnAccessByName can = (ColumnAccessByName) obj;
+        primaryKeys.add((Integer) can.getByName(campoLink));
+      }
     }
 
     if(!primaryKeys.isEmpty())
@@ -76,23 +117,21 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * Gli oggetti passati devono essere detail dei master che si stanno cercando
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
    * @param tableName nome dalla tabella obbiettivo
-   * @param lsObj lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param lsDetails lista di oggetti da ispezionare alla ricerca di chiavi primarie
    * @param fnMap funzione di collegamento (probabilmente una lambda expression) che ritorna l'id del detail
    * da cercare poi nel master; è la chiave esterna del detail che corrispone alla primary key del master
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
   public TableRelationRecordCache(String tableName,
-     List lsObj, Function<T, Integer> fnMap, Connection con)
+     Collection<T> lsDetails, Function<T, Integer> fnMap, Connection con)
      throws Exception
   {
     // recupera tutte le chiavi primarie dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<Integer>();
-    for(int i = 0; i < lsObj.size(); i++)
-    {
-      T obj = (T) lsObj.get(i);
+    HashSet<Integer> primaryKeys = new HashSet<>(lsDetails.size());
+
+    for(T obj : lsDetails)
       primaryKeys.add(fnMap.apply(obj));
-    }
 
     if(!primaryKeys.isEmpty())
       loadDataFromDetail(tableName, primaryKeys, con);
@@ -128,19 +167,20 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
    * @param tableName nome dalla tabella obbiettivo
    * @param nomeCampo nome del campo sulla tabella detail che collega la tabella master
-   * @param lsObj lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param lsMasters lista di oggetti da ispezionare alla ricerca di chiavi primarie
    * @param getLinkM metodo da applicari su lsObj per estrarre la chiave primaria
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public TableRelationRecordCache(String tableName, String nomeCampo, List lsObj, Method getLinkM, Connection con)
+  public TableRelationRecordCache(String tableName, String nomeCampo, Collection<T> lsMasters, Method getLinkM, Connection con)
      throws Exception
   {
     // recupera tutti i valori dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<Integer>();
-    for(int i = 0; i < lsObj.size(); i++)
+    HashSet<Integer> primaryKeys = new HashSet<>(lsMasters.size());
+
+    for(T oo : lsMasters)
     {
-      Persistent obj = (Persistent) lsObj.get(i);
+      Persistent obj = (Persistent) oo;
       primaryKeys.add((Integer) getLinkM.invoke(obj));
     }
 
@@ -155,23 +195,63 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
    * @param tableName nome dalla tabella obbiettivo
    * @param nomeCampo nome del campo sulla tabella detail che collega la tabella master
-   * @param lsObj lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param lsMasters lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param campoLink campo degli oggetti in lsMasters per estrarre la chiave primaria; può contentere sia il nome campo
+   * Torque oppure il nome del campo tabella (usando il prefisso PEER:): Idaccettazioni oppure PEER:ID_ACCETTAZIONI
+   * @param con eventuale connessione al db (può essere null)
+   * @throws Exception
+   */
+  public TableRelationRecordCache(String tableName,
+     ColumnMap nomeCampo, Collection<T> lsMasters, String campoLink, Connection con)
+     throws Exception
+  {
+    // recupera tutti i valori dalla lista oggetti
+    HashSet<Integer> primaryKeys = new HashSet<>(lsMasters.size());
+
+    if(campoLink.startsWith("PEER:"))
+    {
+      campoLink = campoLink.substring(5);
+      for(T obj : lsMasters)
+      {
+        ColumnAccessByName can = (ColumnAccessByName) obj;
+        primaryKeys.add((Integer) can.getByPeerName(campoLink));
+      }
+    }
+    else
+    {
+      for(T obj : lsMasters)
+      {
+        ColumnAccessByName can = (ColumnAccessByName) obj;
+        primaryKeys.add((Integer) can.getByName(campoLink));
+      }
+    }
+
+    if(!primaryKeys.isEmpty())
+      loadDataFromMaster(nomeCampo.getColumnName(), primaryKeys, tableName, con);
+  }
+
+  /**
+   * Costruttore e caricatore dei dati da master.
+   * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
+   * Gli oggetti passati devono essere master dei detail che si stanno cercando
+   * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
+   * @param tableName nome dalla tabella obbiettivo
+   * @param nomeCampo nome del campo sulla tabella detail che collega la tabella master
+   * @param lsMasters lista di oggetti da ispezionare alla ricerca di chiavi primarie
    * @param fnMap funzione di collegamento (probabilmente una lambda expression) che ritorna l'id del master
    * da cercare poi nel detail; in genere è la primary key del master
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
   public TableRelationRecordCache(String tableName, String nomeCampo,
-     List lsObj, Function<T, Integer> fnMap, Connection con)
+     Collection<T> lsMasters, Function<T, Integer> fnMap, Connection con)
      throws Exception
   {
     // recupera tutti i valori dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<Integer>();
-    for(int i = 0; i < lsObj.size(); i++)
-    {
-      T obj = (T) lsObj.get(i);
+    HashSet<Integer> primaryKeys = new HashSet<>(lsMasters.size());
+
+    for(T obj : lsMasters)
       primaryKeys.add(fnMap.apply(obj));
-    }
 
     if(!primaryKeys.isEmpty())
       loadDataFromMaster(nomeCampo, primaryKeys, tableName, con);
@@ -180,8 +260,7 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
   protected void loadDataFromMaster(String nomeCampo, HashSet<Integer> primaryKeys, String tableName, Connection con)
      throws Exception
   {
-    Schema ts = new Schema();
-    ts.schema(con, tableName);
+    Schema ts = Schema.schema(con, tableName);
     List<Column> lsPks = ts.getPrimaryKeys();
 
     if(lsPks.size() != 1)

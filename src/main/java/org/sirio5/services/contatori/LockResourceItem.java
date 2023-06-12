@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Nicola De Nisco
+ * Copyright (C) 2023 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,30 +15,37 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.sirio5.utils.format;
+package org.sirio5.services.contatori;
 
-import java.util.Date;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 /**
- * Formattatore della data e ora.
- * Viene utilizzato in liste.xml.
+ * Informazioni per risorsa.
  *
  * @author Nicola De Nisco
- * @version 1.0
  */
-public class TimeOnlyFormat extends AbstractDateFormat
+public class LockResourceItem
 {
-  @Override
-  public Date parseInternal(String source)
-     throws Exception
+  public Semaphore sem;
+  public final Set<Integer> idUtenti = new HashSet<>();
+  public Thread blocker = null;
+  public int chiaveBloccante;
+
+  public boolean verificaUtente(int idUtente)
   {
-    return df.parseTime(source);
+    return idUtenti.contains(idUtente);
   }
 
-  @Override
-  public String formatInternal(Date value)
-     throws Exception
+  public boolean verificaUtenti(Collection<Integer> idUtenti)
   {
-    return df.formatTime(value);
+    for(Integer i : idUtenti)
+    {
+      if(idUtenti.contains(i))
+        return true;
+    }
+    return false;
   }
 }

@@ -27,13 +27,13 @@ import org.apache.turbine.services.TurbineServices;
  */
 public class ALLARM
 {
-  private static Object all = null;
+  private static Object __all = null;
 
   public static ServAllarmi getService()
   {
-    if(all == null)
-      all = TurbineServices.getInstance().getService(ServAllarmi.SERVICE_NAME);
-    return (ServAllarmi) all;
+    if(__all == null)
+      __all = TurbineServices.getInstance().getService(ServAllarmi.SERVICE_NAME);
+    return (ServAllarmi) __all;
   }
 
   public static void info(String serv, String comp, String msg, int vis)

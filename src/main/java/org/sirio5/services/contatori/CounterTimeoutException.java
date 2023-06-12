@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Nicola De Nisco
+ * Copyright (C) 2023 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,30 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.sirio5.utils.format;
-
-import java.util.Date;
+package org.sirio5.services.contatori;
 
 /**
- * Formattatore della data e ora.
- * Viene utilizzato in liste.xml.
+ * Eccezione sollevata quando il contaore va in timeout (congestionato).
  *
  * @author Nicola De Nisco
- * @version 1.0
  */
-public class TimeOnlyFormat extends AbstractDateFormat
+public class CounterTimeoutException extends Exception
 {
-  @Override
-  public Date parseInternal(String source)
-     throws Exception
+  public CounterTimeoutException(String string)
   {
-    return df.parseTime(source);
-  }
-
-  @Override
-  public String formatInternal(Date value)
-     throws Exception
-  {
-    return df.formatTime(value);
+    super(string);
   }
 }

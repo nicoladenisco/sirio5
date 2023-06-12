@@ -155,7 +155,7 @@ public class CoreTlsManager
     for(int i = 0; i < 3; i++)
     {
       int port = (int) (65000 + ((Math.random() * 500)));
-      try (ServerSocket server = factory.createServerSocket(port))
+      try(ServerSocket server = factory.createServerSocket(port))
       {
         log.debug("SSL environment is sane.");
         break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Nicola De Nisco
+ * Copyright (C) 2023 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,30 +15,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.sirio5.utils.format;
-
-import java.util.Date;
+package org.sirio5.services.contatori;
 
 /**
- * Formattatore della data e ora.
- * Viene utilizzato in liste.xml.
+ * Classe base eccezioni lock.
  *
  * @author Nicola De Nisco
- * @version 1.0
  */
-public class TimeOnlyFormat extends AbstractDateFormat
+public class LockException extends Exception
 {
-  @Override
-  public Date parseInternal(String source)
-     throws Exception
+  public LockException()
   {
-    return df.parseTime(source);
   }
 
-  @Override
-  public String formatInternal(Date value)
-     throws Exception
+  public LockException(String string)
   {
-    return df.formatTime(value);
+    super(string);
+  }
+
+  public LockException(String string, Throwable thrwbl)
+  {
+    super(string, thrwbl);
+  }
+
+  public LockException(Throwable thrwbl)
+  {
+    super(thrwbl);
+  }
+
+  public LockException(String string, Throwable thrwbl, boolean bln, boolean bln1)
+  {
+    super(string, thrwbl, bln, bln1);
   }
 }
