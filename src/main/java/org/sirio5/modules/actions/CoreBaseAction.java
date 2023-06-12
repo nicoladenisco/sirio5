@@ -65,26 +65,33 @@ public class CoreBaseAction extends VelocitySecureAction
 
   public RunData getRunData(PipelineData data)
   {
-    if(data instanceof RunData)
-      return (RunData) data;
-
-    throw new RuntimeException("Invalid object data.");
+    return data.getRunData();
   }
 
   /**
    * Overide this method to perform the security check needed.
-   * Per default tutti gli screen sono permessi purche' l'utente
-   * sia loggato.
+   * Per default tutti gli screen sono permessi purche' l'utente sia loggato.
    *
    * @param pd Turbine information.
    * @return True if the user is authorized to access the screen.
-   * @exception Exception, a generic exception.
+   * @throws java.lang.Exception
    */
   @Override
   final protected boolean isAuthorized(PipelineData pd)
      throws Exception
   {
     CoreRunData data = (CoreRunData) getRunData(pd);
+
+    if(!isValidSession(data))
+      return false;
+
+    return isAuthorized(data);
+  }
+
+  protected boolean isValidSession(RunData data)
+  {
+    // il controllo sulla sessione nuova blocca l'autologon da cookie
+    //if(!data.getUser().hasLoggedIn() || data.getSession().isNew())
 
     if(!data.getUser().hasLoggedIn())
     {
@@ -95,7 +102,7 @@ public class CoreBaseAction extends VelocitySecureAction
       return false;
     }
 
-    return isAuthorized(data);
+    return true;
   }
 
   protected boolean isAuthorized(CoreRunData data)
@@ -206,10 +213,6 @@ public class CoreBaseAction extends VelocitySecureAction
     {
       rdata.setMessage(ex.getMessage());
     }
-    catch(SQLException ex)
-    {
-      SU.reportNonFatalDatabaseError(rdata, ex);
-    }
     catch(TorqueException ex)
     {
       if(ex.getCause() != null && ex.getCause() instanceof SQLException)
@@ -218,7 +221,11 @@ public class CoreBaseAction extends VelocitySecureAction
         SU.reportNonFatalDatabaseError(rdata, sqe);
       }
       else
-        throw ex;
+        SU.reportNonFatalDatabaseError(rdata, ex);
+    }
+    catch(SQLException ex)
+    {
+      SU.reportNonFatalDatabaseError(rdata, ex);
     }
     catch(ConcurrentDatabaseModificationException ex)
     {

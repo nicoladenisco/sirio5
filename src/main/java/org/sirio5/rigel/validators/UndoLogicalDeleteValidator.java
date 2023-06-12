@@ -169,7 +169,7 @@ public class UndoLogicalDeleteValidator implements PostParseValidator
       if(cmap == null)
         throw new Exception(INT.I("Campo %s non trovato in alternate-key/field; rivedere liste.xml.", nomeCampo));
 
-      c.and(cmap.getFullyQualifiedName(), cab.getByName(cmap.getJavaName()));
+      c.and(cmap, cab.getByName(cmap.getJavaName()));
     }
 
     List lsFound = (List) m.invoke(null, c, dbCon);

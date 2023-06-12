@@ -142,13 +142,13 @@ public class JasperPlugin extends BasePdfPlugin
     {
       PropertyManager pm = new PropertyManager();
       pm.addAll(reportParams);
-      try ( FileOutputStream fos = new FileOutputStream(tmpParams.getAbsolutePath() + ".debug"))
+      try (FileOutputStream fos = new FileOutputStream(tmpParams.getAbsolutePath() + ".debug"))
       {
         pm.save(fos);
       }
     }
 
-    try ( ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tmpParams)))
+    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tmpParams)))
     {
       oos.writeObject(reportParams);
     }
@@ -166,7 +166,7 @@ public class JasperPlugin extends BasePdfPlugin
     else
     {
       // recuperiamo dal settaggio di Torque i dati per la connessione al db
-      org.apache.commons.configuration.Configuration cfg = Torque.getConfiguration();
+      Configuration cfg = Torque.getConfiguration();
       String dbDriver = cfg.getString("defaults.connection.driver", "org.postgresql.Driver");
       String dbUri = cfg.getString("defaults.connection.url", "jdbc:localhost:sirio");
       String dbUser = cfg.getString("defaults.connection.user", "sirio");

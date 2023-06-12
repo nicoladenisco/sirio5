@@ -163,6 +163,9 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
 
     if(aa != null)
     {
+      if("DISABLED".equals(aa))
+        return null;
+
       try
       {
         return (CoreAppSanity) Class.forName(aa).newInstance();
@@ -305,8 +308,9 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
     makeTestDir(getRealPath(pathConfCert));
 
     // pulisce la directory /var/nomeapp/tmp
-    CommonFileUtils.deleteDir(new File(pathWorkTmp), false);
-
+    // NON POSSIBILE: se applicazione ha piu moduli distrugge init dei vari moduli
+    // CommonFileUtils.deleteDir(new File(pathWorkTmp), false);
+    //
     // se non già fatto imposta un UUID univoco per questa istanza
     // il dato viene salvato in un apposito files in /var/nomeapp/documenti
     File uuidSec = getWorkDocsFile("uuid.txt");

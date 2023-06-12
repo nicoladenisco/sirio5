@@ -67,10 +67,7 @@ public class CoreBaseScreen extends VelocitySecureScreen
 
   public RunData getRunData(PipelineData data)
   {
-    if(data instanceof RunData)
-      return (RunData) data;
-
-    throw new RuntimeException("Invalid object data.");
+    return data.getRunData();
   }
 
   /**
@@ -212,10 +209,6 @@ public class CoreBaseScreen extends VelocitySecureScreen
     {
       rdata.setMessage(ex.getMessage());
     }
-    catch(SQLException ex)
-    {
-      SU.reportNonFatalDatabaseError(rdata, ex);
-    }
     catch(TorqueException ex)
     {
       if(ex.getCause() != null && ex.getCause() instanceof SQLException)
@@ -224,7 +217,11 @@ public class CoreBaseScreen extends VelocitySecureScreen
         SU.reportNonFatalDatabaseError(rdata, sqe);
       }
       else
-        throw ex;
+        SU.reportNonFatalDatabaseError(rdata, ex);
+    }
+    catch(SQLException ex)
+    {
+      SU.reportNonFatalDatabaseError(rdata, ex);
     }
     catch(ConcurrentDatabaseModificationException ex)
     {
