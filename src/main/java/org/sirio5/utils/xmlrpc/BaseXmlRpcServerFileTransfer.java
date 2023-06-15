@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -62,7 +62,7 @@ public class BaseXmlRpcServerFileTransfer extends BaseXmlRpcServerUserAuth
     TokenAuthItem token = getClient(clientID);
     Pair<Long, byte[]> dt = getHelper(token).getFileBlockCRC32(idFile, block);
     Vector rv = new Vector();
-    rv.add(new Double(dt.first));
+    rv.add((double) dt.first);
     rv.add(dt.second);
     return rv;
   }

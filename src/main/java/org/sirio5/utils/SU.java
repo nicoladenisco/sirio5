@@ -39,6 +39,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.fulcrum.cache.CachedObject;
 import org.apache.fulcrum.cache.ObjectExpiredException;
 import org.apache.fulcrum.parser.ParameterParser;
+import org.apache.turbine.services.TurbineServices;
+import org.apache.turbine.services.pull.PullService;
+import org.apache.turbine.services.pull.tools.UITool;
 import org.apache.turbine.util.RunData;
 import org.commonlib5.exec.ExecHelper;
 import org.commonlib5.utils.*;
@@ -1077,5 +1080,12 @@ public class SU extends StringOper
     }
 
     return false;
+  }
+
+  public static UITool getUITool()
+  {
+    PullService ps = (PullService) TurbineServices.getInstance()
+       .getService(PullService.SERVICE_NAME);
+    return (UITool) ps.getGlobalContext().get("ui");
   }
 }

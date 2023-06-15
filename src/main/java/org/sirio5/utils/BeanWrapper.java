@@ -708,7 +708,7 @@ public class BeanWrapper
         if(lgetter != null)
         {
           PropertyDescriptor po = (PropertyDescriptor) htProp.get(ps.getName().toLowerCase());
-          if(po != null)
+          if(po != null && !(po instanceof IndexedPropertyDescriptor))
           {
             Method lsetter = po.getWriteMethod();
 
@@ -716,7 +716,7 @@ public class BeanWrapper
             {
               if(lgetter != null && lsetter != null)
               {
-                Object value = lgetter.invoke(obj, (java.lang.Object[]) null);
+                Object value = lgetter.invoke(obj);
                 if(!(ignoreNull && value == null))
                 {
                   lsetter.invoke(refObject, value);
