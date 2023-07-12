@@ -51,6 +51,7 @@ import org.sirio5.rigel.ConcurrentDatabaseModificationException;
 import org.sirio5.rigel.RigelHtmlI18n;
 import org.sirio5.rigel.UnmodificableRecordException;
 import org.sirio5.services.cache.CACHE;
+import org.sirio5.services.contatori.CounterTimeoutException;
 import org.sirio5.services.localization.INT;
 import org.sirio5.services.token.TokenAuthItem;
 
@@ -66,8 +67,14 @@ public class SU extends StringOper
   public static final String SESSION_ID = "sessionId";
   public static final String QUERY_STRING = "queryString";
   public static final String PATH_INFO = "pathInfo";
+
   public static final Pattern pw2c = Pattern.compile("^(.):\\\\(.+)$", Pattern.CASE_INSENSITIVE);
   public static final Pattern pc2w = Pattern.compile("^/cygdrive/(.)/(.+)$", Pattern.CASE_INSENSITIVE);
+  public static final Pattern pTestCodice = Pattern.compile("^[a-z|A-Z|0-9|_]+$");
+  public static final Pattern pTestNomeFile = Pattern.compile("^[a-z|A-Z|0-9|_|\\.]+$");
+  public static final Pattern pBodyHtml = Pattern.compile(".*?<body.*?>(.*?)</body>.*?",
+     Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+
   public static final String LISTA_STAMPANTI_SISTEMA = "LISTA_STAMPANTI_SISTEMA";
   public static final SimpleDateFormat fmtDate2Directory = new SimpleDateFormat("yyyy/MM/dd");
   public static final SimpleDateFormat fmtDate2FileName = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
@@ -494,7 +501,7 @@ public class SU extends StringOper
    * @param caller oggetto chiamante
    * @param command comando da eseguire
    * @param data parametri generali della richiesta
-   * @param params mappa di tutti i parametri pp più eventuali parametri permanenti
+   * @param params mappa di tutti i parametri request più eventuali parametri permanenti
    * @param args
    * @return
    * @throws Exception
@@ -552,7 +559,7 @@ public class SU extends StringOper
    * @param caller oggetto chiamante
    * @param command comando da eseguire
    * @param data parametri generali della richiesta
-   * @param params mappa di tutti i parametri pp più eventuali parametri permanenti
+   * @param params mappa di tutti i parametri request più eventuali parametri permanenti
    * @param args
    * @return
    * @throws Exception
@@ -689,9 +696,6 @@ public class SU extends StringOper
     return out.toByteArray();
   }
 
-  public static final Pattern pBodyHtml = Pattern.compile(".*?<body.*?>(.*?)</body>.*?",
-     Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-
   /**
    * Recupera solo 'body' da html.
    * Dato un blocco di HTML recupera solo il contenuto del tag BODY.
@@ -717,7 +721,17 @@ public class SU extends StringOper
   {
     return pTestCodice.matcher(codice).matches();
   }
-  public static final Pattern pTestCodice = Pattern.compile("^[a-z|A-Z|0-9|_]+$");
+
+  /**
+   * Controllo validità codice.
+   * Verifica che codice contenga solo caratteri alfanumerici.
+   * @param codice da verificare
+   * @return vero se contiene solo caratteri consentiti
+   */
+  public static boolean checkNomeFileValido(String codice)
+  {
+    return pTestNomeFile.matcher(codice).matches();
+  }
 
   /**
    * Riporta errore di db all'utente se non fatale.
@@ -746,18 +760,23 @@ public class SU extends StringOper
    * Riporta errore di modifica concorrente all'utente.
    * @param pdata
    * @param ex
+   * @throws Exception
    */
   public static void reportConcurrentDatabaseError(CoreRunData pdata, ConcurrentDatabaseModificationException ex)
+     throws Exception
   {
     pdata.setMessage(
-       "<span class=\"txt-white-bold-12-nul\">" + pdata.i18n("Spiacente!") + "</span><br>"
+       "<div style=\"background-color: red;\">"
+       + "<span class=\"txt-white-bold-12-nul\">" + pdata.i18n("Spiacente!") + "</span><br>"
        + "<span class=\"txt-white-regular-11-nul\">"
        + pdata.i18n("Un altro utente ha modificato il record che stai salvando.") + "<br>"
        + pdata.i18n("Per evitare conflitti le tue modifiche non possono essere accettate.")
        + "</span><br>"
        + "<span class=\"txt-white-regular-09\">"
        + ex.getLocalizedMessage()
-       + "</span>");
+       + "</span>"
+       + "</div>"
+    );
   }
 
   /**
@@ -770,13 +789,41 @@ public class SU extends StringOper
      throws Exception
   {
     pdata.setMessage(
-       "<span class=\"txt-white-bold-12-nul\">" + pdata.i18n("Spiacente!") + "</span><br>"
+       "<div style=\"background-color: red;\">"
+       + "<span class=\"txt-white-bold-12-nul\">" + pdata.i18n("Spiacente!") + "</span><br>"
        + "<span class=\"txt-white-regular-11-nul\">"
        + pdata.i18n("Non hai i permessi per modificare il record indicato.")
        + "</span><br>"
        + "<span class=\"txt-white-regular-09\">"
        + ex.getLocalizedMessage()
-       + "</span>");
+       + "</span>"
+       + "</div>"
+    );
+  }
+
+  /**
+   * Riporta errore di contatori congestionati all'utente.
+   * @param pdata
+   * @param ex
+   * @throws Exception
+   */
+  public static void reportCounterTimeoutException(CoreRunData pdata, CounterTimeoutException ex)
+     throws Exception
+  {
+    pdata.setMessage(
+       "<div style=\"background-color: red;\">"
+       + "<span class=\"txt-white-bold-12-nul\">" + pdata.i18n("Sistema congestionato!") + "</span><br>"
+       + "<span class=\"txt-white-regular-11-nul\">"
+       + pdata.i18n("Non è stato possibile completare l'operazione di salvataggio a causa di un sovraccarico temporaneo.")
+       + "</span><br>"
+       + "<span class=\"txt-white-regular-09\">"
+       + ex.getLocalizedMessage()
+       + "</span><br><br>"
+       + "<span class=\"txt-white-bold-12-nul\">"
+       + pdata.i18n("RIPETERE ULTIMA OPERAZIONE DI SALVATAGGIO.")
+       + "</span>"
+       + "</div>"
+    );
   }
 
   /**
