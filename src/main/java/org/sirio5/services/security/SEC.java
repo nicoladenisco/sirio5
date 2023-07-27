@@ -447,4 +447,15 @@ public class SEC
   {
     getSirioSecurity().cambiaPassword(u, oldPass, newPass, mode);
   }
+
+  /**
+   * Genera una password casuale.
+   * Utilità per generare una password casuale.
+   * @param len lunghezza password (0=default da setup)
+   * @return password generata secondo le regole a setup.
+   */
+  public static String generaPassword(int len)
+  {
+    return getSirioSecurity().generaPassword(len);
+  }
 }

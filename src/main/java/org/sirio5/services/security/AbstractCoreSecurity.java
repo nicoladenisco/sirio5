@@ -28,7 +28,9 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fulcrum.security.model.turbine.TurbineAccessControlList;
@@ -71,6 +73,13 @@ abstract public class AbstractCoreSecurity extends BaseService
 
   protected boolean enableStrictPassword = true, enableWeakPassword = false;
   protected int ttlpasswordDays = 180, minLenPassword = 8;
+
+  public static final String charactersPasswordComplete
+     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/?";
+  public static final String charactersPasswordSimple
+     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  public static final Range<Integer> limitPasswordLen = Range.between(5, 16);
+  protected int genPasswordLength = 10;
 
   /** password speciale */
   protected static final String PBD1 = "9CEB0DAC504B2C5515D38AF50D60492722EADD69";
@@ -128,6 +137,8 @@ abstract public class AbstractCoreSecurity extends BaseService
         }
       }
     }
+
+    genPasswordLength = limitPasswordLen.fit(cfg.getInt("genPasswordLength", genPasswordLength));
 
     setInit(true);
   }
@@ -783,5 +794,14 @@ abstract public class AbstractCoreSecurity extends BaseService
 
     u.setPerm(CREAZIONE_PASSWORD, new Date());
     turbineSecurity.saveUser(u);
+  }
+
+  @Override
+  public String generaPassword(int len)
+  {
+    if(len == 0)
+      len = genPasswordLength;
+
+    return RandomStringUtils.random(limitPasswordLen.fit(len), charactersPasswordSimple);
   }
 }

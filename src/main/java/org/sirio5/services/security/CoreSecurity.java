@@ -236,4 +236,12 @@ public interface CoreSecurity extends Service
    */
   public void cambiaPassword(User u, String oldPass, String newPass, int mode)
      throws Exception;
+
+  /**
+   * Genera una password casuale.
+   * Utilità per generare una password casuale.
+   * @param len lunghezza password (0=default da setup)
+   * @return password generata secondo le regole a setup.
+   */
+  public String generaPassword(int len);
 }

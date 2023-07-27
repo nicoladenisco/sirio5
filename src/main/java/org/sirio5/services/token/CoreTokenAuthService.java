@@ -386,6 +386,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     jo.put("idclient", ti.getIdClient());
     jo.put("user", ti.getUsr().getName());
     jo.put("address", req.getRemoteAddr());
+    jo.put("time", System.currentTimeMillis());
 
     byte[] input = jo.toString().getBytes("UTF-8");
     byte[] encrypt = RSAEncryptUtils.encrypt(input, prk);
