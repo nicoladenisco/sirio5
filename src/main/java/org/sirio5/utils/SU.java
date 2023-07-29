@@ -368,7 +368,6 @@ public class SU extends StringOper
   }
 
   public static String join(Collection lsObj)
-     throws Exception
   {
     return join(lsObj.iterator(), ',');
   }
@@ -1134,5 +1133,108 @@ public class SU extends StringOper
     PullService ps = (PullService) TurbineServices.getInstance()
        .getService(PullService.SERVICE_NAME);
     return (UITool) ps.getGlobalContext().get("ui");
+  }
+
+  /**
+   * Verifica valore per possibili alternative.
+   * Questa funzione è pensata per valori numerici (int, float, short, ecc.).
+   * @param toTest
+   * @param values
+   * @return vero se toTest è contenuto in values
+   */
+  public static boolean testIntValues(int toTest, int[] values)
+  {
+    for(int value : values)
+      if(value == toTest)
+        return true;
+    return false;
+  }
+
+  /**
+   * Verifica valore per possibili alternative.
+   * Questa funzione è pensata per valori numerici (int, float, short, ecc.).
+   * @param toTest
+   * @param values
+   * @return vero se toTest è contenuto in values
+   */
+  public static <T> boolean testValues2(T toTest, T... values)
+  {
+    for(T value : values)
+      if(value == toTest)
+        return true;
+    return false;
+  }
+
+  /**
+   * Ritorna la stringa con i soli caratteri compresi fra 33 e 128.
+   * I caratteri speciali sono convertiti opportunamente.
+   * @param s input
+   * @return output
+   */
+  public static String cvtVarString(String s)
+  {
+    char[] arChar = s.toUpperCase().toCharArray();
+    StringBuilder sb = new StringBuilder();
+
+    for(int i = 0; i < arChar.length; i++)
+    {
+      int c = arChar[i];
+
+      //:?^%/*-+~!|=<>
+      switch(c)
+      {
+        case ':':
+          sb.append("_DP");
+          break;
+        case '?':
+          sb.append("_QP");
+          break;
+        case '^':
+          sb.append("_POW");
+          break;
+        case '%':
+          sb.append("_MOD");
+          break;
+        case '/':
+          sb.append("_DIV");
+          break;
+        case '*':
+          sb.append("_MUL");
+          break;
+        case '-':
+          sb.append("_MIN");
+          break;
+        case '+':
+          sb.append("_PLU");
+          break;
+        case '~':
+          sb.append("_TILDE");
+          break;
+        case '!':
+          sb.append("_MARK");
+          break;
+        case '|':
+          sb.append("_PIPE");
+          break;
+        case '=':
+          sb.append("_EQ");
+          break;
+        case '<':
+          sb.append("_MIN");
+          break;
+        case '>':
+          sb.append("_MAX");
+          break;
+        case '#':
+          sb.append("_HT");
+          break;
+        default:
+          if(c > 32 && c <= 128)
+            sb.append(arChar[i]);
+          break;
+      }
+    }
+
+    return sb.toString();
   }
 }
