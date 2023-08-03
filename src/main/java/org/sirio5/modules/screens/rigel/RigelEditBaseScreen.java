@@ -200,6 +200,7 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
     {
       CustomButtonInfo cb = lso.getHeaderButton(i);
       cb.addRuntimeParam("user", data.getUser());
+      cb.addRuntimeParam("baseUri", baseUri);
 
       MenuItemBean mb = new MenuItemBean();
       boolean popup = isPopup() || cb.getPopup() > 0;

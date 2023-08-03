@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -18,7 +18,6 @@
 package org.sirio5.modules.actions;
 
 import java.util.Map;
-import org.apache.turbine.util.RunData;
 import org.apache.velocity.context.Context;
 import org.sirio5.rigel.RigelHtmlI18n;
 import org.sirio5.services.security.SEC;
@@ -56,10 +55,18 @@ public class TaskManage extends CoreBaseAction
     return super.isAuthorizedAll(data, "TaskManage");
   }
 
+  public void doCmd_startasync(CoreRunData data, Map params, Object... others)
+     throws Exception
+  {
+    doCmd_start(data, params, others);
+    data.setScreenTemplate("TaskList.vm");
+  }
+
   public void doCmd_start(CoreRunData data, Map params, Object... others)
      throws Exception
   {
     String taskName = SU.okStrNull(data.getParameters().getString("nome"));
+    String command = SU.okStrNull(data.getParameters().getString("command"));
 
     if(taskName == null)
       data.throwMessagei18n("Specificare il nome del task da avviare.");
@@ -68,6 +75,7 @@ public class TaskManage extends CoreBaseAction
     Task task = tm.creaTaskDaSetup(idUser, taskName, null);
     task.setAcl(SEC.getACL(data.getSession()));
     task.setI18n(new RigelHtmlI18n(data));
+    task.setParams(params);
 
     // controlla permessi: se l'utente non ha i permessi viene rediretto alla maschera permessi
     String permessi = SU.okStrNull(task.getPermessi());
@@ -75,7 +83,8 @@ public class TaskManage extends CoreBaseAction
       return;
 
     // avvia il task aspettando 3 secondi
-    if(tm.registraAvviaTask(task, WAIT_MILLIS))
+    long waitmil = "startasync".equalsIgnoreCase(command) ? 0 : WAIT_MILLIS;
+    if(tm.registraAvviaTask(task, waitmil))
     {
       // se in 3 secondi non ha completato passa a visualizzazione task
       data.setScreenTemplate("TaskList.vm");

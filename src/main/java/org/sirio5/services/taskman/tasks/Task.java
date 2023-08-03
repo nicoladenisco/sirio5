@@ -21,7 +21,9 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.Action;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
@@ -76,7 +78,9 @@ public abstract class Task extends Thread
   /** Indica se questo task è destinato a produrre files. */
   protected boolean prodFiles = false;
   /** Eventuali file da scaricare collegati. */
-  protected ArrayList<String> arFileCacheTickets = new ArrayList<String>();
+  protected final ArrayList<String> arFileCacheTickets = new ArrayList<String>();
+  /** Eventuali parametri passati al task prima dell'avvio */
+  protected final Map params = new HashMap();
   /** Inizio e fine del task. */
   protected Date tStart, tEnd;
   /** Logging. */
@@ -528,5 +532,31 @@ public abstract class Task extends Thread
   public long getTotalTime()
   {
     return (tEnd == null || tStart == null) ? -1 : tEnd.getTime() - tStart.getTime();
+  }
+
+  public Map getParams()
+  {
+    return Collections.unmodifiableMap(params);
+  }
+
+  public void setParams(Map p)
+  {
+    params.clear();
+    params.putAll(p);
+  }
+
+  public void addParams(Map p)
+  {
+    params.putAll(p);
+  }
+
+  public void addParam(Object key, Object value)
+  {
+    params.put(key, value);
+  }
+
+  public void clearParams()
+  {
+    params.clear();
   }
 }

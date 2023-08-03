@@ -247,7 +247,7 @@ public class LI extends HtmlUtils
 
   public static String getImgIcon(String icon, String text)
   {
-    // sintassi per icone build int in Bootstrap 3
+    // sintassi per icone Bootstrap 3
     if(icon.startsWith("glyphicon:"))
       return getImgGlyphicon(SU.okStr(icon.substring(10)), text);
 
