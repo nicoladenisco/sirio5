@@ -27,12 +27,10 @@ import org.apache.velocity.util.ClassUtils;
 import org.rigel5.SetupHolder;
 import org.rigel5.table.RigelTableModel;
 import org.rigel5.table.html.wrapper.HtmlWrapperBase;
-import org.sirio5.CoreConst;
 import org.sirio5.modules.screens.rigel.FormBase;
 import org.sirio5.services.localization.INT;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.SU;
-import org.sirio5.utils.TR;
 import org.sirio5.utils.velocity.VelocityParser;
 
 /**
@@ -203,23 +201,13 @@ public class ToolRenderFormRigel extends FormBase
       return suppressEmptyMessage;
 
     StringWriter writer = new StringWriter(512);
-    String alternatePath = TR.getString(CoreConst.TOOL_RENDER_MODEL_PATH);
-
-    if(alternatePath == null)
+    // renderizzazione Velocity con il modello caricato da risorsa
+    try (InputStream is = ClassUtils.getResourceAsStream(getClass(), "/" + modello))
     {
-      // renderizzazione Velocity con il modello caricato da risorsa
-      try ( InputStream is = ClassUtils.getResourceAsStream(getClass(), "/org/sirio2/resources/" + modello))
-      {
-        InputStreamReader reader = new InputStreamReader(is, "UTF-8");
+      InputStreamReader reader = new InputStreamReader(is, "UTF-8");
 
-        VelocityParser vp = new VelocityParser(ctx);
-        vp.parseReader(reader, writer, modello);
-      }
-    }
-    else
-    {
-      VelocityParser vp = new VelocityParser(ctx, alternatePath);
-      vp.parseFile(modello, writer);
+      VelocityParser vp = new VelocityParser(ctx);
+      vp.parseReader(reader, writer, modello);
     }
 
     // rimaneggia javascript sostituendo submit con funzione specifica

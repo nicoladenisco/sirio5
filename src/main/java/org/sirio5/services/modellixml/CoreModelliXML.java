@@ -218,13 +218,13 @@ public class CoreModelliXML extends AbstractCoreBaseService
   }
 
   /**
-   * Vero se stiamo usando bootstrap.
+   * Vero se stiamo usando bootstrap 3.
    * Da ridefinire in classi derivate se non usiamo bootstrap.
    * @return vero per bootstrap
    */
   public boolean useBootstrap()
   {
-    return true;
+    return false;
   }
 
   /**
@@ -233,6 +233,16 @@ public class CoreModelliXML extends AbstractCoreBaseService
    * @return vero per bootstrap
    */
   public boolean useAwesome()
+  {
+    return false;
+  }
+
+  /**
+   * Vero se stiamo usando Awesome per le icone.
+   * Da ridefinire in classi derivate se non usiamo awesome.
+   * @return vero per bootstrap
+   */
+  public boolean useAwesome5()
   {
     return true;
   }
@@ -283,9 +293,18 @@ public class CoreModelliXML extends AbstractCoreBaseService
     SetupHolder.setRi18n(new RigelDefaultI18n());
   }
 
-  public String getImgWithDefaults(String key, String defUI, String defAwe, String defBoot, String testo)
+  public String getImgWithDefaults(String key, String defUI, String defAwe, String defAwe5, String defBoot, String testo)
      throws Exception
   {
+    if(useAwesome5())
+    {
+      if(defAwe5.isEmpty())
+        defAwe5 = defAwe.replace("awesome:", "fas:");
+
+      String nomeIcona = getSC(key, defAwe5);
+      return LI.getImgIcon(nomeIcona, testo);
+    }
+
     if(useAwesome())
     {
       String nomeIcona = getSC(key, defAwe);
@@ -306,70 +325,70 @@ public class CoreModelliXML extends AbstractCoreBaseService
   public String getImgSelect()
      throws Exception
   {
-    return getImgWithDefaults("ImgSelect", "select.gif", "awesome:check", "glyphicon:download", INT.I("Conferma"));
+    return getImgWithDefaults("ImgSelect", "select.gif", "awesome:check", "", "glyphicon:download", INT.I("Conferma"));
   }
 
   @Override
   public String getImgEditData()
      throws Exception
   {
-    return getImgWithDefaults("ImgEditData", "calendario.gif", "awesome:calendar", "glyphicon:calendar", INT.I("Modifica data"));
+    return getImgWithDefaults("ImgEditData", "calendario.gif", "awesome:calendar", "", "glyphicon:calendar", INT.I("Modifica data"));
   }
 
   @Override
   public String getImgEditForeign()
      throws Exception
   {
-    return getImgWithDefaults("ImgEditForeign", "editForeign.gif", "awesome:search", "glyphicon:search", INT.I("Ricerca valore"));
+    return getImgWithDefaults("ImgEditForeign", "editForeign.gif", "awesome:search", "", "glyphicon:search", INT.I("Ricerca valore"));
   }
 
   @Override
   public String getImgFormForeign()
      throws Exception
   {
-    return getImgWithDefaults("ImgFormForeign", "formForeign.gif", "awesome:file-code", "glyphicon:list-alt", INT.I("Visualizza dettaglio"));
+    return getImgWithDefaults("ImgFormForeign", "formForeign.gif", "awesome:file-code", "", "glyphicon:list-alt", INT.I("Visualizza dettaglio"));
   }
 
   @Override
   public String getImgLista()
      throws Exception
   {
-    return getImgWithDefaults("ImgLista", "ricerca.gif", "awesome:list", "glyphicon:list", INT.I("Seleziona lista"));
+    return getImgWithDefaults("ImgLista", "ricerca.gif", "awesome:list", "", "glyphicon:list", INT.I("Seleziona lista"));
   }
 
   @Override
   public String getImgEditItem()
      throws Exception
   {
-    return getImgWithDefaults("ImgEditItem", "editItem.gif", "awesome:edit", "glyphicon:edit", INT.I("Modifica"));
+    return getImgWithDefaults("ImgEditItem", "editItem.gif", "awesome:edit", "", "glyphicon:edit", INT.I("Modifica"));
   }
 
   @Override
   public String getImgEditRecord()
      throws Exception
   {
-    return getImgWithDefaults("ImgEditRecord", "editRecord.gif", "awesome:edit", "glyphicon:edit", INT.I("Modifica record"));
+    return getImgWithDefaults("ImgEditRecord", "editRecord.gif", "awesome:edit", "", "glyphicon:edit", INT.I("Modifica record"));
   }
 
   @Override
   public String getImgCancellaRecord()
      throws Exception
   {
-    return getImgWithDefaults("ImgCancellaRecord", "cancella.gif", "awesome:remove", "glyphicon:remove", INT.I("Cancella record"));
+    return getImgWithDefaults("ImgCancellaRecord", "cancella.gif", "awesome:remove", "fas:trash", "glyphicon:remove", INT.I("Cancella record"));
   }
 
   @Override
   public String getImgExpand()
      throws Exception
   {
-    return getImgWithDefaults("ImgEspandi", "ricerca.gif", "awesome:expand", "glyphicon:expand", INT.I("Altre opzioni"));
+    return getImgWithDefaults("ImgEspandi", "ricerca.gif", "awesome:expand", "", "glyphicon:expand", INT.I("Altre opzioni"));
   }
 
   @Override
   public String getImgCollapse()
      throws Exception
   {
-    return getImgWithDefaults("ImgContrai", "cancella.gif", "awesome:collapse-up", "glyphicon:collapse-up", INT.I("Chiudi opzioni"));
+    return getImgWithDefaults("ImgContrai", "cancella.gif", "awesome:collapse-up", "", "glyphicon:collapse-up", INT.I("Chiudi opzioni"));
   }
 
   /**

@@ -34,13 +34,11 @@ import org.rigel5.table.peer.PeerBuilderRicercaGenerica;
 import org.rigel5.table.peer.html.PeerTableModel;
 import org.rigel5.table.sql.SqlBuilderRicercaGenerica;
 import org.rigel5.table.sql.html.SqlTableModel;
-import org.sirio5.CoreConst;
-import org.sirio5.modules.screens.rigel.ListaBase;
+import org.sirio5.modules.screens.rigel.ListaBase5;
 import org.sirio5.modules.screens.rigel.ListaInfo;
 import org.sirio5.services.localization.INT;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.SU;
-import org.sirio5.utils.TR;
 import org.sirio5.utils.velocity.VelocityParser;
 
 /**
@@ -51,7 +49,7 @@ import org.sirio5.utils.velocity.VelocityParser;
  *
  * @author Nicola De Nisco
  */
-public class ToolRenderListeRigel extends ListaBase
+public class ToolRenderListeRigel extends ListaBase5
 {
   protected final ToolRigelUIManager uim = new ToolRigelUIManager();
   protected final ToolCustomUrlBuilder urb = new ToolCustomUrlBuilder();
@@ -88,7 +86,7 @@ public class ToolRenderListeRigel extends ListaBase
     urb.setBasePopupList(ub.getBasePopupList());
 
     context.put("unique", unique);
-    funcNameEdit = "apriFinestraEdit_" + unique;
+    funcNameEdit = "rigel.apriEditTool";
     context.put("funcNameEdit", funcNameEdit);
     funcNameSubmit = "submit_" + unique;
     context.put("funcNameSubmit", funcNameSubmit);
@@ -114,17 +112,19 @@ public class ToolRenderListeRigel extends ListaBase
     flt.setFormName(formName);
     //flt.setUim(uim);
     flt.setI18n(new RigelHtmlI18n(data));
+    String baseurl = flt.getBaseSelfUrl();
+    context.put("selfurl", baseurl);
 
     if(lso.getPtm() instanceof SqlTableModel)
     {
       SqlTableModel tm = (SqlTableModel) lso.getPtm();
       String nometab = tm.getQuery().getVista();
-      flt.setMascheraRicerca(new ToolRicercaListe(new SqlBuilderRicercaGenerica(tm, nometab), tm, act.getI18n(), unique));
+      flt.setMascheraRicerca(new ToolRicercaListe(new SqlBuilderRicercaGenerica(tm, nometab), tm, act.getI18n(), unique, baseurl));
     }
     else if(lso.getPtm() instanceof PeerTableModel)
     {
       PeerTableModel tm = (PeerTableModel) lso.getPtm();
-      flt.setMascheraRicerca(new ToolRicercaListe(new PeerBuilderRicercaGenerica(tm, tm.getTableMap()), tm, act.getI18n(), unique));
+      flt.setMascheraRicerca(new ToolRicercaListe(new PeerBuilderRicercaGenerica(tm, tm.getTableMap()), tm, act.getI18n(), unique, baseurl));
     }
 
     super.makeContextHtml(lso, li, data, context, baseUri);
@@ -202,27 +202,20 @@ public class ToolRenderListeRigel extends ListaBase
       return suppressEmptyMessage;
 
     StringWriter writer = new StringWriter(512);
-    String alternatePath = TR.getString(CoreConst.TOOL_RENDER_MODEL_PATH);
-
-    if(alternatePath == null)
+    // renderizzazione Velocity con il modello caricato da risorsa
+    try (InputStream is = ClassUtils.getResourceAsStream(getClass(), "/ToolLista.vm"))
     {
-      // renderizzazione Velocity con il modello caricato da risorsa
-      try ( InputStream is = ClassUtils.getResourceAsStream(getClass(), "/org/sirio2/resources/ToolLista.vm"))
-      {
-        InputStreamReader reader = new InputStreamReader(is, "UTF-8");
+      InputStreamReader reader = new InputStreamReader(is, "UTF-8");
 
-        VelocityParser vp = new VelocityParser(ctx);
-        vp.parseReader(reader, writer, "ToolLista.vm");
-      }
-    }
-    else
-    {
-      VelocityParser vp = new VelocityParser(ctx, alternatePath);
-      vp.parseFile("ToolLista.vm", writer);
+      VelocityParser vp = new VelocityParser(ctx);
+      vp.parseReader(reader, writer, "ToolLista.vm");
     }
 
     // rimaneggia javascript sostituendo submit con funzione specifica
-    return SU.strReplace(writer.toString(), "document." + formName + ".submit();", funcNameSubmit + "();");
+    String url = (String) ctx.get("selfurl");
+    return SU.strReplace(writer.toString(),
+       "document." + formName + ".submit();",
+       "rigel.submitTool('" + unique + "', '" + url + "')");
   }
 
   @Override

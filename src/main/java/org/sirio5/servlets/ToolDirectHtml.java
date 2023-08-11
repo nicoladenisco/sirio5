@@ -38,6 +38,7 @@ import org.sirio5.utils.SU;
 
 /**
  * Servlet per la restituzione dell'html per i tool.
+ * Vedi RigelFormTool.java e RigelListeTool.java.
  *
  * @author Nicola De Nisco
  */

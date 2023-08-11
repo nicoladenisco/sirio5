@@ -38,7 +38,7 @@ public class ToolRigelUIManager extends CoreRigelUIManager
   {
     String uri = tp.getSelfUrl(rec, sessione);
     String formName = tp.getFormName();
-    return "javascript:jump" + formName + "('" + uri + "')";
+    return "javascript:rigel.jumpTool(unique, '" + uri + "')";
   }
 
   @Override
@@ -46,21 +46,6 @@ public class ToolRigelUIManager extends CoreRigelUIManager
      String funcGoto, AbstractHtmlTablePager tp, int numPagine, int limit,
      String jumpURL, RigelI18nInterface i18n)
   {
-    jumpURL = jumpURL.replace("javascript:", "");
-
-    javascript.append(""
-       + "function " + funcGoto + "()\n"
-       + "{\n"
-       + "  var nPage = document." + tp.getFormName() + ".in_" + funcGoto + ".value;\n"
-       + "  if(nPage <= 0 || nPage > " + numPagine + ") {\n"
-       + "    alert('Valore di pagina non consentito.');\n"
-       + "  } else {\n"
-       + "    rStart = (nPage-1)*" + limit + ";\n"
-       + "    " + jumpURL + "\n"
-       + "  }\n"
-       + "}\n"
-       + "\n"
-    );
   }
 
   /**

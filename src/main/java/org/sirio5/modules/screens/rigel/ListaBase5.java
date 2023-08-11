@@ -24,12 +24,15 @@ import org.commonlib5.utils.ClassOper;
 import org.commonlib5.utils.StringOper;
 import org.rigel5.*;
 import org.rigel5.glue.WrapperCacheBase;
+import org.rigel5.table.MascheraRicercaGenerica;
 import org.rigel5.table.html.AbstractHtmlTablePager;
 import org.rigel5.table.html.AbstractHtmlTablePagerFilter;
+import org.rigel5.table.html.HtmlMascheraRicercaGenericaNoscript;
 import org.rigel5.table.html.PageComponentType;
 import org.rigel5.table.html.RigelHtmlPage;
 import org.rigel5.table.html.wrapper.*;
 import org.rigel5.table.peer.html.*;
+import org.rigel5.table.sql.SqlBuilderRicercaGenerica;
 import org.rigel5.table.sql.html.*;
 import org.sirio5.beans.xml.ReferenceXmlInfo;
 import org.sirio5.rigel.RigelUtils;
@@ -63,7 +66,18 @@ abstract public class ListaBase5 extends RigelEditBaseScreen
       if((hwb = wpc.getListaEditCache(type)) == null)
         return null;
 
+    AbstractHtmlTablePagerFilter pager = (AbstractHtmlTablePagerFilter) hwb.getPager();
+    if(pager.getMascheraRicerca() == null)
+      pager.setMascheraRicerca(getMascheraRG(pager.getI18n(), (SqlTableModel) pager.getTableModel()));
+
     return hwb;
+  }
+
+  public MascheraRicercaGenerica getMascheraRG(RigelI18nInterface i18n, SqlTableModel tm)
+     throws Exception
+  {
+    String nometab = tm.getQuery().getVista();
+    return new HtmlMascheraRicercaGenericaNoscript(new SqlBuilderRicercaGenerica(tm, nometab), tm, i18n);
   }
 
   @Override

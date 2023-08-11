@@ -138,6 +138,28 @@ public class CoreBaseAction extends VelocitySecureAction
     return redirectUnauthorized(data);
   }
 
+  protected boolean isAbbandona(RunData data, String... abbandona)
+     throws Exception
+  {
+    // se l'utente non è loggato è da decidere
+    if(!data.getUser().hasLoggedIn())
+      return false;
+
+    String command = SU.okStrNull(data.getParameters().getString("command"));
+    if(command == null)
+      return false;
+
+    // il comando abbandona viene sempre considerato valido; diversamente non si esce dalle maschere
+    for(String ab : abbandona)
+    {
+      if(command.equalsIgnoreCase(ab))
+        return true;
+    }
+
+    // negli altri casi è da decidere
+    return false;
+  }
+
   protected boolean redirectUnauthorized(CoreRunData data)
      throws Exception
   {

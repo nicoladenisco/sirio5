@@ -1,0 +1,33 @@
+<!-- INIZIO ToolLista.vm -->
+
+<form name="$formName" id="$formName" method="post" action="javascript:rigel.submitTool('$unique', '$baseUri')">
+  <div id="$bodyName">
+    <!-- __START_CUT__ -->
+
+    <div id="data_${unique}" style="display: inline">
+
+      <!-- html ricerca semplice -->
+      $htpage.getHtml("simplesearch")
+
+      <!-- html principale -->
+      <div class="rigel_body" style="padding: 2px;">
+        $htpage.getHtml("body")
+      </div>
+
+      <!-- html navigazione -->
+      $htpage.getHtml("nav")
+
+    </div>
+
+    <div id="search_${unique}" style="display: none">
+
+      <!-- html ricerca avanzata -->
+      $htpage.getHtml("search")
+
+    </div>
+
+    <!-- __END_CUT__ -->
+  </div>
+</form>
+
+<!-- FINE ToolLista.vm -->
