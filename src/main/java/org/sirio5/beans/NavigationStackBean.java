@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.commonlib5.lambda.LEU;
@@ -58,9 +57,7 @@ final public class NavigationStackBean extends CoreBaseBean
     @Override
     public int hashCode()
     {
-      int hash = 3;
-      hash = 59 * hash + Objects.hashCode(this.uri);
-      return hash;
+      return this.uri.hashCode();
     }
 
     @Override

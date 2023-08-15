@@ -210,4 +210,16 @@ abstract public class AbstractCoreServiceBroker extends EffectiveBaseServiceBrok
       }
     }
   }
+
+  public void ricaricaOverrideSetup()
+  {
+    try
+    {
+      loadOverride();
+    }
+    catch(Exception e)
+    {
+      log.error("ricaricaOverrideSetup failure", e);
+    }
+  }
 }

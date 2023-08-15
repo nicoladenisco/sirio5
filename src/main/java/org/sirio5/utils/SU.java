@@ -501,42 +501,30 @@ public class SU extends StringOper
    * @param command comando da eseguire
    * @param data parametri generali della richiesta
    * @param params mappa di tutti i parametri request più eventuali parametri permanenti
-   * @param args
-   * @return
+   * @param args argomenti speciali passati al comando
+   * @return vero se un metodo è stato individuato e chiamato
    * @throws Exception
    */
   public static boolean doCommand(Object caller, String command, RunData data, Map params, Object... args)
      throws Exception
   {
     Class clazz = caller.getClass();
-    String mName = "doCmd_" + command.toLowerCase();
-    Method cmd = null;
+    String mName1 = "doCmd_" + command;
+    String mName2 = "doCmd_" + command.toLowerCase();
 
     try
     {
-      // cerca prima un metodo che supporta i parametri args
-      // ES: doCmd_salva(RunData data, Map params, Object... args)
-      try
-      {
-        cmd = clazz.getMethod(mName, CoreConst.cmdParamTypes2);
-        cmd.invoke(caller, data, params, args);
+      // tenta stesso case e minuscolo con sintassi ad argomenti
+      if(loadCommandMethod2(clazz, mName1, caller, data, params, args))
         return true;
-      }
-      catch(NoSuchMethodException e1)
-      {
-      }
+      if(loadCommandMethod2(clazz, mName2, caller, data, params, args))
+        return true;
 
-      // quindi riprova senza args
-      // ES: doCmd_salva(RunData data, Map params)
-      try
-      {
-        cmd = clazz.getMethod(mName, CoreConst.cmdParamTypes1);
-        cmd.invoke(caller, data, params);
+      // sintassi semplificata (compatibilita versione precedente) senza argomenti
+      if(loadCommandMethod1(clazz, mName1, caller, data, params))
         return true;
-      }
-      catch(NoSuchMethodException e1)
-      {
-      }
+      if(loadCommandMethod1(clazz, mName2, caller, data, params))
+        return true;
     }
     catch(InvocationTargetException ex)
     {
@@ -548,6 +536,46 @@ public class SU extends StringOper
     }
 
     log.info("Comando " + command + " non implementato; ignorato.");
+    return false;
+  }
+
+  private static boolean loadCommandMethod1(Class clazz, String mName, Object caller, RunData data, Map params)
+     throws SecurityException, IllegalAccessException, InvocationTargetException, IllegalArgumentException
+  {
+    Method cmd;
+
+    // cerca prima un metodo che supporta i parametri args
+    // ES: doCmd_salva(RunData data, Map params, Object... args)
+    try
+    {
+      cmd = clazz.getMethod(mName, CoreConst.cmdParamTypes1);
+      cmd.invoke(caller, data, params);
+      return true;
+    }
+    catch(NoSuchMethodException e1)
+    {
+    }
+
+    return false;
+  }
+
+  private static boolean loadCommandMethod2(Class clazz, String mName, Object caller, RunData data, Map params, Object[] args)
+     throws SecurityException, IllegalAccessException, InvocationTargetException, IllegalArgumentException
+  {
+    Method cmd;
+
+    // cerca prima un metodo che supporta i parametri args
+    // ES: doCmd_salva(RunData data, Map params, Object... args)
+    try
+    {
+      cmd = clazz.getMethod(mName, CoreConst.cmdParamTypes2);
+      cmd.invoke(caller, data, params, args);
+      return true;
+    }
+    catch(NoSuchMethodException e1)
+    {
+    }
+
     return false;
   }
 
