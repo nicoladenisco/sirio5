@@ -17,6 +17,7 @@
  */
 package org.sirio5.services;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.collections.map.LinkedMap;
@@ -27,7 +28,7 @@ import org.sirio5.utils.SU;
  *
  * @author Nicola De Nisco
  */
-public class InfoSetupBlock
+public class InfoSetupBlock implements Serializable, Cloneable
 {
   protected String name, priority;
   protected LinkedMap info = new LinkedMap();
@@ -101,5 +102,12 @@ public class InfoSetupBlock
   public void setPriority(String priority)
   {
     this.priority = priority;
+  }
+
+  @Override
+  public Object clone()
+     throws CloneNotSupportedException
+  {
+    return super.clone();
   }
 }
