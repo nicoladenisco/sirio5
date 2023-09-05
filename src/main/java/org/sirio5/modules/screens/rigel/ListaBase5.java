@@ -201,6 +201,38 @@ abstract public class ListaBase5 extends RigelEditBaseScreen
       context.put("newEnabled", "1");
   }
 
+  protected void makeContextHtmlSimplified(HtmlWrapperBase lso, ListaInfo li, CoreRunData data, Context context, String baseUri)
+     throws Exception
+  {
+    Map param = SU.getParMap(data);
+
+    String titolo = data.i18n(lso.getTitolo());
+    String header = data.i18n(lso.getHeader());
+
+    // costruisce componenti pagina
+    RigelHtmlPage page = new RigelHtmlPage();
+    lso.getHtml(param, data.getSession(), page);
+
+    // inserisce nel context i componeti pagina generati
+    int filtro = StringOper.parse(param.get("filtro"), 0);
+    formatHtmlLista(filtro, page, context);
+
+    context.put("header", header);
+    context.put("titolo", titolo);
+    context.put("document", MDL.getDocument());
+    context.put("numrows", lso.getPtm().getRowCount());
+
+    if(SU.isOkStr(lso.getCustomScript()))
+      context.put("cscript", lso.getCustomScript());
+
+    if(lso.isEditEnabled())
+      context.put("editEnabled", "1");
+    if(lso.isSaveEnabled() && RigelUtils.checkPermessiScrittura(data, lso))
+      context.put("saveEnabled", "1");
+    if(lso.isNewEnabled() && RigelUtils.checkPermessiCreazione(data, lso))
+      context.put("newEnabled", "1");
+  }
+
   public void formatHtmlLista(int filtro, RigelHtmlPage page, Context context)
      throws Exception
   {
@@ -209,8 +241,6 @@ abstract public class ListaBase5 extends RigelEditBaseScreen
     // prima emette tutti i commenti
     page.buildPart(sb, PageComponentType.COMMENT, "<!--", "-->");
 
-    // quindi tutti i javascript
-    // page.buildPart(sb, PageComponentType.JAVASCRIPT, "<SCRIPT LANGUAGE=\"JavaScript\">", "</SCRIPT>");
     if(filtro == AbstractHtmlTablePagerFilter.FILTRO_MACHERA)
     {
       // html ricerca avanzata

@@ -124,6 +124,11 @@ public class CoreTurbineWrapperCache extends WrapperCacheBase
     properties.put(chiave, valore);
   }
 
+  public String getProperty(String chiave)
+  {
+    return properties.get(chiave);
+  }
+
   public void clearProperty(String chiave)
   {
     properties.remove(chiave);
