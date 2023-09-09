@@ -103,6 +103,8 @@ abstract public class FormBase extends RigelEditBaseScreen
      throws Exception
   {
     HttpSession session = data.getSession();
+    String titolo = data.i18n(pwl.getTitolo());
+    String header = data.i18n(pwl.getHeader());
 
     HashMap<String, String> extraParams = new HashMap<>();
     extraParams.put("jlc", type);
@@ -122,6 +124,9 @@ abstract public class FormBase extends RigelEditBaseScreen
     context.put("pwl", pwl);
     context.put("scTest", "\n" + scTest);
     context.put("document", MDL.getDocument());
+    context.put("header", header);
+    context.put("titolo", titolo);
+
     if(SU.isOkStr(pwl.getCustomScript()))
       context.put("cscriptm", pwl.getCustomScript());
 

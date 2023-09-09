@@ -70,6 +70,7 @@ public class CoreTurbineWrapperCache extends WrapperCacheBase
 
     wrpBuilder = mdl;
     tuser = data.getUser();
+    properties.put("userid", tuser.getId().toString());
   }
 
   @Override

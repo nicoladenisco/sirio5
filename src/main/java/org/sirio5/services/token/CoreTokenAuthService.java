@@ -24,6 +24,7 @@ import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
+import javax.crypto.Cipher;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
@@ -35,6 +36,8 @@ import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.security.SecurityService;
 import org.commonlib5.crypto.KeyUtils;
 import org.commonlib5.crypto.RSAEncryptUtils;
+import org.commonlib5.io.ByteBufferInputStream;
+import org.commonlib5.io.ByteBufferOutputStream;
 import org.commonlib5.utils.CommonFileUtils;
 import org.json.JSONObject;
 import org.sirio5.services.AbstractCoreBaseService;
@@ -388,19 +391,31 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     jo.put("address", req.getRemoteAddr());
     jo.put("time", System.currentTimeMillis());
 
-    byte[] input = jo.toString().getBytes("UTF-8");
-    byte[] encrypt = RSAEncryptUtils.encrypt(input, prk);
-    return RSAEncryptUtils.encodeBASE64(encrypt, false);
+    ByteBufferOutputStream os = new ByteBufferOutputStream();
+    ByteBufferInputStream is = new ByteBufferInputStream();
+    is.addToBuffer(jo.toString().getBytes("UTF-8"));
+    is.setBlocking(false);
+
+    RSAEncryptUtils.encryptDecryptFile(is, os, prk, Cipher.ENCRYPT_MODE);
+
+    //byte[] input = jo.toString().getBytes("UTF-8");
+    //byte[] encrypt = RSAEncryptUtils.encrypt(input, prk);
+    return RSAEncryptUtils.encodeBASE64(os.array(), false);
   }
 
   @Override
   public JSONObject decriptTokenOauth2(HttpServletRequest req, String token)
      throws Exception
   {
-    byte[] binToken = RSAEncryptUtils.decodeBASE64(token);
-    byte[] decrypt = RSAEncryptUtils.decrypt(binToken, puk);
+    ByteBufferOutputStream os = new ByteBufferOutputStream();
+    ByteBufferInputStream is = new ByteBufferInputStream();
+    is.addToBuffer(RSAEncryptUtils.decodeBASE64(token));
 
-    JSONObject jo = new JSONObject(new String(decrypt, "UTF-8"));
+    RSAEncryptUtils.encryptDecryptFile(is, os, puk, Cipher.DECRYPT_MODE);
+
+    //byte[] binToken = RSAEncryptUtils.decodeBASE64(token);
+    //byte[] decrypt = RSAEncryptUtils.decrypt(binToken, puk);
+    JSONObject jo = new JSONObject(new String(os.array(), "UTF-8"));
 
     if(!SU.isEqu(jo.get("address"), req.getRemoteAddr()))
       throw new TokenAuthFailureException("Invalid address in request.");
