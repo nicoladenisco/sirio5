@@ -19,6 +19,7 @@ package org.sirio5.services.token;
 
 import java.awt.event.ActionListener;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.json.JSONObject;
 import org.sirio5.services.CoreServiceExtension;
 
@@ -145,4 +146,27 @@ public interface TokenAuthService extends CoreServiceExtension
    * @return la chiave codificata in base64
    */
   public String getPublicKeyBase64();
+
+  /**
+   * Genera un token anti CSRF.
+   * La durata del token viene stabilita a setup (default 1 ora).
+   * @param request richiesta HTTP
+   * @param sessione sessione HTTP
+   * @return il token codificato in base 64
+   * @throws Exception
+   */
+  public String getTokenAntiCSRF(HttpServletRequest request, HttpSession sessione)
+     throws Exception;
+
+  /**
+   * Verifica il token indicato per la validità.
+   * @param token il token codificato in base 64
+   * @param remove se vero invalida il token dopo il test; il token non sarà più valido
+   * @param request richiesta HTTP
+   * @param sessione sessione HTTP
+   * @return 0=OK, 1=token inesitente, 2=token non valido
+   * @throws Exception
+   */
+  public int verificaTokenAntiCSRF(String token, boolean remove, HttpServletRequest request, HttpSession sessione)
+     throws Exception;
 }

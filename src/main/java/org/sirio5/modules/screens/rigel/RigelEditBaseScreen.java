@@ -38,7 +38,9 @@ import org.rigel5.table.peer.html.*;
 import org.sirio5.beans.menu.MenuItemBean;
 import org.sirio5.modules.screens.CoreBaseScreen;
 import org.sirio5.services.modellixml.MDL;
+import org.sirio5.services.modellixml.modelliXML;
 import org.sirio5.services.security.SEC;
+import org.sirio5.services.token.TokenAuthService;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.LI;
 import org.sirio5.utils.SU;
@@ -139,6 +141,13 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
         table.setExtraParamsUrls(extraParams);
         String html = table.getHtml(session, params, forceNew);
         context.put("objInEdit", table.getLastObjectInEdit());
+
+        if(table.isAttivaProtezioneCSRF())
+        {
+          // aggiunge il campo con il valore già compilato per protezione anti CSRF
+          html = aggiungiCampoCSRF(data, html);
+        }
+
         return html;
       }
     }
@@ -287,5 +296,13 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
     }
 
     sb.append("</li>");
+  }
+
+  protected String aggiungiCampoCSRF(RunData data, String html)
+     throws Exception
+  {
+    TokenAuthService tas = getService(TokenAuthService.SERVICE_NAME);
+    String token = tas.getTokenAntiCSRF(data.getRequest(), data.getSession());
+    return html + "\n<INPUT type='hidden' name='" + modelliXML.CSRF_TOKEN_FIELD_NAME + "' value='" + token + "'>";
   }
 }

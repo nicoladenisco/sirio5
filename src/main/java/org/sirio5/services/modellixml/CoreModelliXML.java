@@ -88,6 +88,7 @@ public class CoreModelliXML extends AbstractCoreBaseService
   protected String context;
   protected PullService ps;
   protected UITool ui = null;
+  protected boolean attivaProtezioneCSRF = true;
   //
   public static final String WrapperCacheBaseKey = "WrapperCacheBaseKey";
   protected final ArrayList<String> arListeSql = new ArrayList<>();
@@ -106,6 +107,8 @@ public class CoreModelliXML extends AbstractCoreBaseService
     baseListUrl = cfg.getString("baseListUrl", "maint.vm");
     baseFormPopup = cfg.getString("baseFormPopup", "pform.vm");
     baseListPopup = cfg.getString("baseListPopup", "plista.vm");
+
+    attivaProtezioneCSRF = cfg.getBoolean("attivaProtezioneCSRF", attivaProtezioneCSRF);
 
     // carica prima i files personalizzati (hanno precedenza)
     String[] fXmlPers = cfg.getStringArray("file.azienda." + aziendaId);
@@ -262,6 +265,7 @@ public class CoreModelliXML extends AbstractCoreBaseService
         throw new CoreServiceException("Database non supportato.");
     }
 
+    SetupHolder.setAttivaProtezioneCSRF(attivaProtezioneCSRF);
     SetupHolder.setImgEditData(getImgEditData());
     SetupHolder.setImgEditForeign(getImgEditForeign());
     SetupHolder.setImgLista(getImgLista());

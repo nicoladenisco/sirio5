@@ -21,11 +21,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.security.KeyPair;
+import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
 import javax.crypto.Cipher;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,7 +62,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
   /** Logging */
   private static final Log log = LogFactory.getLog(CoreTokenAuthService.class);
 
-  protected long tExpiries = 1000;
+  protected long tExpiries = 1000, csrfExpiries = 1000;
   protected String anonUser;
   protected boolean allowAnonimousLogon = false;
   protected boolean allowDebugLogon = false;
@@ -72,6 +74,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
   protected RSAPrivateKey prk;
   //
   public static final String TOKEN_AUTH_CACHE_CLASS = "TOKEN_AUTH_CACHE_CLASS"; // NOI18N
+  public static final String CSRF_CACHE_CLASS = "CSRF_CACHE_CLASS"; // NOI18N
   public static final String LOGIN_DEBUG_SESSIONID = "LOGIN_DEBUG"; // NOI18N
   public static final String TOKEN_MAGIG = "MDQOWHF!IWEQRGHUYRWVQNCWOEQ$DKPOQKEPO.QJEFWQE;UFNCLWRHV:OIWUERHFUISXJKLMql"; // NOI18N
 
@@ -110,6 +113,11 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     // il parametro expiries e' la durata della sessione in secondi.
     // per default e' impostato a 300 secondi (5 minuti)
     tExpiries = cfg.getInt("expiriesSeconds", 60 * 5) * 1000; // NOI18N
+
+    // il parametro csrfExpiries e' la durata dei token anti CSRF in secondi.
+    // per default e' impostato a 1 ora
+    csrfExpiries = cfg.getInt("csrfExpiriesSeconds", 60 * 60) * 1000; // NOI18N
+
     log.info("CoreTokenAuthServices: tExpiries=" + tExpiries + " path=" + System.getProperty("java.library.path")); // NOI18N
 
     anonUser = cfg.getString("anonUser", "sviluppo"); // NOI18N
@@ -123,8 +131,9 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     else
       usersMagicAllowed.addAll(Arrays.asList(tmp));
 
-    // imposta la cache per bloccare il flush dei token di autenticazione
+    // imposta la cache per bloccare il flush dei token di autenticazione e anti CSRF
     CACHE.setFlushPermitted(TOKEN_AUTH_CACHE_CLASS, false);
+    CACHE.setFlushPermitted(CSRF_CACHE_CLASS, false);
 
     // registrazione sul bus messaggi
     BUS.registerEventListner(this);
@@ -391,31 +400,23 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     jo.put("address", req.getRemoteAddr());
     jo.put("time", System.currentTimeMillis());
 
-    ByteBufferOutputStream os = new ByteBufferOutputStream();
-    ByteBufferInputStream is = new ByteBufferInputStream();
-    is.addToBuffer(jo.toString().getBytes("UTF-8"));
-    is.setBlocking(false);
+    ByteBufferInputStream input = new ByteBufferInputStream(false, jo.toString().getBytes("UTF-8"));
+    ByteBufferOutputStream encrypt = new ByteBufferOutputStream();
+    RSAEncryptUtils.encryptDecryptFile(input, encrypt, prk, Cipher.ENCRYPT_MODE);
 
-    RSAEncryptUtils.encryptDecryptFile(is, os, prk, Cipher.ENCRYPT_MODE);
-
-    //byte[] input = jo.toString().getBytes("UTF-8");
-    //byte[] encrypt = RSAEncryptUtils.encrypt(input, prk);
-    return RSAEncryptUtils.encodeBASE64(os.array(), false);
+    return RSAEncryptUtils.encodeBASE64(encrypt.getBytes(), false);
   }
 
   @Override
   public JSONObject decriptTokenOauth2(HttpServletRequest req, String token)
      throws Exception
   {
-    ByteBufferOutputStream os = new ByteBufferOutputStream();
-    ByteBufferInputStream is = new ByteBufferInputStream();
-    is.addToBuffer(RSAEncryptUtils.decodeBASE64(token));
+    byte[] binToken = RSAEncryptUtils.decodeBASE64(token);
+    ByteBufferInputStream input = new ByteBufferInputStream(false, binToken);
+    ByteBufferOutputStream decrypt = new ByteBufferOutputStream();
+    RSAEncryptUtils.encryptDecryptFile(input, decrypt, puk, Cipher.DECRYPT_MODE);
 
-    RSAEncryptUtils.encryptDecryptFile(is, os, puk, Cipher.DECRYPT_MODE);
-
-    //byte[] binToken = RSAEncryptUtils.decodeBASE64(token);
-    //byte[] decrypt = RSAEncryptUtils.decrypt(binToken, puk);
-    JSONObject jo = new JSONObject(new String(os.array(), "UTF-8"));
+    JSONObject jo = new JSONObject(new String(decrypt.getBytes(), "UTF-8"));
 
     if(!SU.isEqu(jo.get("address"), req.getRemoteAddr()))
       throw new TokenAuthFailureException("Invalid address in request.");
@@ -427,5 +428,41 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
   public String getPublicKeyBase64()
   {
     return RSAEncryptUtils.encodeBASE64(puk.getEncoded(), false);
+  }
+
+  @Override
+  public String getTokenAntiCSRF(HttpServletRequest request, HttpSession sessione)
+     throws Exception
+  {
+    SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+    byte[] data = new byte[16];
+    secureRandom.nextBytes(data);
+
+    // convert to Base64 string
+    String token = Base64.getEncoder().encodeToString(data);
+    CACHE.addObject(CSRF_CACHE_CLASS, token, new CachedObject(sessione.getId(), csrfExpiries));
+
+    return token;
+  }
+
+  @Override
+  public int verificaTokenAntiCSRF(String token, boolean remove, HttpServletRequest request, HttpSession sessione)
+     throws Exception
+  {
+    String cToken = (String) CACHE.getContentQuiet(CSRF_CACHE_CLASS, token);
+
+    if(cToken == null)
+      return 1;
+
+    if(remove)
+    {
+      // questo difatto invaida il token
+      CACHE.removeObject(CSRF_CACHE_CLASS, token);
+    }
+
+    if(!SU.isEqu(cToken, sessione.getId()))
+      return 2;
+
+    return 0;
   }
 }

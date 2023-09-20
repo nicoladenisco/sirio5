@@ -34,6 +34,8 @@ public interface modelliXML extends CoreServiceExtension, WrapperBuilderInterfac
 {
   public static final String SERVICE_NAME = "ModelliXML";
 
+  public static final String CSRF_TOKEN_FIELD_NAME = "csrf_token";
+
   /**
    * Ritorna il documento XML da cui vengono lette le liste.
    * @return
@@ -66,7 +68,7 @@ public interface modelliXML extends CoreServiceExtension, WrapperBuilderInterfac
    * 'getCampoDataIntervalloFine' che genera il campo finale dell'intervallo.
    * @param nomeCampoInizio nome HTML del campo di inizio intervallo
    * @param nomeCampoFine nome HTML del campo di fine intervallo
-   * @param nomeForm
+   * @param nomeForm nome del form che contiene i controlli generati
    * @param valore eventuale valore di default (puo' essere null)
    * @param size dimensione richiesta
    * @return l'HTML completo del campo di inizio intervallo e del javascript per l'editing
@@ -82,7 +84,7 @@ public interface modelliXML extends CoreServiceExtension, WrapperBuilderInterfac
    * 'getCampoDataIntervalloInizio' che genera il campo iniziale dell'intervallo.
    * @param nomeCampoInizio nome HTML del campo di inizio intervallo
    * @param nomeCampoFine nome HTML del campo di fine intervallo
-   * @param nomeForm
+   * @param nomeForm nome del form che contiene i controlli generati
    * @param valore eventuale valore di default (puo' essere null)
    * @param size dimensione richiesta
    * @return l'HTML completo del campo di fine intervallo e del javascript per l'editing

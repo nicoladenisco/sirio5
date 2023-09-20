@@ -39,7 +39,9 @@ import org.sirio5.rigel.RigelUtils;
 import org.sirio5.services.bus.BUS;
 import org.sirio5.services.bus.BusContext;
 import org.sirio5.services.bus.BusMessages;
+import org.sirio5.services.modellixml.modelliXML;
 import org.sirio5.services.security.SEC;
+import org.sirio5.services.token.TokenAuthService;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.SU;
 
@@ -114,6 +116,10 @@ public class FormSave extends RigelEditBaseAction
   {
     PeerAppMaintFormTable pfe = (PeerAppMaintFormTable) (pwl.getTbl());
     boolean isNewObject = pfe.isNewObject();
+
+    // protezione anti CSRF
+    if(pfe.isAttivaProtezioneCSRF())
+      checkTokenCSRF(data, true);
 
     // imposta credenziali e aggiorna dati
     pfe.setUserInfo(SEC.getUserID(data), SEC.isAdmin(data));
@@ -321,6 +327,29 @@ public class FormSave extends RigelEditBaseAction
        objInEdit, pwl.getPtm(), (hEditTable) pwl.getTbl(), 0,
        objectsDetail, eh.getPtm(), (hEditTable) eh.getTbl(),
        data.getSession(), params, i18n, null, validateMap);
+  }
+
+  protected void checkTokenCSRF(CoreRunData data, boolean obbligatorio)
+     throws Exception
+  {
+    String token = data.getParameters().getString(modelliXML.CSRF_TOKEN_FIELD_NAME);
+
+    if(obbligatorio && token == null)
+      throw new Exception("Missing token in request.");
+
+    TokenAuthService tas = getService(TokenAuthService.SERVICE_NAME);
+    int verifica = tas.verificaTokenAntiCSRF(token, true, data.getRequest(), data.getSession());
+
+    switch(verifica)
+    {
+      case 0:
+        return;
+
+      case 1:
+        throw new Exception("Unknow token in request.");
+      case 2:
+        throw new Exception("Invalid token in request.");
+    }
   }
 
   /**
