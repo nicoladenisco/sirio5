@@ -26,13 +26,16 @@ import org.apache.turbine.services.*;
 import org.apache.turbine.util.RunData;
 import org.apache.turbine.util.uri.TemplateURI;
 import org.apache.velocity.context.Context;
+import org.sirio5.CsrfProtectionException;
 import org.sirio5.ErrorMessageException;
 import org.sirio5.beans.BeanFactory;
 import org.sirio5.beans.CoreBaseBean;
 import org.sirio5.beans.NavigationStackBean;
 import org.sirio5.rigel.ConcurrentDatabaseModificationException;
 import org.sirio5.rigel.UnmodificableRecordException;
+import org.sirio5.services.modellixml.modelliXML;
 import org.sirio5.services.security.SEC;
+import org.sirio5.services.token.TokenAuthService;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.LI;
 import org.sirio5.utils.SU;
@@ -264,7 +267,18 @@ public class CoreBaseAction extends VelocitySecureAction
   final public void doPerform(PipelineData data, Context context)
      throws Exception
   {
-    doPerform2((CoreRunData) getRunData(data), context);
+    CoreRunData rdata = (CoreRunData) getRunData(data);
+
+    if(!rdata.getUser().hasLoggedIn())
+    {
+      // autorizzazione non concessa
+      rdata.setMessagei18n("E' necessario effettuare la logon!");
+      String loginScreen = TR.getString("template.login", "Login.vm"); // NOI18N
+      rdata.setScreenTemplate(loginScreen);
+      return;
+    }
+
+    doPerform2(rdata, context);
   }
 
   protected void doPerform2(CoreRunData data, Context context)
@@ -411,6 +425,35 @@ public class CoreBaseAction extends VelocitySecureAction
       String mess = "ASSERT failed: " + cause;
       log.error(mess);
       throw new RuntimeException(mess);
+    }
+  }
+
+  protected void checkTokenCSRF(CoreRunData data, boolean obbligatorio)
+     throws Exception
+  {
+    if("GET".equals(data.getRequest().getMethod()) && data.getParameters().getKeys().length < 10)
+      return;
+
+    String token = data.getParameters().getString(modelliXML.CSRF_TOKEN_FIELD_NAME);
+
+    if(obbligatorio && token == null)
+      throw new CsrfProtectionException("Missing token in request.");
+
+    if(token == null)
+      return;
+
+    TokenAuthService tas = getService(TokenAuthService.SERVICE_NAME);
+    int verifica = tas.verificaTokenAntiCSRF(token, true, data.getRequest(), data.getSession());
+
+    switch(verifica)
+    {
+      case 0:
+        return;
+
+      case 1:
+        throw new CsrfProtectionException("Unknow token in request.");
+      case 2:
+        throw new CsrfProtectionException("Invalid token in request.");
     }
   }
 }

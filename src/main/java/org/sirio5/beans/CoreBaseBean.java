@@ -28,6 +28,9 @@ import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.pull.PullService;
 import org.apache.turbine.services.pull.tools.UITool;
 import static org.sirio5.CoreConst.APP_PREFIX;
+import org.sirio5.CsrfProtectionException;
+import org.sirio5.services.modellixml.modelliXML;
+import org.sirio5.services.token.TokenAuthService;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.DT;
 import org.sirio5.utils.SU;
@@ -255,5 +258,31 @@ public class CoreBaseBean implements HttpSessionBindingListener
   public void setJlc(String jlc)
   {
     this.jlc = jlc;
+  }
+
+  protected void checkTokenCSRF(CoreRunData data, boolean obbligatorio)
+     throws Exception
+  {
+    String token = data.getParameters().getString(modelliXML.CSRF_TOKEN_FIELD_NAME);
+
+    if(obbligatorio && token == null)
+      throw new CsrfProtectionException("Missing token in request.");
+
+    if(token == null)
+      return;
+
+    TokenAuthService tas = getService(TokenAuthService.SERVICE_NAME);
+    int verifica = tas.verificaTokenAntiCSRF(token, true, data.getRequest(), data.getSession());
+
+    switch(verifica)
+    {
+      case 0:
+        return;
+
+      case 1:
+        throw new CsrfProtectionException("Unknow token in request.");
+      case 2:
+        throw new CsrfProtectionException("Invalid token in request.");
+    }
   }
 }
