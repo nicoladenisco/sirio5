@@ -17,6 +17,8 @@
  */
 package org.sirio5.modules.tools;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +28,7 @@ import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.pull.ApplicationTool;
 import org.apache.turbine.services.security.SecurityService;
 import static org.sirio5.services.security.CoreSecurity.ADMIN_ROLE;
+import org.sirio5.services.security.SEC;
 import org.sirio5.utils.SU;
 
 /**
@@ -47,6 +50,7 @@ public class PermissionTool implements ApplicationTool
   private SecurityService security;
   private User user = null;
   private TurbineAccessControlList acl = null;
+  private final Map<String, Boolean> cachePermessi = new HashMap<>();
 
   @Override
   public void init(Object data)
@@ -59,6 +63,7 @@ public class PermissionTool implements ApplicationTool
       {
         security = (SecurityService) TurbineServices.getInstance().getService(SecurityService.SERVICE_NAME);
         acl = security.getACL(user);
+        cachePermessi.clear();
       }
       catch(Throwable ex)
       {
@@ -92,7 +97,7 @@ public class PermissionTool implements ApplicationTool
   public boolean isAuthorized(String permissions)
      throws Exception
   {
-    return isAdmin() || acl.hasPermission(permissions);
+    return isAdmin() || checkPermission(permissions);
   }
 
   /**
@@ -113,7 +118,7 @@ public class PermissionTool implements ApplicationTool
     while(stk.hasMoreTokens())
     {
       String perm = SU.okStrNull(stk.nextToken());
-      if(perm != null && !acl.hasPermission(perm))
+      if(perm != null && !checkPermission(perm))
         return false;
     }
 
@@ -138,11 +143,23 @@ public class PermissionTool implements ApplicationTool
     while(stk.hasMoreTokens())
     {
       String perm = SU.okStrNull(stk.nextToken());
-      if(perm != null && acl.hasPermission(perm))
+      if(perm != null && checkPermission(perm))
         return true;
     }
 
     return false;
+  }
+
+  protected boolean checkPermission(String perm)
+  {
+    Boolean rv = cachePermessi.get(perm);
+    if(rv == null)
+    {
+      SEC.salvaPermesso(perm);
+      rv = acl.hasPermission(perm);
+      cachePermessi.put(perm, rv);
+    }
+    return rv;
   }
 
   /**

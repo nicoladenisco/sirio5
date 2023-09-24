@@ -370,6 +370,17 @@ public class CoreRunData extends DefaultTurbineRunData
   {
     return getRequest().getContextPath() + "/" + url;
   }
+
+  public String getTemplateUrl(String url)
+  {
+    return getRequest().getContextPath() + "/app/template/" + url;
+  }
+
+  public String getTemplateActionUrl(String url, String action)
+  {
+    return getRequest().getContextPath() + "/app/template/" + url + "/action/" + action;
+  }
+
   private static String appletCodeBase = null;
 
   public String getAppletCodebase()
