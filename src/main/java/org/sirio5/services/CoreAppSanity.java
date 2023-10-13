@@ -18,6 +18,7 @@
 package org.sirio5.services;
 
 import com.workingdogs.village.Record;
+import com.workingdogs.village.TableDataSet;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fulcrum.security.entity.Role;
 import org.apache.torque.util.Transaction;
+import org.commonlib5.lambda.FunctionTrowException;
 import org.commonlib5.lambda.LEU;
 import org.commonlib5.utils.JavaLoggingToCommonLoggingRedirector;
 import org.rigel5.db.DbUtils;
@@ -167,27 +169,10 @@ public class CoreAppSanity
   protected void grantAllPermission(Role role)
      throws Exception
   {
-    Connection connection = null;
-    try
-    {
-      connection = Transaction.begin();
-
-      if(grantAllPermission(role, connection))
-        return;
-
-      Transaction.commit(connection);
-      connection = null;
-    }
-    finally
-    {
-      if(connection != null)
-      {
-        Transaction.safeRollback(connection);
-      }
-    }
+    executeInTransaction((con) -> grantAllPermission(con, role));
   }
 
-  protected boolean grantAllPermission(Role role, Connection connection)
+  protected boolean grantAllPermission(Connection connection, Role role)
      throws Exception
   {
     String sSQL
@@ -197,13 +182,13 @@ public class CoreAppSanity
        + "    select permission_id from turbine_role_permission where role_id=" + role.getId() + ")";
     List<Record> lsRecs = DbUtils.executeQuery(sSQL, connection);
     if(lsRecs.isEmpty())
-      return true;
+      return false;
 
     int[] permissionToGrant = lsRecs.stream()
        .mapToInt(LEU.rethrowFunctionInt((r) -> r.getValue(1).asInt()))
        .distinct().sorted().toArray();
     if(permissionToGrant.length == 0)
-      return true;
+      return false;
 
     String sINS
        = "INSERT INTO turbine_role_permission(\n"
@@ -223,7 +208,7 @@ public class CoreAppSanity
       }
     }
 
-    return false;
+    return true;
   }
 
   /**
@@ -234,27 +219,10 @@ public class CoreAppSanity
   protected void createRoles(String... roleNames)
      throws Exception
   {
-    Connection connection = null;
-    try
-    {
-      connection = Transaction.begin();
-
-      if(createRoles(roleNames, connection))
-        return;
-
-      Transaction.commit(connection);
-      connection = null;
-    }
-    finally
-    {
-      if(connection != null)
-      {
-        Transaction.safeRollback(connection);
-      }
-    }
+    executeInTransaction((con) -> createRoles(con, roleNames));
   }
 
-  protected boolean createRoles(String[] roleNames, Connection con)
+  protected boolean createRoles(Connection con, String[] roleNames)
      throws Exception
   {
     String sSQL
@@ -285,7 +253,7 @@ public class CoreAppSanity
       }
     }
 
-    return false;
+    return true;
   }
 
   /**
@@ -296,27 +264,10 @@ public class CoreAppSanity
   protected void createPermissions(String... permissionNames)
      throws Exception
   {
-    Connection connection = null;
-    try
-    {
-      connection = Transaction.begin();
-
-      if(createPermissions(permissionNames, connection))
-        return;
-
-      Transaction.commit(connection);
-      connection = null;
-    }
-    finally
-    {
-      if(connection != null)
-      {
-        Transaction.safeRollback(connection);
-      }
-    }
+    executeInTransaction((con) -> createPermissions(con, permissionNames));
   }
 
-  protected boolean createPermissions(String[] permissionNames, Connection con)
+  protected boolean createPermissions(Connection con, String[] permissionNames)
      throws Exception
   {
     String sSQL
@@ -347,7 +298,7 @@ public class CoreAppSanity
       }
     }
 
-    return false;
+    return true;
   }
 
   /**
@@ -359,27 +310,10 @@ public class CoreAppSanity
   protected void grantPermission(Role role, String... permissions)
      throws Exception
   {
-    Connection connection = null;
-    try
-    {
-      connection = Transaction.begin();
-
-      if(grantPermission(role, connection, permissions))
-        return;
-
-      Transaction.commit(connection);
-      connection = null;
-    }
-    finally
-    {
-      if(connection != null)
-      {
-        Transaction.safeRollback(connection);
-      }
-    }
+    executeInTransaction((con) -> grantPermission(con, role, permissions));
   }
 
-  protected boolean grantPermission(Role role, Connection connection, String... permissions)
+  protected boolean grantPermission(Connection connection, Role role, String... permissions)
      throws Exception
   {
     String sSQL
@@ -389,7 +323,7 @@ public class CoreAppSanity
        + "    select permission_id from turbine_role_permission where role_id=" + role.getId() + ")";
     List<Record> lsRecs = DbUtils.executeQuery(sSQL, connection);
     if(lsRecs.isEmpty())
-      return true;
+      return false;
 
     String sINS
        = "INSERT INTO turbine_role_permission(\n"
@@ -416,6 +350,106 @@ public class CoreAppSanity
       }
     }
 
-    return false;
+    return true;
+  }
+
+  protected void createUsers(String... utenti)
+     throws Exception
+  {
+    executeInTransaction((con) -> createUsers(con, utenti));
+  }
+
+  protected boolean createUsers(Connection con, String... utenti)
+     throws Exception
+  {
+    try(TableDataSet td = new TableDataSet(con, "turbine_user"))
+    {
+      for(String loginName : utenti)
+      {
+        td.clear();
+        td.where("login_name='" + loginName + "'");
+        td.fetchRecords();
+
+        Record r;
+        if(td.size() == 0)
+        {
+          r = td.addRecord();
+          long userID = DbUtils.getMaxField("turbine_user", "user_id", con);
+          r.setValue("user_id", userID);
+          r.setValue("login_name", loginName);
+          r.setValue("password_value", "disattiva123456!!!");
+          r.setValue("first_name", loginName);
+          r.setValue("last_name", loginName);
+
+          long nextID = td.getNextID();
+          r.setValue("user_id", nextID);
+          r.save();
+        }
+      }
+    }
+
+    return true;
+  }
+
+  protected void grantRole(String logonUser, String groupName, String roleName)
+     throws Exception
+  {
+    executeInTransaction((con) -> grantRole(con, logonUser, groupName, roleName));
+  }
+
+  protected boolean grantRole(Connection con, String loginName, String groupName, String roleName)
+     throws Exception
+  {
+    int[] idu = DbUtils.queryForID(con, "SELECT user_id  FROM turbine_user  WHERE login_name='" + loginName + "'");
+    int[] idg = DbUtils.queryForID(con, "SELECT group_id FROM turbine_group WHERE group_name='" + groupName + "'");
+    int[] idr = DbUtils.queryForID(con, "SELECT role_id  FROM turbine_role  WHERE role_name='" + roleName + "'");
+
+    if(idu.length < 1 || idg.length < 1 || idr.length < 1)
+      return false;
+
+    try(PreparedStatement ps = con.prepareStatement(
+       "SELECT * FROM turbine_user_group_role\n"
+       + "WHERE user_id=? AND group_id=? AND role_id=?"))
+    {
+      ps.setInt(1, idu[0]);
+      ps.setInt(2, idg[0]);
+      ps.setInt(3, idr[0]);
+      if(ps.executeQuery().next())
+        return false;
+    }
+
+    try(PreparedStatement ps = con.prepareStatement(
+       "INSERT INTO turbine_user_group_role(\n"
+       + "	user_id, group_id, role_id)\n"
+       + "	VALUES (?, ?, ?);"))
+    {
+      ps.setInt(1, idu[0]);
+      ps.setInt(2, idg[0]);
+      ps.setInt(3, idr[0]);
+      ps.executeUpdate();
+    }
+
+    return true;
+  }
+
+  protected void executeInTransaction(FunctionTrowException<Connection, Boolean> toRun)
+     throws Exception
+  {
+    Connection connection = Transaction.begin();
+    try
+    {
+      if(!toRun.apply(connection))
+      {
+        Transaction.safeRollback(connection);
+        return;
+      }
+
+      Transaction.commit(connection);
+    }
+    catch(Exception ex)
+    {
+      Transaction.safeRollback(connection);
+      throw ex;
+    }
   }
 }
