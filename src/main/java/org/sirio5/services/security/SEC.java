@@ -180,6 +180,13 @@ public class SEC
     return getSirioSecurity().getACL(session);
   }
 
+  /**
+   * Recupera lista permessi dal database.
+   * @param user utente
+   * @return lista permessi o null
+   * @throws DataBackendException
+   * @throws UnknownEntityException
+   */
   public static TurbineAccessControlList getACL(User user)
      throws DataBackendException, UnknownEntityException
   {

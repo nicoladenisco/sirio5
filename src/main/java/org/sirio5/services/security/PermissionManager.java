@@ -40,7 +40,7 @@ public class PermissionManager
   protected final SecurityService security;
   protected Role adminRole;
 
-  PermissionManager(SecurityService security)
+  public PermissionManager(SecurityService security)
   {
     this.security = security;
   }

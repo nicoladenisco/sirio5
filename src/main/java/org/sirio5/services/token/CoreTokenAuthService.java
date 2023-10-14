@@ -418,6 +418,10 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
 
     JSONObject jo = new JSONObject(new String(decrypt.getBytes(), "UTF-8"));
 
+    // caso speciale per localhost: ignora indirizzo di rilascio del token
+    if("127.0.0.1".equals(req.getRemoteAddr()))
+      return jo;
+
     if(!SU.isEqu(jo.get("address"), req.getRemoteAddr()))
       throw new TokenAuthFailureException("Invalid address in request.");
 
