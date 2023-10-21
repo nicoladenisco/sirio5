@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.util.*;
 import java.util.function.Function;
 import org.apache.torque.criteria.Criteria;
+import org.apache.torque.map.ColumnMap;
 import org.apache.torque.om.ColumnAccessByName;
 import org.apache.torque.om.NumberKey;
 import org.apache.torque.om.ObjectKey;
@@ -116,7 +117,7 @@ public class TableRelationCache<T extends Persistent> extends ArrayList<T>
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public TableRelationCache(Class cls, String nomeCampo, List lsObj, Method getLinkM, Connection con)
+  public TableRelationCache(Class cls, ColumnMap nomeCampo, List lsObj, Method getLinkM, Connection con)
      throws Exception
   {
     // recupera tutti i valori dalla lista oggetti
@@ -144,7 +145,7 @@ public class TableRelationCache<T extends Persistent> extends ArrayList<T>
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public TableRelationCache(Class cls, String nomeCampo, List lsObj,
+  public TableRelationCache(Class cls, ColumnMap nomeCampo, List lsObj,
      Function<Persistent, Integer> fnMap, Connection con)
      throws Exception
   {
@@ -160,7 +161,7 @@ public class TableRelationCache<T extends Persistent> extends ArrayList<T>
       loadDataFromMaster(nomeCampo, primaryKeys, cls, con);
   }
 
-  protected void loadDataFromMaster(String nomeCampo, HashSet<Integer> primaryKeys, Class cls, Connection con)
+  protected void loadDataFromMaster(ColumnMap nomeCampo, HashSet<Integer> primaryKeys, Class cls, Connection con)
      throws Exception
   {
     Criteria c = new Criteria();

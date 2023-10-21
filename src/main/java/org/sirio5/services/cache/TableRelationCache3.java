@@ -139,7 +139,7 @@ public class TableRelationCache3<T extends Persistent, O extends Persistent> ext
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public TableRelationCache3(Class cls, String nomeCampo, Collection<O> lsMasters, Collection<String> ignoreTableName, Method getLinkM, Connection con)
+  public TableRelationCache3(Class cls, ColumnMap nomeCampo, Collection<O> lsMasters, Collection<String> ignoreTableName, Method getLinkM, Connection con)
      throws Exception
   {
     // recupera tutti i valori dalla lista oggetti
@@ -167,7 +167,7 @@ public class TableRelationCache3<T extends Persistent, O extends Persistent> ext
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public TableRelationCache3(Class cls, String nomeCampo, Collection<O> lsMasters, Collection<String> ignoreTableName,
+  public TableRelationCache3(Class cls, ColumnMap nomeCampo, Collection<O> lsMasters, Collection<String> ignoreTableName,
      Function<O, Integer> fnMap, Connection con)
      throws Exception
   {
@@ -194,14 +194,14 @@ public class TableRelationCache3<T extends Persistent, O extends Persistent> ext
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public TableRelationCache3(Class cls, String nomeCampo, Collection<Integer> primaryKeysMasters, Collection<String> ignoreTableName, Connection con)
+  public TableRelationCache3(Class cls, ColumnMap nomeCampo, Collection<Integer> primaryKeysMasters, Collection<String> ignoreTableName, Connection con)
      throws Exception
   {
     if(!primaryKeysMasters.isEmpty())
       loadDataFromMaster(nomeCampo, primaryKeysMasters, ignoreTableName, cls, con);
   }
 
-  protected void loadDataFromMaster(String nomeCampo, Collection<Integer> primaryKeys, Collection<String> ignoreTableName, Class cls, Connection con)
+  protected void loadDataFromMaster(ColumnMap nomeCampo, Collection<Integer> primaryKeys, Collection<String> ignoreTableName, Class cls, Connection con)
      throws Exception
   {
     if(!cls.getName().endsWith("Peer"))
