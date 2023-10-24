@@ -33,6 +33,7 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.fulcrum.security.entity.Permission;
 import org.apache.fulcrum.security.model.turbine.TurbineAccessControlList;
 import org.apache.fulcrum.security.util.DataBackendException;
 import org.apache.fulcrum.security.util.PasswordMismatchException;
@@ -63,7 +64,7 @@ abstract public class AbstractCoreSecurity extends BaseService
   /** Logging */
   private static final Log log = LogFactory.getLog(AbstractCoreSecurity.class);
   //
-  protected boolean autoSavePermessi = true, enableLdap = false;
+  protected boolean autoSavePermessi = true, permessiNocase = true, enableLdap = false;
   protected KeyCalculator kCalc = new KeyCalculator();
   protected String urlLdap, domainLdap;
   protected String[] userMapLdap;
@@ -97,6 +98,8 @@ abstract public class AbstractCoreSecurity extends BaseService
 
     Configuration cfg = getConfiguration();
     autoSavePermessi = cfg.getBoolean("autoSavePermessi", autoSavePermessi);
+    permessiNocase = cfg.getBoolean("permessiNocase", permessiNocase);
+
     enableLdap = cfg.getBoolean("enableLdap", enableLdap);
     urlLdap = SU.okStrNull(cfg.getString("urlLdap"));
     domainLdap = SU.okStrNull(cfg.getString("domainLdap"));
@@ -279,15 +282,39 @@ abstract public class AbstractCoreSecurity extends BaseService
     if(acl.hasRole(ADMIN_ROLE))
       return true;
 
-    StringTokenizer stk = new StringTokenizer(permessi, ",; ");
-    while(stk.hasMoreTokens())
+    if(permessiNocase)
     {
-      String p = SU.okStr(stk.nextToken());
-      if(p.length() > 0 && acl.hasPermission(p))
-        return true;
+      PermissionSet allPerms = acl.getPermissions();
+      StringTokenizer stk = new StringTokenizer(permessi, ",; ");
+      while(stk.hasMoreTokens())
+      {
+        String p = SU.okStr(stk.nextToken());
+        if(p.length() > 0 && testPermissionNocase(allPerms, p))
+          return true;
+      }
+    }
+    else
+    {
+      StringTokenizer stk = new StringTokenizer(permessi, ",; ");
+      while(stk.hasMoreTokens())
+      {
+        String p = SU.okStr(stk.nextToken());
+        if(p.length() > 0 && acl.hasPermission(p))
+          return true;
+      }
     }
 
     log.info("Negato permesso " + permessi + " all'utente " + getUserID(session));
+    return false;
+  }
+
+  private boolean testPermissionNocase(PermissionSet allPerms, String p)
+  {
+    for(Permission pe : allPerms)
+    {
+      if(SU.isEquNocase(p, pe.getName()))
+        return true;
+    }
     return false;
   }
 
@@ -349,15 +376,33 @@ abstract public class AbstractCoreSecurity extends BaseService
     if(acl.hasRole(ADMIN_ROLE))
       return true;
 
-    StringTokenizer stk = new StringTokenizer(permessi, ",; ");
-    while(stk.hasMoreTokens())
+    if(permessiNocase)
     {
-      String p = SU.okStr(stk.nextToken());
-      if(p.length() > 0 && !acl.hasPermission(p))
+      PermissionSet allPerms = acl.getPermissions();
+      StringTokenizer stk = new StringTokenizer(permessi, ",; ");
+      while(stk.hasMoreTokens())
       {
-        // salva il risultato nella cache dei permessi utente
-        log.info("Negato permesso " + p + " all'utente " + getUserID(session));
-        return false;
+        String p = SU.okStr(stk.nextToken());
+        if(p.length() > 0 && !testPermissionNocase(allPerms, p))
+        {
+          // salva il risultato nella cache dei permessi utente
+          log.info("Negato permesso " + p + " all'utente " + getUserID(session));
+          return false;
+        }
+      }
+    }
+    else
+    {
+      StringTokenizer stk = new StringTokenizer(permessi, ",; ");
+      while(stk.hasMoreTokens())
+      {
+        String p = SU.okStr(stk.nextToken());
+        if(p.length() > 0 && !acl.hasPermission(p))
+        {
+          // salva il risultato nella cache dei permessi utente
+          log.info("Negato permesso " + p + " all'utente " + getUserID(session));
+          return false;
+        }
       }
     }
 
