@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.turbine.Turbine;
 import org.apache.turbine.TurbineConstants;
 import org.apache.turbine.util.ServerData;
@@ -34,6 +36,8 @@ import org.apache.turbine.util.uri.URIConstants;
  */
 public class TR
 {
+  private static final Log log = LogFactory.getLog(TR.class);
+
   /**
    * Carica gli override delle properties.
    * @param cfg configurazione da aggiornare
@@ -64,6 +68,8 @@ public class TR
 
       last = nome;
     }
+
+    log.debug("Caricati override di setup " + override.size());
   }
 
   /**
