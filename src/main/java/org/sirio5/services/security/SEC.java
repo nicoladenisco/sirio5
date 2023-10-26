@@ -71,6 +71,9 @@ public class SEC
 
   /**
    * Recupera la TurbineAccessControlList relativa all'utente indicato
+   * @param us
+   * @return
+   * @throws Exception
    */
   public static TurbineAccessControlList getUserACL(User us)
      throws Exception
@@ -81,6 +84,10 @@ public class SEC
   /**
    * Controlla l'acl correntemente salvata nella sessione e verifica
    * se l'utente ha il permesso indicato in tutti i gruppi possibili
+   * @param acl
+   * @param permname
+   * @return
+   * @throws Exception
    */
   public static boolean checkPermission(TurbineAccessControlList acl, String permname)
      throws Exception
@@ -92,6 +99,10 @@ public class SEC
   /**
    * Controlla l'acl correntemente salvata nella sessione e verifica
    * se l'utente ha il permesso indicato in tutti i gruppi possibili
+   * @param acl
+   * @param rolename
+   * @return
+   * @throws Exception
    */
   public static boolean checkRole(TurbineAccessControlList acl, String rolename)
      throws Exception
@@ -199,6 +210,7 @@ public class SEC
    * @param data dati di sessione
    * @param permessi lista di permessi separati da ',;' o spazio
    * @return true se l'utente possiede uno dei permessi
+   * @throws java.lang.Exception
    */
   public static boolean checkAnyPermission(RunData data, String permessi)
      throws Exception
@@ -212,6 +224,7 @@ public class SEC
    * @param data dati di sessione
    * @param permessi lista di permessi separati da ',;' o spazio
    * @return true se l'utente posside tutti i permessi
+   * @throws java.lang.Exception
    */
   public static boolean checkAllPermission(RunData data, String permessi)
      throws Exception
@@ -222,9 +235,10 @@ public class SEC
   /**
    * Controlla che l'utente loggato possieda almeno uno dei permessi indicati.
    * NOTA: l'utente amministratore ritorna sempre true.
-   * @param data dati di sessione
+   * @param session dati di sessione
    * @param permessi lista di permessi separati da ',;' o spazio
    * @return true se l'utente possiede uno dei permessi
+   * @throws java.lang.Exception
    */
   public static boolean checkAnyPermission(HttpSession session, String permessi)
      throws Exception
@@ -235,9 +249,10 @@ public class SEC
   /**
    * Controlla che l'utente loggato possieda tutti i permessi indicati.
    * NOTA: l'utente amministratore ritorna sempre true.
-   * @param data dati di sessione
+   * @param session dati di sessione
    * @param permessi lista di permessi separati da ',;' o spazio
    * @return true se l'utente posside tutti i permessi
+   * @throws java.lang.Exception
    */
   public static boolean checkAllPermission(HttpSession session, String permessi)
      throws Exception
@@ -254,6 +269,10 @@ public class SEC
   /**
    * Controlla l'acl correntemente salvata nella sessione e verifica
    * se l'utente ha il permesso indicato in tutti i gruppi possibili.
+   * @param session
+   * @param permname
+   * @return
+   * @throws Exception
    */
   public static boolean checkPermission(HttpSession session, String permname)
      throws Exception
@@ -264,6 +283,10 @@ public class SEC
   /**
    * Controlla l'acl correntemente salvata nella sessione e verifica
    * se l'utente ha il permesso indicato in tutti i gruppi possibili.
+   * @param session
+   * @param rolename
+   * @return
+   * @throws Exception
    */
   public static boolean checkRole(HttpSession session, String rolename)
      throws Exception

@@ -81,6 +81,7 @@ import org.commonlib5.utils.MacroResolver;
  * <li>AZIENDAID - ID dell'azienda (da setup)</li>
  * <li>AZIENDA - nome dell'azienda (da setup)</li>
  * <li>ESERCIZIO - anno corrente in quattro cifre (2017)</li>
+ * <li>USER_ID - id dell'utente loggato</li>
  * </ul>
  * @author Nicola De Nisco
  */
@@ -385,6 +386,7 @@ public class SirioMacroResolver extends MacroResolver
     mapFunction.put("AZIENDAID", (seg) -> TR.getString("azienda.id", ""));
     mapFunction.put("AZIENDA", (seg) -> TR.getString("azienda.nome", ""));
     mapFunction.put("ESERCIZIO", (seg) -> Integer.toString(1900 + today.getYear()));
+    mapFunction.put("USER_ID", (seg) -> (u == null) ? "" : u.getId().toString());
   }
 
   public String formatData(Date d)

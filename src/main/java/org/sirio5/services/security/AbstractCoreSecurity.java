@@ -157,7 +157,7 @@ abstract public class AbstractCoreSecurity extends BaseService
   {
     try
     {
-      return SU.parseInt(us.getId());
+      return SU.parse(us.getId(), -1);
     }
     catch(Exception ex)
     {
@@ -206,7 +206,7 @@ abstract public class AbstractCoreSecurity extends BaseService
 
     // tutti gli utenti che hanno il ruolo turbine_root
     TurbineAccessControlList acl = getACL(session);
-    return acl.hasRole(ADMIN_ROLE);
+    return acl == null ? false : acl.hasRole(ADMIN_ROLE);
   }
 
   /**
