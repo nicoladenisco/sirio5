@@ -85,8 +85,9 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
    * @param cls classe del peer dell'oggetto di ritorno (ES: se AnAnagrafiche sarà AnAnagrafichePeer.class)
    * @param lsDettails lista di oggetti da ispezionare alla ricerca di chiavi primarie
-   * @param campoLink campo degli oggetti in lsMasters per estrarre la chiave primaria; può contentere sia il nome campo
-   * Torque oppure il nome del campo tabella (usando il prefisso PEER:): Idaccettazioni oppure PEER:ID_ACCETTAZIONI
+   * @param campoLink campo degli oggetti in lsDettails per estrarre la chiave primaria; può contentere sia il nome
+   * campo Torque oppure il nome del campo tabella (usando il prefisso PEER:): Idaccettazioni oppure
+   * PEER:ID_ACCETTAZIONI
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
