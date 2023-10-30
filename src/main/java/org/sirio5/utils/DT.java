@@ -177,6 +177,42 @@ public class DT extends DateTime
   /**
    * Effettua un parsing di una stringa
    * nel formato corretto del formattatore.
+   * Per l'italia gg/mm/aaaa hh:mm:ss.
+   *
+   * @param s stringa da interpretare
+   * @param flags una delle costanti ValidatorParserInterface.FLAG_ROUND
+   * @return oggetto Date relativo
+   */
+  public static Date parseDataFull(String s, int flags)
+  {
+    return parseDataFull(s, null, flags);
+  }
+
+  /**
+   * Effettua un parsing di una stringa
+   * nel formato corretto del formattatore.
+   * Per l'italia gg/mm/aaaa hh:mm:ss.
+   *
+   * @param s stringa da interpretare
+   * @param defVal valore di default
+   * @param flags una delle costanti ValidatorParserInterface.FLAG_ROUND
+   * @return oggetto Date relativo
+   */
+  public static Date parseDataFull(String s, Date defVal, int flags)
+  {
+    try
+    {
+      return df.parseDataFull(s, flags);
+    }
+    catch(Exception e)
+    {
+      return defVal;
+    }
+  }
+
+  /**
+   * Effettua un parsing di una stringa
+   * nel formato corretto del formattatore.
    * Per l'italia hh:mm.
    *
    * @param s stringa da interpretare

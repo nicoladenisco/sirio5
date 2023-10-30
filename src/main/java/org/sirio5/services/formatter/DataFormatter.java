@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -42,7 +42,8 @@ public interface DataFormatter extends CoreServiceExtension
    * @return stringa data formattata
    * @throws java.lang.Exception
    */
-  public String formatData(Date d) throws Exception;
+  public String formatData(Date d)
+     throws Exception;
 
   /**
    * Effettua un parsing di una stringa
@@ -52,7 +53,8 @@ public interface DataFormatter extends CoreServiceExtension
    * @return oggetto Date relativo
    * @throws java.lang.Exception
    */
-  public Date parseData(String s) throws Exception;
+  public Date parseData(String s)
+     throws Exception;
 
   /**
    * Ritorna vero se la stringa e' correttamente
@@ -69,7 +71,8 @@ public interface DataFormatter extends CoreServiceExtension
    * @return stringa data formattata
    * @throws java.lang.Exception
    */
-  public String formatDataFull(Date d) throws Exception;
+  public String formatDataFull(Date d)
+     throws Exception;
 
   /**
    * Formatta la sola ora senza i secondi.
@@ -78,7 +81,8 @@ public interface DataFormatter extends CoreServiceExtension
    * @return stringa data formattata
    * @throws java.lang.Exception
    */
-  public String formatTime(Date d) throws Exception;
+  public String formatTime(Date d)
+     throws Exception;
 
   /**
    * Formatta la sola ora completa di secondi.
@@ -87,17 +91,32 @@ public interface DataFormatter extends CoreServiceExtension
    * @return stringa data formattata
    * @throws java.lang.Exception
    */
-  public String formatTimeFull(Date d) throws Exception;
+  public String formatTimeFull(Date d)
+     throws Exception;
+
+  /**
+   * Effettua un parsing di una stringa
+   * nel formato corretto del formattatore.
+   * Per l'italia gg/mm/aaaa hh:mm:ss.
+   * Equivalente a parseDate(s, defval, ValidatorParserInterface.FLAG_ROUND_DEAULT).
+   * @param s stringa da interpretare
+   * @return oggetto Date relativo
+   * @throws java.lang.Exception
+   */
+  public Date parseDataFull(String s)
+     throws Exception;
 
   /**
    * Effettua un parsing di una stringa
    * nel formato corretto del formattatore.
    * Per l'italia gg/mm/aaaa hh:mm:ss.
    * @param s stringa da interpretare
+   * @param flags una delle costanti ValidatorParserInterface.FLAG_ROUND
    * @return oggetto Date relativo
    * @throws java.lang.Exception
    */
-  public Date parseDataFull(String s) throws Exception;
+  public Date parseDataFull(String s, int flags)
+     throws Exception;
 
   /**
    * Effettua un parsing di una stringa
@@ -107,7 +126,8 @@ public interface DataFormatter extends CoreServiceExtension
    * @return oggetto Date relativo
    * @throws java.lang.Exception
    */
-  public Date parseTime(String s) throws Exception;
+  public Date parseTime(String s)
+     throws Exception;
 
   /**
    * Effettua un parsing di una stringa
@@ -117,7 +137,8 @@ public interface DataFormatter extends CoreServiceExtension
    * @return oggetto Date relativo
    * @throws java.lang.Exception
    */
-  public Date parseTimeFull(String s) throws Exception;
+  public Date parseTimeFull(String s)
+     throws Exception;
 
   /**
    * Ritorna il primo giorno della settimana.

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.commonlib5.utils.ArrayOper;
+import org.rigel5.RigelI18nInterface;
 import org.sirio5.rigel.RigelHtmlI18n;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.SirioGenericContext;
@@ -54,6 +55,12 @@ public class BusContext extends SirioGenericContext
     setI18n(new RigelHtmlI18n(data));
   }
 
+  public BusContext(RigelI18nInterface i18n)
+  {
+    super();
+    setI18n(i18n);
+  }
+
   public BusContext(Object... params)
   {
     super();
@@ -64,6 +71,13 @@ public class BusContext extends SirioGenericContext
   {
     super();
     setI18n(new RigelHtmlI18n(data));
+    appendPair(params);
+  }
+
+  public BusContext(RigelI18nInterface i18n, Object... params)
+  {
+    super();
+    setI18n(i18n);
     appendPair(params);
   }
 

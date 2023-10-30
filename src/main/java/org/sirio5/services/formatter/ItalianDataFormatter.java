@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
  */
 package org.sirio5.services.formatter;
 
-import java.util.*;
 import java.text.*;
+import java.util.*;
 import org.apache.commons.configuration2.Configuration;
 import org.commonlib5.gui.validator.ItalianParser;
 import org.commonlib5.utils.Pair;
@@ -144,6 +144,17 @@ public class ItalianDataFormatter extends AbstractCoreBaseService
      throws Exception
   {
     Date d = itParser.parseDate(s, null);
+    if(d == null)
+      throw new ParseException("Non riesco ad interpretare la data/ora.", 0);
+
+    return d;
+  }
+
+  @Override
+  public Date parseDataFull(String s, int flags)
+     throws Exception
+  {
+    Date d = itParser.parseDate(s, null, flags);
     if(d == null)
       throw new ParseException("Non riesco ad interpretare la data/ora.", 0);
 
