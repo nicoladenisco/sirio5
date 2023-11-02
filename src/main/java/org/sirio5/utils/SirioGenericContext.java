@@ -19,6 +19,7 @@ package org.sirio5.utils;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.Callable;
 import org.rigel5.RigelI18nInterface;
 import org.sirio5.rigel.RigelDefaultI18n;
 
@@ -488,5 +489,28 @@ public class SirioGenericContext extends HashMap<String, Object>
   {
     put(key, value);
     return this;
+  }
+
+  public SirioGenericContext appendPair(Object... obj)
+  {
+    if((obj.length & 1) != 0)
+      throw new IllegalArgumentException("Parameter list must be pair.");
+
+    for(int i = 0; i < obj.length; i += 2)
+    {
+      String key = obj[i].toString();
+      Object val = obj[i + 1];
+
+      super.put(key, val);
+    }
+
+    return this;
+  }
+
+  public <T> T getOrDefaultLambda(String key, Callable<T> fun)
+     throws Exception
+  {
+    T val = (T) get(key);
+    return val != null ? val : fun.call();
   }
 }
