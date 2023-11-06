@@ -535,7 +535,6 @@ public class SU extends StringOper
       throw (Exception) t;
     }
 
-    log.info("Comando " + command + " non implementato; ignorato.");
     return false;
   }
 
@@ -633,7 +632,6 @@ public class SU extends StringOper
       throw (Exception) t;
     }
 
-    log.info("Comando " + command + " non implementato; ignorato.");
     return false;
   }
 
