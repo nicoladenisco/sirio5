@@ -439,12 +439,12 @@ public class CalcolaCodiceFiscale
     'L', 'M', 'P', 'R', 'S', 'T'
   };
 
-  private static char getCodiceMese(int mese)
+  public static char getCodiceMese(int mese)
   {
     return codici_mesi[mese];
   }
 
-  private static int getNumMese(char mese)
+  public static int getNumMese(char mese)
   {
     mese = Character.toUpperCase(mese);
 
