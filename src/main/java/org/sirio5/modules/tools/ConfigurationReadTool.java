@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@ import org.apache.turbine.Turbine;
 import org.apache.turbine.services.pull.ApplicationTool;
 import org.apache.turbine.util.RunData;
 import org.apache.turbine.util.uri.TemplateURI;
+import org.commonlib5.utils.StringOper;
 
 /**
  * Tool per l'accesso ai dati di configurazione
@@ -82,6 +83,17 @@ public class ConfigurationReadTool implements ApplicationTool
   public boolean isButtonEnabled(String formID, String butLabel)
   {
     String key = butLabel.replace(' ', '_');
-    return cfg.getBoolean(formID+".menu.but."+key, true);
+    return cfg.getBoolean(formID + ".menu.but." + key, true);
+  }
+
+  public boolean isBoolTrue(String key)
+  {
+    return isBoolTrueDef(key, false);
+  }
+
+  public boolean isBoolTrueDef(String key, boolean defVal)
+  {
+    String val = cfg.getString(key);
+    return StringOper.checkTrueFalse(val, defVal);
   }
 }
