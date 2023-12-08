@@ -17,6 +17,7 @@
  */
 package org.sirio5.services.security;
 
+import java.util.StringTokenizer;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.fulcrum.security.entity.Group;
@@ -30,6 +31,7 @@ import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.security.SecurityService;
 import org.apache.turbine.util.RunData;
+import org.sirio5.utils.SU;
 
 /**
  * Gestione della sicurezza.
@@ -96,6 +98,21 @@ public class SEC
        || acl.hasRole(CoreSecurity.ADMIN_ROLE);
   }
 
+  public static boolean checkPermission(int idUser, String permission)
+     throws Exception
+  {
+    User user = getUser(idUser);
+    return checkPermission(user, permission);
+  }
+
+  public static boolean checkPermission(User user, String permission)
+     throws Exception
+  {
+    getSirioSecurity().salvaPermesso(permission);
+    TurbineAccessControlList acl = getUserACL(user);
+    return checkPermission(acl, permission);
+  }
+
   /**
    * Controlla l'acl correntemente salvata nella sessione e verifica
    * se l'utente ha il permesso indicato in tutti i gruppi possibili
@@ -109,6 +126,20 @@ public class SEC
   {
     return acl == null ? false : acl.hasRole(rolename, getTurbineSecurity().getAllGroups())
        || acl.hasRole(CoreSecurity.ADMIN_ROLE);
+  }
+
+  public static boolean checkRole(int idUser, String rolename)
+     throws Exception
+  {
+    User user = getUser(idUser);
+    return checkRole(user, rolename);
+  }
+
+  public static boolean checkRole(User user, String rolename)
+     throws Exception
+  {
+    TurbineAccessControlList acl = getUserACL(user);
+    return checkRole(acl, rolename);
   }
 
   /**
@@ -216,6 +247,34 @@ public class SEC
      throws Exception
   {
     return getSirioSecurity().checkAnyPermission(data.getSession(), permessi);
+  }
+
+  public static boolean checkAnyPermission(int idUser, String permission)
+     throws Exception
+  {
+    User user = getUser(idUser);
+    return checkAnyPermission(user, permission);
+  }
+
+  public static boolean checkAnyPermission(User user, String permission)
+     throws Exception
+  {
+    TurbineAccessControlList acl = getUserACL(user);
+    return checkAnyPermission(acl, permission);
+  }
+
+  public static boolean checkAllPermission(int idUser, String permission)
+     throws Exception
+  {
+    User user = getUser(idUser);
+    return checkAllPermission(user, permission);
+  }
+
+  public static boolean checkAllPermission(User user, String permission)
+     throws Exception
+  {
+    TurbineAccessControlList acl = getUserACL(user);
+    return checkAllPermission(acl, permission);
   }
 
   /**
@@ -487,5 +546,33 @@ public class SEC
   public static String generaPassword(int len)
   {
     return getSirioSecurity().generaPassword(len);
+  }
+
+  private static boolean checkAnyPermission(TurbineAccessControlList acl, String permission)
+  {
+    getSirioSecurity().salvaPermessi(permission);
+    StringTokenizer stk = new StringTokenizer(permission, ",; ");
+    while(stk.hasMoreTokens())
+    {
+      String p = SU.okStr(stk.nextToken());
+      if(p.length() > 0)
+        if(acl.hasPermission(p))
+          return true;
+    }
+    return false;
+  }
+
+  private static boolean checkAllPermission(TurbineAccessControlList acl, String permission)
+  {
+    getSirioSecurity().salvaPermessi(permission);
+    StringTokenizer stk = new StringTokenizer(permission, ",; ");
+    while(stk.hasMoreTokens())
+    {
+      String p = SU.okStr(stk.nextToken());
+      if(p.length() > 0)
+        if(!acl.hasPermission(p))
+          return false;
+    }
+    return true;
   }
 }
