@@ -329,6 +329,7 @@ public class FormSave extends RigelEditBaseAction
        data.getSession(), params, i18n, null, validateMap);
   }
 
+  @Override
   protected void checkTokenCSRF(CoreRunData data, boolean obbligatorio)
      throws Exception
   {
@@ -336,6 +337,9 @@ public class FormSave extends RigelEditBaseAction
 
     if(obbligatorio && token == null)
       throw new Exception("Missing token in request.");
+
+    if(token == null)
+      return;
 
     TokenAuthService tas = getService(TokenAuthService.SERVICE_NAME);
     int verifica = tas.verificaTokenAntiCSRF(token, true, data.getRequest(), data.getSession());
