@@ -304,29 +304,37 @@ public class BeanWrapper
      throws Exception
   {
     Class vcl = getValClass();
+    return parseValue(value, vcl);
+  }
+
+  public static Object parseValue(String value, Class vcl)
+     throws Exception
+  {
     boolean invalid = value == null || value.trim().length() == 0;
 
     if(vcl.equals(Integer.class))
-      return invalid ? new Integer(0) : new Integer(value);
+      return invalid ? Integer.valueOf(0) : Integer.valueOf(value);
     if(vcl.equals(Float.class))
-      return invalid ? new Float(0.0f) : new Float(value);
+      return invalid ? Float.valueOf(0.0f) : Float.valueOf(value);
     if(vcl.equals(Boolean.class))
       return invalid ? false : StringOper.checkTrueFalse(value, false);
     if(vcl.equals(Double.class))
-      return invalid ? new Double(0.0) : new Double(value);
+      return invalid ? Double.valueOf(0.0) : Double.valueOf(value);
 
-    if(vcl.equals(java.util.Date.class))
-      return invalid ? new java.util.Date() : DateTime.parseIsoFull(value, null);
+    if(vcl.equals(java.sql.Timestamp.class))
+    {
+      java.util.Date dtmp = invalid ? new java.util.Date() : (java.util.Date) DateTime.parseIsoFull(value, null);
+      return new java.sql.Timestamp(dtmp.getTime());
+    }
+
     if(vcl.equals(java.sql.Date.class))
     {
       java.util.Date dtmp = invalid ? new java.util.Date() : (java.util.Date) DateTime.parseIsoFull(value, null);
       return new java.sql.Date(dtmp.getTime());
     }
 
-    if(vcl.equals(StringKey.class))
-      return invalid ? new StringKey() : new StringKey(value);
-    if(vcl.equals(NumberKey.class))
-      return invalid ? new NumberKey() : new NumberKey(value);
+    if(vcl.equals(java.util.Date.class))
+      return invalid ? new java.util.Date() : DateTime.parseIsoFull(value, null);
 
     return value;
   }
@@ -344,6 +352,12 @@ public class BeanWrapper
      throws Exception
   {
     Class vcl = getValClass();
+    return formatValue(value, vcl);
+  }
+
+  public static String formatValue(Object value, Class vcl)
+     throws Exception
+  {
     boolean invalid = value == null;
 
     if(vcl.equals(Integer.class))
@@ -558,26 +572,29 @@ public class BeanWrapper
    * Ritorna vero se la classe e' fra quelle di nostro interesse
    * per il trasferimento dei peer.
    * @param clName
+   * @return vero se il tipo corrisponde
    */
   static public boolean checkForType(String clName)
   {
-    if(clName.equals("java.lang.String"))
-      return true;
-    if(clName.equals("java.lang.Integer"))
-      return true;
-    if(clName.equals("java.lang.Float"))
-      return true;
-    if(clName.equals("java.lang.Boolean"))
-      return true;
-    if(clName.equals("java.lang.Double"))
-      return true;
-    if(clName.equals("java.util.Date"))
-      return true;
-    if(clName.equals("org.apache.turbine.om.StringKey"))
-      return true;
-    if(clName.equals("org.apache.turbine.om.NumberKey"))
-      return true;
-
+    switch(clName)
+    {
+      case "java.lang.String":
+        return true;
+      case "java.lang.Integer":
+        return true;
+      case "java.lang.Float":
+        return true;
+      case "java.lang.Boolean":
+        return true;
+      case "java.lang.Double":
+        return true;
+      case "java.util.Date":
+        return true;
+      case "org.apache.turbine.om.StringKey":
+        return true;
+      case "org.apache.turbine.om.NumberKey":
+        return true;
+    }
     return false;
   }
 
@@ -618,7 +635,6 @@ public class BeanWrapper
    * L'ordine deve essere tassativamente quello
    * delle proprietà (è l'inverso di objExport).
    * @param v vettore on i dati
-   * @return nome della classe dell'oggeto (contenuto all'indice 0)
    * @throws Exception
    */
   public void objImport(String[] v)
