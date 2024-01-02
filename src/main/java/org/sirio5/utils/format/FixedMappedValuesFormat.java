@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -37,6 +37,7 @@ public class FixedMappedValuesFormat extends Format
 {
   protected ArrayMap<String, String> arOptions = new ArrayMap<>();
   protected String valueElse;
+  protected boolean useDefault;
 
   public FixedMappedValuesFormat(Element xml)
   {
@@ -51,6 +52,7 @@ public class FixedMappedValuesFormat extends Format
         arOptions.put(key, val);
     }
     valueElse = SU.okStrNull(elMap.getChildText("else"));
+    useDefault = elMap.getChild("default") != null;
   }
 
   @Override
@@ -65,6 +67,8 @@ public class FixedMappedValuesFormat extends Format
     {
       if(valueElse != null)
         toAppendTo.append(valueElse);
+      else if(useDefault)
+        toAppendTo.append(obj.toString());
     }
 
     return toAppendTo;
