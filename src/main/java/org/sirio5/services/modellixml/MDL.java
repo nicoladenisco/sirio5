@@ -250,4 +250,10 @@ public class MDL
   {
     return getService().getListeSql();
   }
+
+  public static String[] getImgsNav()
+     throws Exception
+  {
+    return getService().getImgsNav();
+  }
 }

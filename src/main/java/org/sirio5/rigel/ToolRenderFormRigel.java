@@ -40,7 +40,7 @@ import org.sirio5.utils.velocity.VelocityParser;
  */
 public class ToolRenderFormRigel extends FormBase
 {
-  protected ToolRigelUIManager uim = new ToolRigelUIManager();
+  protected ToolRigelUIManager2 uim = new ToolRigelUIManager2();
   protected ToolCustomUrlBuilder urb = new ToolCustomUrlBuilder();
   protected String unique = null, funcNameEdit, funcNameSubmit, funcNameSplit, formName, bodyName;
   protected int counter;
@@ -68,6 +68,8 @@ public class ToolRenderFormRigel extends FormBase
      Map params, CoreRunData data, Context context, HtmlWrapperBase pwl, String type, String baseUri)
      throws Exception
   {
+    uim.setUnique(unique);
+
     CoreCustomUrlBuilder ub = (CoreCustomUrlBuilder) SetupHolder.getUrlBuilder();
     urb.setBaseMainForm(ub.getBaseMainForm());
     urb.setBaseMainList(ub.getBaseMainList());

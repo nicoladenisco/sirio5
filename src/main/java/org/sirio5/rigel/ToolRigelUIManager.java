@@ -30,6 +30,7 @@ import org.rigel5.table.html.RigelHtmlPageComponent;
  */
 public class ToolRigelUIManager extends CoreRigelUIManager
 {
+  private String unique;
   private RigelHtmlPage lastPageLista = null, lastPageForm = null;
 
   @Override
@@ -38,7 +39,7 @@ public class ToolRigelUIManager extends CoreRigelUIManager
   {
     String uri = tp.getSelfUrl(rec, sessione);
     String formName = tp.getFormName();
-    return "javascript:rigel.jumpTool(unique, '" + uri + "')";
+    return "javascript:rigel.jumpTool('" + unique + "', '" + uri + "')";
   }
 
   @Override
@@ -87,5 +88,15 @@ public class ToolRigelUIManager extends CoreRigelUIManager
   public RigelHtmlPage getLastPageForm()
   {
     return lastPageForm;
+  }
+
+  public String getUnique()
+  {
+    return unique;
+  }
+
+  public void setUnique(String unique)
+  {
+    this.unique = unique;
   }
 }

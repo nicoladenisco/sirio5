@@ -161,4 +161,7 @@ public interface modelliXML extends CoreServiceExtension, WrapperBuilderInterfac
 
   public String getImgExpand()
      throws Exception;
+
+  public String[] getImgsNav()
+     throws Exception;
 }

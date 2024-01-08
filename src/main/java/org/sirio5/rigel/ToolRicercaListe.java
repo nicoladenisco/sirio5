@@ -41,7 +41,8 @@ public class ToolRicercaListe extends HtmlMascheraRicercaGenericaNoscript
 {
   protected String unique, url;
 
-  public ToolRicercaListe(BuilderRicercaGenerica brg, RigelTableModel rtm, RigelI18nInterface i18n, String unique, String url)
+  public ToolRicercaListe(BuilderRicercaGenerica brg, RigelTableModel rtm,
+     RigelI18nInterface i18n, String unique, String url)
   {
     super(brg, rtm, i18n);
     this.unique = unique;
@@ -100,6 +101,7 @@ public class ToolRicercaListe extends HtmlMascheraRicercaGenericaNoscript
    * Ritorna l'HTML completo della ricerca semplice.
    * @param nomeForm the value of nomeForm
    * @param sizeFld the value of sizeFld
+   * @param haveFilter vero se il filtro è attivo
    * @param page the value of page
    * @throws Exception
    */
@@ -118,7 +120,7 @@ public class ToolRicercaListe extends HtmlMascheraRicercaGenericaNoscript
     RigelHtmlPageComponent html = new RigelHtmlPageComponent(PageComponentType.HTML, "simplesearch");
     html.append("<div class=\"rigel_simple_search\">\r\n")
        .append("<!-- BEGIN SIMPLE SEARCH -->\r\n")
-       .append("&nbsp;<a href=\"#\" onclick=\"rigel.showRicTool(").append(unique).append(");\">")
+       .append("&nbsp;<a href=\"#\" onclick=\"rigel.showRicTool('").append(unique).append("');\">")
        .append(MDL.getImgExpand()).append("</a>&nbsp;&nbsp;&nbsp;\r\n");
 
     for(int i = 0; i < rtm.getColumnCount(); i++)
@@ -226,6 +228,7 @@ public class ToolRicercaListe extends HtmlMascheraRicercaGenericaNoscript
        .append("<input type=\"button\" name=\"publisciSimpleSearch\" value=\"")
        .append(i18n.getCaptionButtonPulisci())
        .append("\" onclick=\"rigel.pulisciRicercaTool('").append(unique).append("', '").append(url).append("');\"/>\r\n")
+       .append(haveFilter ? " [" + i18n.msg("Filtro attivo") + "]" : "")
        .append("<!-- END FORM SIMPLE SEARCH -->\r\n")
        .append("</div>\r\n");
 

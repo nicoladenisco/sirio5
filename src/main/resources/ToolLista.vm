@@ -4,7 +4,7 @@
   <div id="$bodyName">
     <!-- __START_CUT__ -->
 
-    <div id="data_${unique}" style="display: inline">
+    <div id="data_${unique}" style="display: inline" class="table-responsive manina">
 
       <!-- html ricerca semplice -->
       $htpage.getHtml("simplesearch")
