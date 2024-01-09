@@ -454,13 +454,13 @@ public class CoreModelliXML extends AbstractCoreBaseService
   {
     String[] rv = new String[4];
     rv[0] = getImgWithDefaults("ImgFirst", "pagination_first.gif",
-       "awesome:fast-backward", "", "glyphicon:collapse-up", INT.I("Primo"));
+       "awesome:fast-backward", "", "glyphicon:collapse-up", INT.I("Prima pagina"));
     rv[1] = getImgWithDefaults("ImgLast", "pagination_last.gif",
-       "awesome:fast-forward", "", "glyphicon:collapse-up", INT.I("Precedente"));
+       "awesome:fast-forward", "", "glyphicon:collapse-up", INT.I("Ultima pagina"));
     rv[2] = getImgWithDefaults("ImgPrev", "pagination_prev.gif",
-       "awesome:step-backward", "", "glyphicon:collapse-up", INT.I("Successivo"));
+       "awesome:step-backward", "", "glyphicon:collapse-up", INT.I("Pagina precedente"));
     rv[3] = getImgWithDefaults("ImgNext", "pagination_next.gif",
-       "awesome:step-forward", "", "glyphicon:collapse-up", INT.I("Ultimo"));
+       "awesome:step-forward", "", "glyphicon:collapse-up", INT.I("Pagina successiva"));
     return rv;
   }
 
