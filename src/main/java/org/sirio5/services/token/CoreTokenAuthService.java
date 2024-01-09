@@ -63,7 +63,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
   private static final Log log = LogFactory.getLog(CoreTokenAuthService.class);
 
   protected long tExpiries = 1000, csrfExpiries = 1000;
-  protected String anonUser;
+  protected String anonUser, pathKeystore;
   protected boolean allowAnonimousLogon = false;
   protected boolean allowDebugLogon = false;
   protected boolean allowMagicLogon = true;
@@ -120,7 +120,11 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
 
     log.info("CoreTokenAuthServices: tExpiries=" + tExpiries + " path=" + System.getProperty("java.library.path")); // NOI18N
 
+    // eventuale indicazione del keystore da variabile di ambiente
+    pathKeystore = System.getenv("TOKEN_PATH_KEYSTORE");
+
     anonUser = cfg.getString("anonUser", "sviluppo"); // NOI18N
+    pathKeystore = cfg.getString("pathKeystore", pathKeystore); // NOI18N
     allowAnonimousLogon = cfg.getBoolean("allowAnonimousLogon", allowAnonimousLogon); // NOI18N
     allowDebugLogon = cfg.getBoolean("allowDebugLogon", allowDebugLogon); // NOI18N
     allowMagicLogon = cfg.getBoolean("allowMagicLogon", allowMagicLogon); // NOI18N
@@ -148,6 +152,25 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
   protected void inizializzaChiaviRSA()
      throws Exception
   {
+    // verifica per keystore impostato
+    if(pathKeystore != null)
+    {
+      File dirKeystore = new File(pathKeystore);
+      if(dirKeystore.isDirectory())
+      {
+        publicKeyFile = new File(dirKeystore, RSA_PUBLIC_FILE);
+        privateKeyFile = new File(dirKeystore, RSA_PRIVATE_FILE);
+
+        if(privateKeyFile.exists() && publicKeyFile.exists())
+        {
+          puk = KeyUtils.getRSAPublicKeyFromPEM(publicKeyFile);
+          prk = KeyUtils.getRSAPrivateKeyFromPEM(privateKeyFile);
+          return;
+        }
+      }
+    }
+
+    // genera una coppia di chiavi nella directory work
     publicKeyFile = getWorkMainFile(RSA_PUBLIC_FILE);
     privateKeyFile = getWorkMainFile(RSA_PRIVATE_FILE);
 

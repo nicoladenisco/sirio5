@@ -51,7 +51,7 @@ import org.sirio5.utils.velocity.VelocityParser;
  */
 public class ToolRenderListeRigel extends ListaBase5
 {
-  protected final ToolRigelUIManager uim = new ToolRigelUIManager();
+  protected final ToolRigelUIManager2 uim = new ToolRigelUIManager2();
   protected final ToolCustomUrlBuilder urb = new ToolCustomUrlBuilder();
   protected String unique = null, funcNameEdit, funcNameSubmit, funcNameSplit, formName, bodyName;
   protected int counter;
@@ -79,6 +79,8 @@ public class ToolRenderListeRigel extends ListaBase5
   protected void makeContextHtml(HtmlWrapperBase lso, ListaInfo li, CoreRunData data, Context context, String baseUri)
      throws Exception
   {
+    uim.setUnique(unique);
+
     CoreCustomUrlBuilder ub = (CoreCustomUrlBuilder) SetupHolder.getUrlBuilder();
     urb.setBaseMainForm(ub.getBaseMainForm());
     urb.setBaseMainList(ub.getBaseMainList());

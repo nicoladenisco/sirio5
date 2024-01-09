@@ -297,7 +297,8 @@ public class CoreModelliXML extends AbstractCoreBaseService
     SetupHolder.setRi18n(new RigelDefaultI18n());
   }
 
-  public String getImgWithDefaults(String key, String defUI, String defAwe, String defAwe5, String defBoot, String testo)
+  public String getImgWithDefaults(String key,
+     String defUI, String defAwe, String defAwe5, String defBoot, String testo)
      throws Exception
   {
     if(useAwesome5())
@@ -392,7 +393,7 @@ public class CoreModelliXML extends AbstractCoreBaseService
   public String getImgCollapse()
      throws Exception
   {
-    return getImgWithDefaults("ImgContrai", "cancella.gif", "awesome:collapse-up", "", "glyphicon:collapse-up", INT.I("Chiudi opzioni"));
+    return getImgWithDefaults("ImgContrai", "cancella.gif", "awesome:compress", "", "glyphicon:collapse-up", INT.I("Chiudi opzioni"));
   }
 
   /**
@@ -440,6 +441,27 @@ public class CoreModelliXML extends AbstractCoreBaseService
     }
 
     return simg;
+  }
+
+  /**
+   * Costruzione delle url per le quattro immagini di navigazione.
+   * @return array di 4 url: primo, ultimo, precedente, successivo
+   * @throws java.lang.Exception
+   */
+  @Override
+  public String[] getImgsNav()
+     throws Exception
+  {
+    String[] rv = new String[4];
+    rv[0] = getImgWithDefaults("ImgFirst", "pagination_first.gif",
+       "awesome:fast-backward", "", "glyphicon:collapse-up", INT.I("Prima pagina"));
+    rv[1] = getImgWithDefaults("ImgLast", "pagination_last.gif",
+       "awesome:fast-forward", "", "glyphicon:collapse-up", INT.I("Ultima pagina"));
+    rv[2] = getImgWithDefaults("ImgPrev", "pagination_prev.gif",
+       "awesome:step-backward", "", "glyphicon:collapse-up", INT.I("Pagina precedente"));
+    rv[3] = getImgWithDefaults("ImgNext", "pagination_next.gif",
+       "awesome:step-forward", "", "glyphicon:collapse-up", INT.I("Pagina successiva"));
+    return rv;
   }
 
   protected String getSC(String key, String defVal)

@@ -28,12 +28,15 @@ import org.rigel5.table.html.RigelHtmlPageComponent;
 import org.sirio5.services.modellixml.MDL;
 
 /**
- * Gestore dell'interfaccia rigel.
+ * Gestore dell'interfaccia rigel per i Tool.
  *
  * @author Nicola De Nisco
  */
-public class CoreRigelUIManager extends DefaultUIManager
+public class ToolRigelUIManager2 extends DefaultUIManager
 {
+  private String unique;
+  private RigelHtmlPage lastPageLista = null, lastPageForm = null;
+
   /**
    * Restituisce la barra inferiore di navigazione.
    * Nella barra inferiore viene indicato sulla sinistra il navigatore
@@ -56,11 +59,11 @@ public class CoreRigelUIManager extends DefaultUIManager
     String sLeft, sCenter, sRight;
     RigelI18nInterface i18n = tp.getI18n();
     RigelHtmlPageComponent html = new RigelHtmlPageComponent(PageComponentType.HTML, "nav");
-    RigelHtmlPageComponent javascript = new RigelHtmlPageComponent(PageComponentType.JAVASCRIPT, "nav");
 
-    String funcGoto = "gotoPage_" + tp.getFormName();
-    String funcTest = "testInvioGoto_" + tp.getFormName();
-    String funTestEvent = "onkeypress='return " + funcTest + "(event);'";
+    String uri = tp.getBaseSelfUrl();
+    String funcGoto = "rigel.gotoForTool('" + uri + "'," + limit + "," + numPagine + ", '" + unique + "')";
+    String funcTest = "rigel.testInvioTool('" + uri + "'," + limit + "," + numPagine + ", '" + unique + "', event)";
+    String funTestEvent = "onkeypress=\"return " + funcTest + "\"";
 
     String[] aimg = MDL.getImgsNav();
     String imgFirst = aimg[0];
@@ -83,7 +86,8 @@ public class CoreRigelUIManager extends DefaultUIManager
     sCenter
        = "Pag. <input class=\"little\" type=\"text\""
        + " value=\"" + (pagCurr + 1) + "\""
-       + " name=\"in_" + funcGoto + "\""
+       + " name=\"in_" + unique + "\""
+       + " id=\"id_in_" + unique + "\""
        + " size='5' " + funTestEvent + ">"
        + " di " + numPagine + " <input class=\"little\" type=\"button\""
        + " value=\"Go\" onClick=\"" + funcGoto + "();\">";
@@ -103,20 +107,6 @@ public class CoreRigelUIManager extends DefaultUIManager
     String tmp = getJumpUrl(tp, sessione, 9999);
     tmp = StringOper.strReplace(tmp, "9999", "'+rStart+'");
 
-    generateFuncGoto(javascript, funcGoto, tp, numPagine, limit, tmp, i18n);
-
-    javascript.append(""
-       + "function " + funcTest + "(e)\n"
-       + "{\n"
-       + "  if(e == null) e=event;\n"
-       + "  if(e.keyCode == 13){\n"
-       + "  " + funcGoto + "();\n"
-       + "   return false;\n"
-       + "  }\n"
-       + "  return true;\n"
-       + "}\n"
-    );
-
     html.append("<div class=\"rigel_navbar\">"
        + "<table width=100% border=0 cellspacing=0 cellpadding=1><TR>\r\n"
        + "<TD width=33% class=\"rigel_navbar_left\" align=left>" + sLeft + "</td>\r\n"
@@ -127,42 +117,63 @@ public class CoreRigelUIManager extends DefaultUIManager
     );
 
     page.add(html);
-    page.add(javascript);
   }
 
-  protected void generateFuncGoto(RigelHtmlPageComponent javascript,
-     String funcGoto, AbstractHtmlTablePager tp, int numPagine, int limit,
-     String jumpURL, RigelI18nInterface i18n)
-  {
-    String alert = i18n.msg("Valore di pagina non consentito.");
-
-    javascript.append(""
-       + "function " + funcGoto + "()\n"
-       + "{\n"
-       + "  var nPage = document." + tp.getFormName() + ".in_" + funcGoto + ".value;\n"
-       + "  if(nPage <= 0 || nPage > " + numPagine + ") {\n"
-       + "    alert('" + alert + "');\n"
-       + "  } else {\n"
-       + "    rStart = (nPage-1)*" + limit + ";\n"
-       + "    window.location.href = '" + jumpURL + "'\n"
-       + "  }\n"
-       + "}\n"
-       + "\n"
-    );
-  }
-
-  /**
-   * Costruisce url di salto.
-   * Ridefinibile in classi derivate.
-   * @param tp pager di riferimento
-   * @param sessione sessione corrente
-   * @param rec record di salto
-   * @return url di salto
-   * @throws Exception
-   */
   protected String getJumpUrl(AbstractHtmlTablePager tp, HttpSession sessione, int rec)
      throws Exception
   {
-    return tp.getSelfUrl(rec, sessione);
+    String uri = tp.getSelfUrl(rec, sessione);
+    return "javascript:rigel.jumpTool('" + unique + "', '" + uri + "')";
+  }
+
+  /**
+   * Formattazione nulla per Tool.
+   * Il tool renderizza le componenti direttamente nella vm.
+   * @param filtro
+   * @param page
+   * @return sempre stringa vuota
+   * @throws Exception
+   */
+  @Override
+  public String formatHtmlLista(int filtro, RigelHtmlPage page)
+     throws Exception
+  {
+    lastPageLista = page;
+    return "";
+  }
+
+  /**
+   * Formattazione nulla per Tool.
+   * Il tool renderizza le componenti direttamente nella vm.
+   * @param page
+   * @return sempre stringa vuota
+   * @throws Exception
+   */
+  @Override
+  public String formatHtmlForm(RigelHtmlPage page)
+     throws Exception
+  {
+    lastPageForm = page;
+    return "";
+  }
+
+  public RigelHtmlPage getLastPageLista()
+  {
+    return lastPageLista;
+  }
+
+  public RigelHtmlPage getLastPageForm()
+  {
+    return lastPageForm;
+  }
+
+  public String getUnique()
+  {
+    return unique;
+  }
+
+  public void setUnique(String unique)
+  {
+    this.unique = unique;
   }
 }
