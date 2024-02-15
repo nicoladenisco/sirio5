@@ -17,20 +17,19 @@
  */
 package org.sirio5.services.cache;
 
-import com.workingdogs.village.Column;
-import com.workingdogs.village.Record;
-import com.workingdogs.village.Schema;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.apache.torque.criteria.Criteria;
 import org.apache.torque.map.ColumnMap;
 import org.apache.torque.om.ColumnAccessByName;
+import org.apache.torque.om.NumberKey;
+import org.apache.torque.om.ObjectKey;
 import org.apache.torque.om.Persistent;
+import org.apache.torque.om.SimpleKey;
 import org.commonlib5.lambda.PredicateThrowException;
-import org.commonlib5.utils.StringOper;
-import org.rigel5.SetupHolder;
-import org.rigel5.db.sql.QueryBuilder;
 import org.sirio5.utils.SU;
 
 /**
@@ -41,53 +40,76 @@ import org.sirio5.utils.SU;
  * NON utilizza la GlobalCache.
  *
  * @author Nicola De Nisco
- * @param <T> classe di oggetti Torque da usare come origine dei dati
+ * @param <T> Tipo di oggetti recuperati
+ * @param <O> Tipo di oggetti origine
  */
-public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Record>
+public class TableRelationCache4<T extends Persistent, O extends Persistent> extends ArrayList<T>
 {
-  private final String tableName;
-  private final Map<Integer, Record> mapValues = new HashMap<>();
+  private final Class targetPeerClass;
+  private final Method getRecords;
+  private final Method doSelect;
+  private final Map<ObjectKey, Persistent> mapValues = new HashMap<>();
 
-  public TableRelationRecordCache(String tableName)
+  public TableRelationCache4(Class cls)
   {
-    this.tableName = tableName;
+    try
+    {
+      if(!cls.getName().endsWith("Peer"))
+        throw new Exception("Deve essere un oggetto Peer.");
+
+      targetPeerClass = cls;
+      getRecords = targetPeerClass.getMethod("retrieveByPKs", Collection.class, Connection.class);
+      doSelect = targetPeerClass.getMethod("doSelect", Criteria.class, Connection.class);
+    }
+    catch(Exception ex)
+    {
+      throw new RuntimeException(ex);
+    }
   }
 
   /**
-   * Costruttore e caricatore dei dati da detail.
-   * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
-   * Gli oggetti passati devono essere detail dei master che si stanno cercando
-   * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
-   * @param lsDetails lista di oggetti da ispezionare alla ricerca di chiavi primarie
-   * @param getLinkM metodo da applicari su lsObj per estrarre la chiave primaria
-   * @param con eventuale connessione al db (può essere null)
-   * @throws Exception
-   */
-  public void loadDataFromDetail(Collection<T> lsDetails, Method getLinkM, Connection con)
-     throws Exception
-  {
-    // recupera tutte le chiavi primarie dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<>(lsDetails.size());
-
-    for(T obj : lsDetails)
-      primaryKeys.add((Integer) getLinkM.invoke(obj));
-
-    if(!primaryKeys.isEmpty())
-      loadDataFromDetail(primaryKeys, con);
-  }
-
-  /**
-   * Costruttore e caricatore dei dati da detail.
+   * Caricatore dei dati da detail.
    * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
    * Gli oggetti passati devono essere detail dei master che si stanno cercando
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
    * @param lsDettails lista di oggetti da ispezionare alla ricerca di chiavi primarie
-   * @param campoLink campo degli oggetti in lsMasters per estrarre la chiave primaria; può contentere sia il nome campo
-   * Torque oppure il nome del campo tabella (usando il prefisso PEER:): Idaccettazioni oppure PEER:ID_ACCETTAZIONI
+   * @param getLinkM metodo da applicari su lsDettails per estrarre la chiave primaria
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public void loadDataFromDetail(Collection<T> lsDettails, String campoLink, Connection con)
+  public void loadDataFromDetail(Collection<O> lsDettails, Method getLinkM, Connection con)
+     throws Exception
+  {
+    // recupera tutte le chiavi primarie dalla lista oggetti
+    HashSet<Integer> primaryKeys = new HashSet<>(lsDettails.size());
+
+    for(O obj : lsDettails)
+      primaryKeys.add((Integer) getLinkM.invoke(obj));
+
+    if(primaryKeys.isEmpty())
+      return;
+
+    List<ObjectKey> pks = primaryKeys.stream()
+       .map((i) -> SimpleKey.keyFor(i))
+       .collect(Collectors.toList());
+
+    if(!pks.isEmpty())
+      loadDataFromPrimaryKeys(pks, con);
+  }
+
+  /**
+   * Caricatore dei dati da detail.
+   * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
+   * Gli oggetti passati devono essere detail dei master che si stanno cercando
+   * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
+   * @param lsDettails lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param campoLink campo degli oggetti in lsDettails per estrarre la chiave primaria; può contentere sia il nome
+   * campo Torque oppure il nome del campo tabella (usando il prefisso PEER:): Idaccettazioni oppure
+   * PEER:ID_ACCETTAZIONI
+   * @param con eventuale connessione al db (può essere null)
+   * @throws Exception
+   */
+  public void loadDataFromDetail(Collection<O> lsDettails, String campoLink, Connection con)
      throws Exception
   {
     // recupera tutte le chiavi primarie dalla lista oggetti
@@ -96,7 +118,12 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
     if(primaryKeys.isEmpty())
       return;
 
-    loadDataFromDetail(primaryKeys, con);
+    List<ObjectKey> pks = primaryKeys.stream()
+       .map((i) -> SimpleKey.keyFor(i))
+       .collect(Collectors.toList());
+
+    if(!primaryKeys.isEmpty())
+      loadDataFromPrimaryKeys(pks, con);
   }
 
   /**
@@ -105,12 +132,12 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * @param lsDettails
    * @param primaryKeys
    */
-  protected void getKeysFromNomeCampo(Collection<T> lsDettails, String campoLink, HashSet<Integer> primaryKeys)
+  protected void getKeysFromNomeCampo(Collection<O> lsDettails, String campoLink, HashSet<Integer> primaryKeys)
   {
     if(campoLink.startsWith("PEER:"))
     {
       campoLink = campoLink.substring(5);
-      for(T obj : lsDettails)
+      for(O obj : lsDettails)
       {
         ColumnAccessByName can = (ColumnAccessByName) obj;
         primaryKeys.add((Integer) can.getByPeerName(campoLink));
@@ -118,7 +145,7 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
     }
     else
     {
-      for(T obj : lsDettails)
+      for(O obj : lsDettails)
       {
         ColumnAccessByName can = (ColumnAccessByName) obj;
         primaryKeys.add((Integer) can.getByName(campoLink));
@@ -127,81 +154,83 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
   }
 
   /**
-   * Costruttore e caricatore dei dati da detail.
+   * Caricatore dei dati da detail.
    * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
    * Gli oggetti passati devono essere detail dei master che si stanno cercando
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
-   * @param lsDetails lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param lsDettails lista di oggetti da ispezionare alla ricerca di chiavi primarie
    * @param fnMap funzione di collegamento (probabilmente una lambda expression) che ritorna l'id del detail
    * da cercare poi nel master; è la chiave esterna del detail che corrispone alla primary key del master
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public void loadDataFromDetail(Collection<T> lsDetails, Function<T, Integer> fnMap, Connection con)
+  public void loadDataFromDetail(Collection<O> lsDettails, Function<O, Integer> fnMap, Connection con)
      throws Exception
   {
     // recupera tutte le chiavi primarie dalla lista oggetti
-    HashSet<Integer> primaryKeys = new HashSet<>(lsDetails.size());
+    HashSet<Integer> primaryKeys = new HashSet<>(lsDettails.size());
 
-    for(T obj : lsDetails)
+    for(O obj : lsDettails)
+      primaryKeys.add(fnMap.apply(obj));
+
+    if(primaryKeys.isEmpty())
+      return;
+
+    List<ObjectKey> pks = primaryKeys.stream()
+       .map((i) -> SimpleKey.keyFor(i))
+       .collect(Collectors.toList());
+
+    if(!pks.isEmpty())
+      loadDataFromPrimaryKeys(pks, con);
+  }
+
+  public void loadDataFromDetail(Function<O, ObjectKey> fnMap, Collection<O> lsDettails, Connection con)
+     throws Exception
+  {
+    // recupera tutte le chiavi primarie dalla lista oggetti
+    HashSet<ObjectKey> primaryKeys = new HashSet<>(lsDettails.size());
+
+    for(O obj : lsDettails)
       primaryKeys.add(fnMap.apply(obj));
 
     if(!primaryKeys.isEmpty())
-      loadDataFromDetail(primaryKeys, con);
+      loadDataFromPrimaryKeys(primaryKeys, con);
   }
 
-  protected void loadDataFromDetail(HashSet<Integer> primaryKeys, Connection con)
+  public void loadDataFromPrimaryKeys(Collection<ObjectKey> primaryKeys, Connection con)
      throws Exception
   {
-    Schema ts = Schema.schema(con, tableName);
-    List<Column> lsPks = ts.getPrimaryKeys();
-
-    if(lsPks.size() != 1)
-      throw new Exception("Target table must have one and only one primary key.");
-    Column primaryKey = lsPks.get(0);
-    if(!primaryKey.isNumericValue())
-      throw new Exception("Target table must have one and only one primary key of numeric type.");
-
-    String pkname = primaryKey.name();
-    try (QueryBuilder qb = SetupHolder.getQueryBuilder())
-    {
-      qb.setFrom(tableName);
-      qb.setWhere(pkname + " IN (" + StringOper.join(primaryKeys.iterator(), ',') + ")");
-
-      List<Record> lsRecs = qb.executeQuery(con, true);
-      loadData(lsRecs, pkname);
-    }
+    // recupera tutti i record collegati attraverso il metodo
+    List lsValues = (List) getRecords.invoke(null, primaryKeys, con);
+    loadData(lsValues);
   }
 
   /**
-   * Costruttore e caricatore dei dati da master.
+   * Caricatore dei dati da master.
    * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
    * Gli oggetti passati devono essere master dei detail che si stanno cercando
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
    * @param nomeCampo nome del campo sulla tabella detail che collega la tabella master
    * @param lsMasters lista di oggetti da ispezionare alla ricerca di chiavi primarie
-   * @param getLinkM metodo da applicari su lsObj per estrarre la chiave primaria
+   * @param getLinkM metodo da applicari su lsMasters per estrarre la chiave primaria
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public void loadDataFromMaster(String nomeCampo, Collection<T> lsMasters, Method getLinkM, Connection con)
+  public void loadDataFromMaster(ColumnMap nomeCampo, Collection<O> lsMasters, Method getLinkM, Connection con)
      throws Exception
   {
     // recupera tutti i valori dalla lista oggetti
     HashSet<Integer> primaryKeys = new HashSet<>(lsMasters.size());
 
-    for(T oo : lsMasters)
-    {
-      Persistent obj = (Persistent) oo;
+    for(O obj : lsMasters)
       primaryKeys.add((Integer) getLinkM.invoke(obj));
-    }
 
     if(!primaryKeys.isEmpty())
-      loadDataFromMaster(nomeCampo, primaryKeys, con);
+      loadDataFromForeignKey(nomeCampo, primaryKeys, con);
   }
 
   /**
-   * Costruttore e caricatore dei dati da master.
+   * Caricatore dei dati da master.
    * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
    * Gli oggetti passati devono essere master dei detail che si stanno cercando
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
@@ -212,21 +241,18 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public void loadDataFromMaster(String tableName,
-     ColumnMap nomeCampo, Collection<T> lsMasters, String campoLink, Connection con)
+  public void loadDataFromMaster(ColumnMap nomeCampo, Collection<O> lsMasters, String campoLink, Connection con)
      throws Exception
   {
     // recupera tutti i valori dalla lista oggetti
     HashSet<Integer> primaryKeys = new HashSet<>(lsMasters.size());
     getKeysFromNomeCampo(lsMasters, campoLink, primaryKeys);
-    if(primaryKeys.isEmpty())
-      return;
-
-    loadDataFromMaster(nomeCampo.getColumnName(), primaryKeys, con);
+    if(!primaryKeys.isEmpty())
+      loadDataFromForeignKey(nomeCampo, primaryKeys, con);
   }
 
   /**
-   * Costruttore e caricatore dei dati da master.
+   * Caricatore dei dati da master.
    * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
    * Gli oggetti passati devono essere master dei detail che si stanno cercando
    * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
@@ -237,52 +263,51 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * @param con eventuale connessione al db (può essere null)
    * @throws Exception
    */
-  public void loadDataFromMaster(String nomeCampo,
-     Collection<T> lsMasters, Function<T, Integer> fnMap, Connection con)
+  public void loadDataFromMaster(ColumnMap nomeCampo, Collection<O> lsMasters,
+     Function<O, Integer> fnMap, Connection con)
      throws Exception
   {
     // recupera tutti i valori dalla lista oggetti
     HashSet<Integer> primaryKeys = new HashSet<>(lsMasters.size());
 
-    for(T obj : lsMasters)
+    for(O obj : lsMasters)
       primaryKeys.add(fnMap.apply(obj));
 
     if(!primaryKeys.isEmpty())
-      loadDataFromMaster(nomeCampo, primaryKeys, con);
+      loadDataFromForeignKey(nomeCampo, primaryKeys, con);
   }
 
-  protected void loadDataFromMaster(String nomeCampo, HashSet<Integer> primaryKeys, Connection con)
+  /**
+   * Caricatore dei dati da master.
+   * Questo costruttore è utile quando ho già selezionato le primary key del master
+   * da cercare negli oggetti detail. Questo è conveniente se devo caricare più detail
+   * da un unico insieme di master.
+   * @param nomeCampo nome del campo sulla tabella detail che collega la tabella master (nomeTabella.nomeCampo)
+   * @param primaryKeysMasters primary key del master
+   * @param con eventuale connessione al db (può essere null)
+   * @throws Exception
+   */
+  protected void loadDataFromForeignKey(ColumnMap nomeCampo, Collection<Integer> primaryKeysMasters, Connection con)
      throws Exception
   {
-    Schema ts = Schema.schema(con, tableName);
-    List<Column> lsPks = ts.getPrimaryKeys();
+    if(primaryKeysMasters.isEmpty())
+      return;
 
-    if(lsPks.size() != 1)
-      throw new Exception("Target table must have one and only one primary key.");
-    Column primaryKey = lsPks.get(0);
-    if(!primaryKey.isNumericValue())
-      throw new Exception("Target table must have one and only one primary key of numeric type.");
-
-    String pkname = primaryKey.name();
-    try (QueryBuilder qb = SetupHolder.getQueryBuilder())
-    {
-      qb.setFrom(tableName);
-      qb.setWhere(nomeCampo + " IN (" + StringOper.join(primaryKeys.iterator(), ',') + ")");
-
-      List<Record> lsRecs = qb.executeQuery(con, true);
-      loadData(lsRecs, pkname);
-    }
+    Criteria c = new Criteria();
+    c.whereIn(nomeCampo, primaryKeysMasters);
+    List lsValues = (List) doSelect.invoke(null, c, con);
+    loadData(lsValues);
   }
 
-  protected void loadData(List<Record> lsValues, String primaryKey)
+  protected void loadData(List lsValues)
      throws Exception
   {
     addAll(lsValues);
 
-    for(Record val : lsValues)
+    for(int i = 0; i < lsValues.size(); i++)
     {
-      int pk = val.getValue(primaryKey).asInt();
-      mapValues.put(pk, val);
+      Persistent val = (Persistent) lsValues.get(i);
+      mapValues.put(val.getPrimaryKey(), val);
     }
   }
 
@@ -290,28 +315,67 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * Recupera il record richiesto.
    * @param id chiave primaria
    * @return oggetto oppure null
-   * @throws Exception
    */
-  public Record findByPrimaryKey(int id)
-     throws Exception
+  public T findByPrimaryKey(int id)
   {
-    return (Record) mapValues.get(id);
+    return findByPrimaryKey(new NumberKey(id));
   }
 
-  public List<Record> extractByFieldValue(String fieldName, Object valueFilter, boolean ingoreDeleted)
-     throws Exception
+  /**
+   * Recupera il record richiesto.
+   * @param toSearch chiave primaria
+   * @return oggetto oppure null
+   */
+  public T findByPrimaryKey(ObjectKey toSearch)
   {
-    ArrayList<Record> rv = new ArrayList<>();
+    return (T) mapValues.get(toSearch);
+  }
+
+  /**
+   * Estrae tutti gli oggetti con un campo pari al valore richiesto.
+   * @param fieldName nome del campo
+   * @param valueFilter valore del viltro
+   * @param ignoreDeleted se vero ignora cancellati (StatoRec ge 10)
+   * @return lista di oggetti
+   */
+  public List<T> extractByFieldValue(String fieldName, Object valueFilter, boolean ignoreDeleted)
+  {
+    ArrayList<T> rv = new ArrayList<>();
 
     for(Iterator itr = iterator(); itr.hasNext();)
     {
       ColumnAccessByName val = (ColumnAccessByName) itr.next();
 
-      if(ingoreDeleted && SU.parse(val.getByName("StatoRec"), 0) >= 10)
+      if(ignoreDeleted && SU.parse(val.getByName("StatoRec"), 0) >= 10)
         continue;
 
       if(SU.isEqu(valueFilter, val.getByName(fieldName)))
-        rv.add((Record) val);
+        rv.add((T) val);
+    }
+
+    return rv;
+  }
+
+  /**
+   * Estrae tutti gli oggetti con un campo pari al valore richiesto.
+   * @param fieldName nome del campo
+   * @param valueFilter valore del viltro
+   * @param ignoreDeleted se vero ignora cancellati (STATO_REC ge 10)
+   * @return lista di oggetti
+   */
+  public List<T> extractByFieldValuePeerName(String fieldName, Object valueFilter, boolean ignoreDeleted)
+  {
+    ArrayList<T> rv = new ArrayList<>();
+
+    for(Iterator itr = iterator(); itr.hasNext();)
+    {
+      ColumnAccessByName val = (ColumnAccessByName) itr.next();
+
+      if(ignoreDeleted && SU.parse(val.getByName("StatoRec"), 0) >= 10)
+        continue;
+
+      if(SU.isEqu(valueFilter, val.getByPeerName(fieldName)))
+        rv.add((T) val);
     }
 
     return rv;
@@ -323,10 +387,10 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * @return oggetto o null
    * @throws Exception
    */
-  public Record findFirst(PredicateThrowException<Record> fn)
+  public T findFirst(PredicateThrowException<T> fn)
      throws Exception
   {
-    for(Record t : this)
+    for(T t : this)
     {
       if(fn.test(t))
         return t;
@@ -340,11 +404,11 @@ public class TableRelationRecordCache<T extends Persistent> extends ArrayList<Re
    * @return oggetto o null
    * @throws Exception
    */
-  public Record findLast(PredicateThrowException<Record> fn)
+  public T findLast(PredicateThrowException<T> fn)
      throws Exception
   {
-    Record rv = null;
-    for(Record t : this)
+    T rv = null;
+    for(T t : this)
     {
       if(fn.test(t))
         rv = t;

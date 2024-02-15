@@ -38,6 +38,7 @@ import org.sirio5.utils.SU;
  *
  * @author Nicola De Nisco
  * @param <T>
+ * @deprecated usa TableRelationCache2, TableRelationCache3, TableRelationCache4
  */
 public class TableRelationCache<T extends Persistent> extends ArrayList<T>
 {
