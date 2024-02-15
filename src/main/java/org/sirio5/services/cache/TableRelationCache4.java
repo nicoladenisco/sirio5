@@ -51,14 +51,20 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
   private final Map<ObjectKey, Persistent> mapValues = new HashMap<>();
 
   public TableRelationCache4(Class cls)
-     throws Exception
   {
-    if(!cls.getName().endsWith("Peer"))
-      throw new Exception("Deve essere un oggetto Peer.");
+    try
+    {
+      if(!cls.getName().endsWith("Peer"))
+        throw new Exception("Deve essere un oggetto Peer.");
 
-    targetPeerClass = cls;
-    getRecords = targetPeerClass.getMethod("retrieveByPKs", Collection.class, Connection.class);
-    doSelect = targetPeerClass.getMethod("doSelect", Criteria.class, Connection.class);
+      targetPeerClass = cls;
+      getRecords = targetPeerClass.getMethod("retrieveByPKs", Collection.class, Connection.class);
+      doSelect = targetPeerClass.getMethod("doSelect", Criteria.class, Connection.class);
+    }
+    catch(Exception ex)
+    {
+      throw new RuntimeException(ex);
+    }
   }
 
   /**
