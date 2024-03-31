@@ -35,7 +35,6 @@ import org.apache.fulcrum.cache.CachedObject;
 import org.apache.fulcrum.security.util.DataBackendException;
 import org.apache.fulcrum.security.util.UnknownEntityException;
 import org.apache.turbine.om.security.User;
-import org.apache.turbine.services.security.SecurityService;
 import org.commonlib5.crypto.KeyUtils;
 import org.commonlib5.crypto.RSAEncryptUtils;
 import org.commonlib5.io.ByteBufferInputStream;
@@ -223,13 +222,35 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     if(!allowAnonimousLogon && !allowDebugLogon)
       throw new TokenAuthFailureException(INT.I("Login anonimo non permesso: occorre una sessione oppure utente e password."));
 
-    SecurityService sec = (SecurityService) getServiceBroker().getService(SecurityService.SERVICE_NAME);
-
-    User tu = (User) sec.getUser(anonUser);
+    User tu = SEC.getUser(anonUser);
     if(tu == null)
       throw new TokenAuthFailureException(INT.I("Utente per login anonimo non impostato a setup."));
 
     return addClient(anonUser, tu.getPassword(), expireAction);
+  }
+
+  @Override
+  public TokenAuthItem addClient(User user, ActionListener expireAction)
+     throws Exception
+  {
+    // verifica se esiste già un token associato all'utente e lo ritorna
+    String uName = user.getName();
+    Iterator<CachedObject> itObj = CACHE.cachedObjects(TOKEN_AUTH_CACHE_CLASS);
+    while(itObj.hasNext())
+    {
+      TokenCachedObject c = (TokenCachedObject) itObj.next();
+      TokenAuthItem t = (TokenAuthItem) c.getContents();
+      if(t.getUsr() == null)
+        continue;
+
+      if(SU.isEqu(uName, t.getUsr().getName()))
+      {
+        c.refreshEntry();
+        return t;
+      }
+    }
+
+    return saveUserToken(user, expireAction);
   }
 
   /**
@@ -258,13 +279,11 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
       }
     }
 
-    SecurityService sec = (SecurityService) getServiceBroker().getService(SecurityService.SERVICE_NAME);
-
     User usr = SEC.loginUser(uName, uPass, null);
     if(usr == null && allowMagicLogon && usersMagicAllowed.contains(uName))
     {
       // effettua un altro tentativo con il token speciale
-      if((usr = sec.getUser(uName)) == null)
+      if((usr = SEC.getUser(uName)) == null)
         throw new TokenAuthFailureException(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
 
       String shHash = CommonFileUtils.calcolaHashStringa(
@@ -276,10 +295,10 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     if(usr == null)
       throw new TokenAuthFailureException(INT.I("Utente sconosciuto. Rivedere nome e/o password."));
 
-    return saveUserToken(usr, sec, expireAction);
+    return saveUserToken(usr, expireAction);
   }
 
-  protected TokenAuthItem saveUserToken(User usr, SecurityService sec, ActionListener expireAction)
+  protected TokenAuthItem saveUserToken(User usr, ActionListener expireAction)
      throws UnknownEntityException, DataBackendException
   {
     TokenAuthItem item = new TokenAuthItem();
@@ -287,7 +306,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     item.setUserID(SU.parseInt(usr.getId()));
     String s = generaIdCliente();
     item.setIdClient(s);
-    item.setAcl(sec.getACL(usr));
+    item.setAcl(SEC.getACL(usr));
     CACHE.addObject(TOKEN_AUTH_CACHE_CLASS, s, new TokenCachedObject(item, tExpiries, expireAction));
     return item;
   }
@@ -296,8 +315,6 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
   public synchronized TokenAuthItem addClient(String sessionID, ActionListener expireAction)
      throws Exception
   {
-    SecurityService sec = (SecurityService) getServiceBroker().getService(SecurityService.SERVICE_NAME);
-
     // verifica se esiste già un token associato alla sessione lo ritorna
     Iterator<CachedObject> enObj = CACHE.cachedObjects(TOKEN_AUTH_CACHE_CLASS);
     while(enObj.hasNext())
@@ -317,7 +334,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     if(allowDebugLogon && sessionID.startsWith(LOGIN_DEBUG_SESSIONID + ":"))
     {
       String userName = sessionID.substring(12);
-      User tu = (User) sec.getUser(userName);
+      User tu = (User) SEC.getUser(userName);
       if(tu == null)
         throw new TokenExpiredException(INT.I("Utente per login anonimo non valido."));
       return addClient(userName, tu.getPassword(), expireAction);
@@ -330,7 +347,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     // recupera l'utente tramite userId
     User tu = SEC.getUser(bean.getUserId());
 
-    TokenAuthItem item = saveUserToken(tu, sec, expireAction);
+    TokenAuthItem item = saveUserToken(tu, expireAction);
     item.setSession(sessionID);
     return item;
   }

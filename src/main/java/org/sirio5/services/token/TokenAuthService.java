@@ -20,6 +20,7 @@ package org.sirio5.services.token;
 import java.awt.event.ActionListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.turbine.om.security.User;
 import org.json.JSONObject;
 import org.sirio5.services.CoreServiceExtension;
 
@@ -67,6 +68,16 @@ public interface TokenAuthService extends CoreServiceExtension
    * @throws Exception
    */
   public TokenAuthItem addClient(ActionListener expireAction)
+     throws Exception;
+
+  /**
+   * Aggiunge un utente con identità già verificata.
+   * @param user utente per il quale creare il token
+   * @param expireAction eventuale azione da intraprendere allo scadere del token (può essere null)
+   * @return il token per l'utente
+   * @throws Exception
+   */
+  public TokenAuthItem addClient(User user, ActionListener expireAction)
      throws Exception;
 
   /**

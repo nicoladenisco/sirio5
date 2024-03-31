@@ -170,9 +170,20 @@ public class SEC
   }
 
   public static User getAnonymousUser()
-     throws UnknownEntityException
   {
-    return getTurbineSecurity().getAnonymousUser();
+    try
+    {
+      return getTurbineSecurity().getAnonymousUser();
+    }
+    catch(UnknownEntityException ex)
+    {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  public static User getTurbineUser()
+  {
+    return getUser(0);
   }
 
   public static int getRoleID(Role rl)

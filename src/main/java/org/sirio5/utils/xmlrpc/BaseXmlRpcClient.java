@@ -153,7 +153,7 @@ public class BaseXmlRpcClient
   {
     // scaricamento del file zip
     URL u = getURL();
-    String s = u.toString().replace("RPC2", "cache/" + ticket);
+    String s = u.toString().replaceAll("RPC[0-9]+", "cache/" + ticket);
     CommonFileUtils.readUrlToFile(new URL(s), toSave, lol);
   }
 
@@ -184,7 +184,7 @@ public class BaseXmlRpcClient
      throws Exception
   {
     // tenta di connettersi alla porta XML-RPC del master
-    try ( Socket s = new Socket(server, port))
+    try (Socket s = new Socket(server, port))
     {
       return s.getLocalAddress();
     }
