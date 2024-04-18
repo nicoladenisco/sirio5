@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 import org.apache.commons.lang.mutable.MutableDouble;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.logging.Log;
@@ -215,12 +216,34 @@ public class SU extends StringOper
         htParam.put(name, value[0]);
       else
         htParam.put(name, value);
-
-      // NOTA: nelle versioni precedenti qui venivano passati i file items;
-      // in Turbine 5 la gestione dei files allegati è molto diversa
-      // vedi data.getParameters().getParts()
     }
+
+    try
+    {
+      for(int i = 0; i < keys.length; i++)
+      {
+        String name = (String) keys[i];
+        Part filePart = data.getRequest().getPart(name);
+        if(filePart != null && isFilePart(filePart))
+          htParam.put("filepart_" + name, filePart);
+      }
+    }
+    catch(Exception ex)
+    {
+      if(!ex.getMessage().contains("InvalidContentTypeException"))
+        log.error("Error in parsing parts.", ex);
+    }
+
     return htParam;
+  }
+
+  public static boolean isFilePart(Part part)
+  {
+    // Ottieni il tipo di contenuto della parte
+    String contentType = part.getContentType();
+
+    // Questo indica che la parte è un file
+    return contentType != null;
   }
 
   public static Object removeParam(HttpSession session, String key)

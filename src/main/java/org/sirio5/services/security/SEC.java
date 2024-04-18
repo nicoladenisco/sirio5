@@ -31,6 +31,7 @@ import org.apache.turbine.om.security.User;
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.security.SecurityService;
 import org.apache.turbine.util.RunData;
+import org.commonlib5.utils.Pair;
 import org.sirio5.utils.SU;
 
 /**
@@ -167,6 +168,14 @@ public class SEC
      throws DataBackendException, UnknownEntityException
   {
     return getTurbineSecurity().getUser(username);
+  }
+
+  public static Pair<User, TurbineAccessControlList> getUserAndAcl(int userid)
+     throws DataBackendException, UnknownEntityException
+  {
+    User user = getUser(userid);
+    TurbineAccessControlList acl = getACL(user);
+    return new Pair<>(user, acl);
   }
 
   public static User getAnonymousUser()
