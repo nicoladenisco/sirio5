@@ -209,6 +209,16 @@ abstract public class AbstractCoreSecurity extends BaseService
     return acl == null ? false : acl.hasRole(ADMIN_ROLE);
   }
 
+  public boolean isAdmin(User user, TurbineAccessControlList acl)
+  {
+    // utente con id == 0 è amministratore (turbine)
+    if(getUserID(user) == 0)
+      return true;
+
+    // tutti gli utenti che hanno il ruolo turbine_root
+    return acl == null ? false : acl.hasRole(ADMIN_ROLE);
+  }
+
   /**
    * Recupera lista permessi dalla sessione.
    * @param session sessione con i dati dell'utente

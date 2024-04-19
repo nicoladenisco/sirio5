@@ -233,6 +233,17 @@ public class SEC
   }
 
   /**
+   * Verifica se utente corrente è amministratore.
+   * @param user
+   * @param acl
+   * @return vero se amministratore
+   */
+  public static boolean isAdmin(User user, TurbineAccessControlList acl)
+  {
+    return getSirioSecurity().isAdmin(user, acl);
+  }
+
+  /**
    * Recupera lista permessi dalla sessione.
    * @param session sessione con i dati dell'utente
    * @return lista permessi o null

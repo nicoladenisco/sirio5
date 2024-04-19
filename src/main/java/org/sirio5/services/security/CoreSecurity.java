@@ -130,6 +130,14 @@ public interface CoreSecurity extends Service
   public boolean isAdmin(HttpSession session);
 
   /**
+   * Verifica se utente corrente è amministratore.
+   * @param user
+   * @param acl
+   * @return vero se amministratore
+   */
+  public boolean isAdmin(User user, TurbineAccessControlList acl);
+
+  /**
    * Salvataggio automatico permessi non presenti.
    * @param permessi lista di permessi separati da ',;' o spazio
    */
