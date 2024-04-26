@@ -81,6 +81,7 @@ public class BusContext extends SirioGenericContext
     appendPair(params);
   }
 
+  @Override
   public BusContext appendPair(Object... params)
   {
     Map m = ArrayOper.asMapFromPair(params);
