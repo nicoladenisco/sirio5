@@ -29,6 +29,8 @@ import org.apache.torque.om.NumberKey;
 import org.apache.torque.om.ObjectKey;
 import org.apache.torque.om.Persistent;
 import org.apache.torque.om.SimpleKey;
+import org.commonlib5.lambda.ConsumerThrowException;
+import org.commonlib5.lambda.FunctionTrowException;
 import org.commonlib5.lambda.PredicateThrowException;
 import org.sirio5.utils.SU;
 
@@ -414,5 +416,45 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
         rv = t;
     }
     return rv;
+  }
+
+  /**
+   * Esegue sul primo oggetto che soddisfa il filtro.
+   * @param fn espressione lambda del filtro
+   * @param call azione da intraprendere
+   * @return oggetto che ha ricevuto l'azione o null
+   * @throws Exception
+   */
+  public T findFirstExecute(PredicateThrowException<T> fn, ConsumerThrowException<T> call)
+     throws Exception
+  {
+    for(T t : this)
+    {
+      if(fn.test(t))
+      {
+        call.accept(t);
+        return t;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Esegue sul primo oggetto che soddisfa il filtro.
+   * @param <V> tipo di ritorno azione
+   * @param fn espressione lambda del filtro
+   * @param call azione da intraprendere
+   * @return oggetto che ha ricevuto l'azione o null
+   * @throws Exception
+   */
+  public <V> V findFirstFunction(PredicateThrowException<T> fn, FunctionTrowException<T, V> call)
+     throws Exception
+  {
+    for(T t : this)
+    {
+      if(fn.test(t))
+        return call.apply(t);
+    }
+    return null;
   }
 }
