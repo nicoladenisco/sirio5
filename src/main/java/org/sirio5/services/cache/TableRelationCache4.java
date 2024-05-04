@@ -24,6 +24,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.torque.criteria.Criteria;
 import org.apache.torque.map.ColumnMap;
+import org.apache.torque.map.ForeignKeyMap;
+import org.apache.torque.map.TableMap;
 import org.apache.torque.om.ColumnAccessByName;
 import org.apache.torque.om.NumberKey;
 import org.apache.torque.om.ObjectKey;
@@ -32,6 +34,7 @@ import org.apache.torque.om.SimpleKey;
 import org.commonlib5.lambda.ConsumerThrowException;
 import org.commonlib5.lambda.FunctionTrowException;
 import org.commonlib5.lambda.PredicateThrowException;
+import org.rigel5.db.torque.TableMapHelper;
 import org.sirio5.utils.SU;
 
 /**
@@ -50,6 +53,7 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
   private final Class targetPeerClass;
   private final Method getRecords;
   private final Method doSelect;
+  private final Method getTableMap;
   private final Map<ObjectKey, Persistent> mapValues = new HashMap<>();
 
   public TableRelationCache4(Class cls)
@@ -62,6 +66,7 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
       targetPeerClass = cls;
       getRecords = targetPeerClass.getMethod("retrieveByPKs", Collection.class, Connection.class);
       doSelect = targetPeerClass.getMethod("doSelect", Criteria.class, Connection.class);
+      getTableMap = targetPeerClass.getMethod("getTableMap");
     }
     catch(Exception ex)
     {
@@ -97,6 +102,43 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
 
     if(!pks.isEmpty())
       loadDataFromPrimaryKeys(pks, con);
+  }
+
+  /**
+   * Caricatore dei dati da detail.
+   * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
+   * Gli oggetti passati devono essere detail dei master che si stanno cercando
+   * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
+   * @param lsDettails lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param con eventuale connessione al db (può essere null)
+   * @throws Exception
+   */
+  public void loadDataFromDetailAuto(Collection<O> lsDettails, Connection con)
+     throws Exception
+  {
+    if(lsDettails.isEmpty())
+      return;
+
+    TableMap tm = (TableMap) getTableMap.invoke(null);
+    String masterTableName = tm.getName();
+
+    O primo = lsDettails.iterator().next();
+    TableMapHelper tmDettail = TableMapHelper.getByObject(primo);
+
+    for(ForeignKeyMap fkm : tmDettail.getTmap().getForeignKeys())
+    {
+      if(fkm.getForeignTableName().equals(masterTableName))
+      {
+        if(fkm.getColumns().size() != 1)
+          throw new Exception("troppe colonne in chiave esterna: solo una supportata");
+
+        ForeignKeyMap.ColumnPair colonne = fkm.getColumns().get(0);
+        loadDataFromDetail(lsDettails, colonne.getLocal().getJavaName(), con);
+        return;
+      }
+    }
+
+    throw new Exception("nessuna chiave esterna disponibile");
   }
 
   /**
@@ -205,6 +247,44 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
     // recupera tutti i record collegati attraverso il metodo
     List lsValues = (List) getRecords.invoke(null, primaryKeys, con);
     loadData(lsValues);
+  }
+
+  /**
+   * Caricatore dei dati da master.
+   * Carica in memoria tutti gli oggetti collegati all'array passato come parametro.
+   * Gli oggetti passati devono essere master dei detail che si stanno cercando
+   * (ES: da una lista di accettazioni voglio ottenere le corrispondenti anagrafiche).
+   * Questa versione usa la tablemap per determinare automaticamente la relazione
+   * ovvero la chiave esterna fra le due tabelle.
+   * @param lsMasters lista di oggetti da ispezionare alla ricerca di chiavi primarie
+   * @param con eventuale connessione al db (può essere null)
+   * @throws Exception
+   */
+  public void loadDataFromMasterAuto(Collection<O> lsMasters, Connection con)
+     throws Exception
+  {
+    if(lsMasters.isEmpty())
+      return;
+
+    O primo = lsMasters.iterator().next();
+    TableMapHelper tmMaster = TableMapHelper.getByObject(primo);
+    String masterTableName = tmMaster.getNomeTabella();
+
+    TableMap tm = (TableMap) getTableMap.invoke(null);
+    for(ForeignKeyMap fkm : tm.getForeignKeys())
+    {
+      if(fkm.getForeignTableName().equals(masterTableName))
+      {
+        if(fkm.getColumns().size() != 1)
+          throw new Exception("troppe colonne in chiave esterna: solo una supportata");
+
+        ForeignKeyMap.ColumnPair colonne = fkm.getColumns().get(0);
+        loadDataFromMaster(colonne.getLocal(), lsMasters, colonne.getForeign().getJavaName(), con);
+        return;
+      }
+    }
+
+    throw new Exception("Nessuna chiave esterna disponibile.");
   }
 
   /**
