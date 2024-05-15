@@ -621,4 +621,10 @@ public class CoreRunData extends DefaultTurbineRunData
     err.forEach((s) -> arTrans.add(i18n(s)));
     ErrorMessageException.throwErrorMessageException(arTrans);
   }
+
+  public void addMessagei18nBR(String key, Object... params)
+  {
+    addMessagei18n(key, params);
+    addMessage("<br>");
+  }
 }
