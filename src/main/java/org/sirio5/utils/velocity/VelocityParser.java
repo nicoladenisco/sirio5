@@ -27,6 +27,8 @@ package org.sirio5.utils.velocity;
 
 import java.io.*;
 import org.apache.turbine.Turbine;
+import org.apache.turbine.services.TurbineServices;
+import org.apache.turbine.services.velocity.VelocityService;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.event.EventCartridge;
@@ -187,5 +189,12 @@ public class VelocityParser
   {
     Template template = createTemplateFromReader(reader, templateName);
     mergeTemplate(template, writer);
+  }
+
+  public static Context createNewContext()
+  {
+    VelocityService velocity = (VelocityService) TurbineServices
+       .getInstance().getService(VelocityService.SERVICE_NAME);
+    return velocity.getNewContext();
   }
 }
