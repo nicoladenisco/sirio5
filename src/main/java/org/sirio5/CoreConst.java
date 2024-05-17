@@ -19,6 +19,7 @@ package org.sirio5;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.sirio5.services.token.TokenAuthItem;
@@ -136,9 +137,11 @@ public class CoreConst
 
   public static final String MIME_BINARY = "application/binary";
 
+  public final static String MIME_PDFA = "application/pdf+text/x-cda-r2+xml"; //TipoMime CDA Tabella 2.11-1 AffinityDomain
+
   public final static String[] MIME_PDFs =
   {
-    MIME_PDF, EXT_PDF
+    MIME_PDF, EXT_PDF, MIME_PDFA
   };
 
   public static final String[] MIME_IMAGES =
@@ -156,6 +159,7 @@ public class CoreConst
   public static final String CLEAR_FORM_DATA = "abbandona";
   public static final String CLOSE_EDIT = "chiudi";
   public static final String DELETE_RECORD = "cancella";
+  public static final String LEAVE_EDIT = "abbandona";
 
   public static final String M_DEF_LIST = "clifor";
 
@@ -211,4 +215,17 @@ public class CoreConst
 
   /** Chiave di setup per path alternativa dove reperire i modelli per i tools */
   public static final String TOOL_RENDER_MODEL_PATH = "toolRender.model.path";
+
+  public static final Date[] EMPTY_DATE_ARRAY = new Date[]
+  {
+  };
+  public static final String[] EMPTY_STRING_ARRAY = new String[]
+  {
+  };
+  public static final int[] EMPTY_INT_ARRAY = new int[]
+  {
+  };
+  public static final long[] EMPTY_LONG_ARRAY = new long[]
+  {
+  };
 }

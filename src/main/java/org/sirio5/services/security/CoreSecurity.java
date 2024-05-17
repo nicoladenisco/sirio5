@@ -40,11 +40,14 @@ public interface CoreSecurity extends Service
   public static final String ADMIN_ROLE = "turbine_root";
   public static final String SVILUPPO_NAME = "sviluppo";
   public static final String INFOMED_NAME = "infomed";
+  public static final String GLOBAL_GROUP_NAME = "global";
   public static final String SVILUPPO_GROUP_NAME = "Sviluppo";
   public static final String ASSISTENZA_GROUP_NAME = "Assistenza";
+  //
   public static final String ALL_PERMISSION_CACHE_KEY = "ALL_PERMISSION_CACHE_KEY";
   //
   public static final String CREAZIONE_PASSWORD = "creazionePassword";
+
   public static final int PASS_CHECK_OK = 0;
   public static final int PASS_CHECK_STRONG = 1;
   public static final int PASS_CHECK_SHORT = 2;
