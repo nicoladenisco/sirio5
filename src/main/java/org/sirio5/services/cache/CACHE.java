@@ -144,6 +144,18 @@ public class CACHE
    * Adds a content to the cache.
    * The content will be wrapped in a CachedObject instance.
    *
+   * @param id The String id for the object.
+   * @param content The content to add to the cache.
+   */
+  public static void addContent(String id, Object content)
+  {
+    getService().addObject(id, new CachedObject(content));
+  }
+
+  /**
+   * Adds a content to the cache.
+   * The content will be wrapped in a CachedObject instance.
+   *
    * @param objClass classe degli oggetti
    * @param id The String id for the object.
    * @param content The content to add to the cache.
