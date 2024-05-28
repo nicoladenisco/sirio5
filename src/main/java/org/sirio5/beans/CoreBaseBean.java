@@ -24,6 +24,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.turbine.Turbine;
+import org.apache.turbine.services.Service;
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.pull.PullService;
 import org.apache.turbine.services.pull.tools.UITool;
@@ -149,7 +150,7 @@ public class CoreBaseBean implements HttpSessionBindingListener
     this.currJspName = currJspName;
   }
 
-  public <T> T getService(String serviceName)
+  public <T extends Service> T getService(String serviceName)
   {
     return (T) TurbineServices.getInstance().getService(serviceName);
   }
@@ -226,6 +227,11 @@ public class CoreBaseBean implements HttpSessionBindingListener
   }
 
   public void clearBoolean()
+     throws Exception
+  {
+  }
+
+  public void readParams(Map params)
      throws Exception
   {
   }
