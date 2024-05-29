@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+In Turbine 4 e successivi vengono usati componenti avalon.
+Inserire questo estratto nel corrispondente 'role-list' nel progetto turbine.
+I componenti già registrati (name="...") vanno disattivati.
+-->
+
+<role-list>
+  <role
+    name="org.apache.fulcrum.cache.GlobalCacheService"
+    shorthand="cache"
+    default-class="org.sirio5.services.cache.CoreGlobalCacheService"/>
+  <role
+    name="org.apache.fulcrum.localization.LocalizationService"
+    shorthand="localization"
+    default-class="org.sirio5.services.localization.CoreLocalizationService"/>
+</role-list>
+
