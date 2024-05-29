@@ -776,7 +776,7 @@ public class CoreCacheImp implements CoreCacheServices
   }
 
   @Override
-  public List<CachedObject> getCachedObjects()
+  public List<CachedObject<?>> getCachedObjects()
   {
     Map<String, CachedObject> cache = getCache(GENERIC_OBJ_CLASS);
     return new ArrayList(cache.values());
