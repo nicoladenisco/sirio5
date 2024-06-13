@@ -17,8 +17,9 @@
  */
 package org.sirio5.utils.xmlrpc;
 
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.commonlib5.utils.Pair;
 import org.commonlib5.xmlrpc.FileTransfer;
 import org.sirio5.beans.BeanFactory;
@@ -56,12 +57,12 @@ public class BaseXmlRpcServerFileTransfer extends BaseXmlRpcServerUserAuth
   }
 
   @Override
-  final public Vector getFileBlockCRC32(String clientID, String idFile, int block)
+  final public List getFileBlockCRC32(String clientID, String idFile, int block)
      throws Exception
   {
     TokenAuthItem token = getClient(clientID);
     Pair<Long, byte[]> dt = getHelper(token).getFileBlockCRC32(idFile, block);
-    Vector rv = new Vector();
+    List rv = new ArrayList();
     rv.add((double) dt.first);
     rv.add(dt.second);
     return rv;
@@ -92,14 +93,14 @@ public class BaseXmlRpcServerFileTransfer extends BaseXmlRpcServerUserAuth
   }
 
   @Override
-  public Hashtable preparaDownload(String clientID, Hashtable dati, int suggestBlockSize)
+  public Map preparaDownload(String clientID, Map dati, int suggestBlockSize)
      throws Exception
   {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
-  final public Hashtable preparaUpload(String clientID, Hashtable dati, int suggestBlockSize)
+  final public Map preparaUpload(String clientID, Map dati, int suggestBlockSize)
      throws Exception
   {
     TokenAuthItem token = getClient(clientID);

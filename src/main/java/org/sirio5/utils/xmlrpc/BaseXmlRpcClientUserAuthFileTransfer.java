@@ -16,8 +16,8 @@ package org.sirio5.utils.xmlrpc;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.List;
+import java.util.Map;
 import org.commonlib5.utils.Pair;
 import org.commonlib5.xmlrpc.FileTransfer;
 
@@ -42,17 +42,17 @@ public class BaseXmlRpcClientUserAuthFileTransfer extends BaseXmlRpcClientUserAu
   }
 
   @Override
-  public Hashtable preparaDownload(String clientID, Hashtable dati, int suggestBlockSize)
+  public Map preparaDownload(String clientID, Map dati, int suggestBlockSize)
      throws Exception
   {
-    return (Hashtable) call("preparaDownload", clientID, dati, suggestBlockSize);
+    return (Map) call("preparaDownload", clientID, dati, suggestBlockSize);
   }
 
   @Override
-  public Hashtable preparaUpload(String clientID, Hashtable dati, int suggestBlockSize)
+  public Map preparaUpload(String clientID, Map dati, int suggestBlockSize)
      throws Exception
   {
-    return (Hashtable) call("preparaUpload", clientID, dati, suggestBlockSize);
+    return (Map) call("preparaUpload", clientID, dati, suggestBlockSize);
   }
 
   /**
@@ -93,11 +93,11 @@ public class BaseXmlRpcClientUserAuthFileTransfer extends BaseXmlRpcClientUserAu
   }
 
   @Override
-  public Vector getFileBlockCRC32(String clientID, String idFile, int block)
+  public List getFileBlockCRC32(String clientID, String idFile, int block)
      throws Exception
   {
     ASSERT(idFile != null, "idFile != null");
-    return (Vector) call("getFileBlockCRC32", clientID, idFile, block);
+    return (List) call("getFileBlockCRC32", clientID, idFile, block);
   }
 
   /**
@@ -113,7 +113,7 @@ public class BaseXmlRpcClientUserAuthFileTransfer extends BaseXmlRpcClientUserAu
   public Pair<Long, byte[]> getFileBlockCRC32(String idFile, int block)
      throws Exception
   {
-    Vector vget = getFileBlockCRC32(idClient, idFile, block);
+    List vget = getFileBlockCRC32(idClient, idFile, block);
     Double checksum = (Double) vget.get(0);
     return new Pair<>(checksum.longValue(), (byte[]) vget.get(1));
   }
@@ -217,7 +217,7 @@ public class BaseXmlRpcClientUserAuthFileTransfer extends BaseXmlRpcClientUserAu
    * @return id dell'operazione da utilizzare in chiamate successive
    * @throws Exception
    */
-  public String uploadLoopGenerico(Hashtable pup, File tmpFile)
+  public String uploadLoopGenerico(Map pup, File tmpFile)
      throws Exception
   {
     return uploadFileStandardLoop(idClient, pup, tmpFile, null);
@@ -230,7 +230,7 @@ public class BaseXmlRpcClientUserAuthFileTransfer extends BaseXmlRpcClientUserAu
    * @return id dell'operazione da utilizzare in chiamate successive
    * @throws Exception
    */
-  public String downloadLoopGenerico(Hashtable pup, File tmpFile)
+  public String downloadLoopGenerico(Map pup, File tmpFile)
      throws Exception
   {
     return downloadFileStandardLoop(idClient, pup, tmpFile, null);
