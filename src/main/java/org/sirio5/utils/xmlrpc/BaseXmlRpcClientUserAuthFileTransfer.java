@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import org.commonlib5.utils.Pair;
 import org.commonlib5.xmlrpc.FileTransfer;
+import org.commonlib5.xmlrpc.FileTransferLoop;
 
 /**
  * Classe base dei client con autenticazione e trasferimento files.
@@ -220,7 +221,8 @@ public class BaseXmlRpcClientUserAuthFileTransfer extends BaseXmlRpcClientUserAu
   public String uploadLoopGenerico(Map pup, File tmpFile)
      throws Exception
   {
-    return uploadFileStandardLoop(idClient, pup, tmpFile, null);
+    FileTransferLoop loop = new FileTransferLoop(this);
+    return loop.uploadFileStandardLoop(idClient, pup, tmpFile, null);
   }
 
   /**
@@ -233,6 +235,7 @@ public class BaseXmlRpcClientUserAuthFileTransfer extends BaseXmlRpcClientUserAu
   public String downloadLoopGenerico(Map pup, File tmpFile)
      throws Exception
   {
-    return downloadFileStandardLoop(idClient, pup, tmpFile, null);
+    FileTransferLoop loop = new FileTransferLoop(this);
+    return loop.downloadFileStandardLoop(idClient, pup, tmpFile, null);
   }
 }
