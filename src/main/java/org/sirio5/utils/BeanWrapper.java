@@ -711,9 +711,18 @@ public class BeanWrapper
   public int importFrom(Object obj, boolean ignoreNull)
      throws Exception
   {
+    return importFrom(obj, ignoreNull, null);
+  }
+
+  public int importFrom(Object obj, boolean ignoreNull, String... ignoreFields)
+     throws Exception
+  {
     int count = 0;
     Class objClass = obj.getClass();
     PropertyDescriptor[] pObj = Introspector.getBeanInfo(objClass).getPropertyDescriptors();
+
+    if(ignoreFields != null)
+      Arrays.sort(ignoreFields);
 
     for(int i = 0; i < pObj.length; i++)
     {
@@ -723,7 +732,11 @@ public class BeanWrapper
         Method lgetter = ps.getReadMethod();
         if(lgetter != null)
         {
-          PropertyDescriptor po = (PropertyDescriptor) htProp.get(ps.getName().toLowerCase());
+          final String pName = ps.getName().toLowerCase();
+          if(ignoreFields != null && Arrays.binarySearch(ignoreFields, pName) >= 0)
+            continue;
+
+          PropertyDescriptor po = (PropertyDescriptor) htProp.get(pName);
           if(po != null && !(po instanceof IndexedPropertyDescriptor))
           {
             Method lsetter = po.getWriteMethod();
