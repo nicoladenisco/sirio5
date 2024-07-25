@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -21,6 +21,8 @@ import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParsePosition;
 import org.apache.commons.lang.StringUtils;
+import org.jdom2.Element;
+import org.sirio5.utils.SU;
 
 /**
  * Fromattatore per stringhe per un massimo di 32 caratteri.
@@ -29,16 +31,38 @@ import org.apache.commons.lang.StringUtils;
  */
 public class Max32StringFormatter extends Format
 {
+  protected int maxLen = 32;
+  protected boolean removeHtml;
+
+  public Max32StringFormatter(Element xml)
+  {
+    String tmp = xml.getAttributeValue("len");
+    if(tmp == null)
+      tmp = xml.getAttributeValue("maxlen");
+
+    maxLen = SU.parse(tmp, maxLen);
+
+    tmp = xml.getAttributeValue("removeHtml");
+    removeHtml = SU.checkTrueFalse(tmp, removeHtml);
+  }
+
   public int getMaxLen()
   {
-    return 32;
+    return maxLen;
   }
 
   @Override
   public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos)
   {
     if(obj != null)
-      toAppendTo.append(StringUtils.abbreviate(obj.toString(), getMaxLen()));
+    {
+      String s = obj.toString();
+      if(removeHtml)
+        s = purgeHtml(s);
+
+      toAppendTo.append(StringUtils.abbreviate(s, getMaxLen()));
+    }
+
     return toAppendTo;
   }
 
@@ -47,5 +71,10 @@ public class Max32StringFormatter extends Format
   {
     pos.setIndex(source.length());
     return source;
+  }
+
+  public String purgeHtml(String s)
+  {
+    return s.replaceAll("(<([^>]+)>)", "");
   }
 }

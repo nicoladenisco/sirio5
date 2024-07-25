@@ -52,7 +52,10 @@ public class CoreBaseActionDoPerform extends CoreBaseAction
     {
       Map params = null;
       if(!ignoreCommands.contains(command))
+      {
         params = SU.getParMap(data);
+        bean.readParams(params);
+      }
 
       bean.doCommand(command, data, params, context);
       this.doCommand(command, data, params, context, bean);
