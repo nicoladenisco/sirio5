@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.commonlib5.utils.JsonHelper;
@@ -41,6 +42,7 @@ public class GoogleTranslate
   private File credFile;
   private static final String SCOPE = "https://www.googleapis.com/auth/cloud-platform";
   private static final Logger logger = Logger.getLogger(GoogleTranslate.class.getName());
+  public static final int MAX_NUM_STRINGHE = 128;
 
   public GoogleTranslate(File credFile)
   {
@@ -88,6 +90,7 @@ public class GoogleTranslate
     URI uri = new URI("https://translation.googleapis.com/language/translate/v2");
     JsonHelper jh = new JsonHelper(uri);
     jh.addToHeader("Authorization", "Bearer " + token);
+    jh.setWrapException(true);
     return jh.postAsJson(request);
   }
 
@@ -104,6 +107,9 @@ public class GoogleTranslate
   public void traduci(List<Pair<String, String>> testi, String linguaOrigine, String linguaDestinazione, String formatoTesto)
      throws Exception
   {
+    if(testi.size() > MAX_NUM_STRINGHE)
+      throw new IOException("String list size exced max allowed (request=" + testi.size() + " max=" + MAX_NUM_STRINGHE + ").");
+
     AccessToken accessToken = autorizza();
     String token = accessToken.getTokenValue();
     List<String> listaStringhe = testi.stream().map((p) -> p.first).collect(Collectors.toList());
@@ -117,7 +123,12 @@ public class GoogleTranslate
     Pair<Integer, JSONObject> response = chiama(token, request);
 
     if(response.first != 200)
+    {
+      if(response.second != null)
+        logger.log(Level.SEVERE, "Server returned invalid HTTP response code (" + response.first + "):\n" + response.second);
+
       throw new IOException("Return value " + response.first + " not valid; must be 200.");
+    }
 
     JSONArray arTradotto = response.second
        .getJSONObject("data")
