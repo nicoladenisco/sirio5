@@ -80,7 +80,8 @@ public class COMMLOG
     commLog(ServAllarmi.TIPALLARME_FATAL, serv, comp, msg, vis, note, info);
   }
 
-  public static void commLog(String severity, String servizio, String componente, String messaggio, int visibilita, String note, String... info)
+  public static void commLog(String severity, String servizio, String componente,
+     String messaggio, int visibilita, String note, String... info)
   {
     getService().commLog(severity, servizio, componente, messaggio, visibilita, note, info);
   }
