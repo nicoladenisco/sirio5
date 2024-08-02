@@ -21,9 +21,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.swing.tree.TreeNode;
 import org.apache.commons.collections.IteratorUtils;
+import org.commonlib5.lambda.ConsumerThrowException;
 import org.commonlib5.lambda.PredicateThrowException;
 
 /**
@@ -194,6 +196,22 @@ public class CoreTreeNodeImpl<T> extends ArrayList<CoreTreeNodeImpl<T>>
     return null;
   }
 
+  public CoreTreeNodeImpl<T> findDownNode2(PredicateThrowException<T> p)
+     throws Exception
+  {
+    if(value != null && p.test(value))
+      return this;
+
+    CoreTreeNodeImpl<T> t;
+    for(CoreTreeNodeImpl<T> n : this)
+    {
+      if((t = n.findDownNode2(p)) != null)
+        return t;
+    }
+
+    return null;
+  }
+
   public T findUp(Predicate<T> p)
   {
     if(value != null && p.test(value))
@@ -241,5 +259,26 @@ public class CoreTreeNodeImpl<T> extends ArrayList<CoreTreeNodeImpl<T>>
     if(recursive)
       for(CoreTreeNodeImpl<T> n : this)
         n.sortTree(c, recursive);
+  }
+
+  public void forEach(boolean recursive, Consumer<T> action)
+  {
+    if(value != null)
+      action.accept(value);
+
+    if(recursive && !isLeaf())
+      for(CoreTreeNodeImpl<T> n : this)
+        n.forEach(recursive, action);
+  }
+
+  public void forEach2(boolean recursive, ConsumerThrowException<T> action)
+     throws Exception
+  {
+    if(value != null)
+      action.accept(value);
+
+    if(recursive && !isLeaf())
+      for(CoreTreeNodeImpl<T> n : this)
+        n.forEach2(recursive, action);
   }
 }
