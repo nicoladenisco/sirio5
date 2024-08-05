@@ -116,6 +116,11 @@ public class HtmlTableHelperTorque extends HtmlTableHelper
     lsHolder.clear();
     super.clear();
   }
+
+  public List<Holder> getHolderList()
+  {
+    return lsHolder;
+  }
 }
 
 /*

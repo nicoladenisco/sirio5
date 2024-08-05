@@ -25,6 +25,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.turbine.modules.Action;
+import org.apache.turbine.modules.ScreenLoader;
 import org.apache.turbine.modules.actions.VelocityAction;
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.assemblerbroker.AssemblerBrokerService;
@@ -51,7 +52,16 @@ public class ActionJspBean
   AssemblerBrokerService abs = (AssemblerBrokerService) TurbineServices.getInstance()
      .getService(AssemblerBrokerService.SERVICE_NAME);
 
-  public void runAction(HttpServletRequest request,
+  /**
+   * Esegue una action ritornando i risultati in JSON.
+   * @param request
+   * @param response
+   * @param config
+   * @param out
+   * @throws Exception
+   */
+  public void runAction(
+     HttpServletRequest request,
      HttpServletResponse response,
      ServletConfig config, Writer out)
      throws Exception
@@ -124,6 +134,43 @@ public class ActionJspBean
     }
 
     out.write(json.toString());
+    out.flush();
+  }
+
+  /**
+   * Elabora uno screen ritornando il risultato in HTML.
+   * @param request
+   * @param response
+   * @param config
+   * @param out
+   * @throws Exception
+   */
+  public void runScreenHtml(
+     HttpServletRequest request,
+     HttpServletResponse response,
+     ServletConfig config, Writer out)
+     throws Exception
+  {
+    CoreRunData data = (CoreRunData) rd.getRunData(request, response, config);
+
+    try
+    {
+      // Pull user from session.
+      data.populate();
+
+      // legge il nome della screen e usa il caricatore per ricavarne l'istanza
+      String nomeScreen = request.getParameter("screen");
+
+      // usa il servizio di turbine per creare e renderizzare lo screen
+      data.getTemplateInfo().setScreenTemplate(nomeScreen + ".vm");
+      String results = ScreenLoader.getInstance().eval(data, nomeScreen);
+      out.write(results);
+    }
+    finally
+    {
+      rd.putRunData(data);
+    }
+
     out.flush();
   }
 }

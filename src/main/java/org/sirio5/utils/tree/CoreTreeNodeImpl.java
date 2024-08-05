@@ -102,6 +102,11 @@ public class CoreTreeNodeImpl<T> extends ArrayList<CoreTreeNodeImpl<T>>
     return parent;
   }
 
+  public CoreTreeNodeImpl<T> getParent2()
+  {
+    return (CoreTreeNodeImpl<T>) parent;
+  }
+
   @Override
   public int getIndex(TreeNode node)
   {

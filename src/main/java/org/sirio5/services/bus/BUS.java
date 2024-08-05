@@ -205,4 +205,13 @@ public class BUS
   {
     getService().sendMessagePackAsync(clQueue);
   }
+
+  /**
+   * Ritorna helper per memorizzazione eventi da inviare in ritardo.
+   * @return istanza dell'helper
+   */
+  public static BusMessageQueueHelper getHelper()
+  {
+    return new BusMessageQueueHelper();
+  }
 }
