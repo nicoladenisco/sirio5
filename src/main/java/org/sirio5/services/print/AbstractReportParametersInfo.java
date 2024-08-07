@@ -56,15 +56,15 @@ import org.xml.sax.helpers.DefaultHandler;
 abstract public class AbstractReportParametersInfo extends DefaultHandler
 {
   /** Logging */
-  private static Log log = LogFactory.getLog(AbstractReportParametersInfo.class);
+  private static final Log log = LogFactory.getLog(AbstractReportParametersInfo.class);
   /** variabili locali */
   private int idUser;
-  private Map params;
+  private PrintContext context;
   private File originalFile = null;
   private String nomeStampa = null;
   private boolean internal = false;
   private final ArrayList<ParameterInfo> filtriStatistiche = new ArrayList<>();
-  private PdfPrint pp = (PdfPrint) (TurbineServices.getInstance().
+  private final PdfPrint pp = (PdfPrint) (TurbineServices.getInstance().
      getService(PdfPrint.SERVICE_NAME));
 
   public static final String LOCAL_JASPER_DTD = "jasperreport.dtd";
@@ -74,9 +74,9 @@ abstract public class AbstractReportParametersInfo extends DefaultHandler
     return idUser;
   }
 
-  public Map getParams()
+  public PrintContext getContext()
   {
-    return params;
+    return context;
   }
 
   /**
@@ -84,17 +84,17 @@ abstract public class AbstractReportParametersInfo extends DefaultHandler
    * @param idUser
    * @param reportName
    * @param originalFile
-   * @param params
+   * @param context
    * @throws Exception
    */
-  public void initForJasper(int idUser, String reportName, File originalFile, Map params)
+  public void initForJasper(int idUser, String reportName, File originalFile, PrintContext context)
      throws Exception
   {
     internal = false;
     this.idUser = idUser;
     this.originalFile = originalFile;
     this.nomeStampa = reportName;
-    this.params = params;
+    this.context = context;
     loadJasperReport();
   }
 
@@ -154,17 +154,17 @@ abstract public class AbstractReportParametersInfo extends DefaultHandler
    * @param idUser
    * @param reportName
    * @param reportInfo
-   * @param params
+   * @param context
    * @throws Exception
    */
-  public void initGeneric(int idUser, String reportName, String reportInfo, Map params)
+  public void initGeneric(int idUser, String reportName, String reportInfo, PrintContext context)
      throws Exception
   {
     internal = true;
     originalFile = null;
     nomeStampa = reportName;
     this.idUser = idUser;
-    this.params = params;
+    this.context = context;
     buildFromDescriptor(reportInfo);
   }
 
@@ -473,8 +473,8 @@ abstract public class AbstractReportParametersInfo extends DefaultHandler
 
     User u = SEC.getUser(idUser);
     SirioMacroResolver mres = new SirioMacroResolver(u);
-    if(params != null && !params.isEmpty())
-      mres.putAll(params);
+    if(context != null && !context.isEmpty())
+      mres.putAll(context);
 
     int pos;
     Class tiClass = null;
@@ -673,6 +673,8 @@ abstract public class AbstractReportParametersInfo extends DefaultHandler
   abstract public String getNome();
 
   abstract public String getInfo();
+
+  abstract public String getDataMaker();
 
   public static class CommonInfoParametro
   {

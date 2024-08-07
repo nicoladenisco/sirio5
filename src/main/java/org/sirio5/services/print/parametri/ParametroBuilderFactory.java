@@ -24,7 +24,7 @@ import org.sirio5.utils.factory.CoreAbstractPluginFactory;
  */
 public class ParametroBuilderFactory extends CoreAbstractPluginFactory<ParametroBuilder>
 {
-  private static ParametroBuilderFactory theInstance = new ParametroBuilderFactory();
+  private static final ParametroBuilderFactory theInstance = new ParametroBuilderFactory();
 
   private ParametroBuilderFactory()
   {

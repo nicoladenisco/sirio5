@@ -19,7 +19,6 @@ package org.sirio5.services.print.plugin;
 
 import java.io.*;
 import java.util.*;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.*;
@@ -32,6 +31,7 @@ import org.sirio5.services.CoreServiceException;
 import org.sirio5.services.localization.INT;
 import org.sirio5.services.print.AbstractReportParametersInfo;
 import org.sirio5.services.print.PdfPrint;
+import org.sirio5.services.print.PrintContext;
 import org.sirio5.utils.SU;
 import org.sirio5.utils.TR;
 
@@ -49,7 +49,7 @@ public class JasperPlugin extends BasePdfPlugin
   public static final String PLG_NAME_CON = "jasper";
   public static final String PLG_NAME_NOCON = "jaspernc";
   /** Logging */
-  private static Log log = LogFactory.getLog(JasperPlugin.class);
+  private static final Log log = LogFactory.getLog(JasperPlugin.class);
   //
   // flag per attivare o meno le connessioni con il database
   protected boolean useDB = true;
@@ -57,10 +57,10 @@ public class JasperPlugin extends BasePdfPlugin
   protected String jasperAppLocation = null;
 
   @Override
-  public void configure(String pluginName, Configuration cfg, File dirTmp)
+  public void configure(String pluginName, Configuration cfg)
      throws Exception
   {
-    super.configure(pluginName, cfg, dirTmp);
+    super.configure(pluginName, cfg);
     useDB = SU.isEqu(PLG_NAME_CON, pluginName);
 
     // legge locazione dell'applicazione jasperApp (NON DAL SERVIZIO)
@@ -69,27 +69,32 @@ public class JasperPlugin extends BasePdfPlugin
   }
 
   @Override
-  public void getParameters(int idUser, String reportName, String reportInfo, Map params, AbstractReportParametersInfo rpb)
+  public void getParameters(int idUser, PrintContext context)
      throws Exception
   {
+    String reportName = context.getAsString(PrintContext.REPORT_NAME_KEY);
+    String reportInfo = context.getAsString(PrintContext.REPORT_INFO_KEY);
+    AbstractReportParametersInfo pbean = (AbstractReportParametersInfo) context.get(PrintContext.PBEAN_KEY);
+
     File reportFile = getFileReport(reportName, reportInfo);
-    rpb.initForJasper(idUser, reportName, reportFile, params);
+    pbean.initForJasper(idUser, reportName, reportFile, context);
   }
 
   @Override
-  public void buildPdf(PdfPrint.JobInfo job, int idUser,
-     String reportName, String reportInfo, Map params,
-     AbstractReportParametersInfo pbean, File pdfToGen, HttpSession sessione)
+  public void buildPdf(PdfPrint.JobInfo job, int idUser, PrintContext context)
      throws Exception
   {
+    String reportName = context.getAsString(PrintContext.REPORT_NAME_KEY);
+    String reportInfo = context.getAsString(PrintContext.REPORT_INFO_KEY);
+    AbstractReportParametersInfo pbean = (AbstractReportParametersInfo) context.get(PrintContext.PBEAN_KEY);
     File reportFile = getFileReport(reportName, reportInfo);
 
     // estrae i soli parametri relativi al report
     // opportunamente parserizzati rispetto al tipo
-    Map reportParams = pbean.parseParameter(params);
+    Map reportParams = pbean.parseParameter(context);
 
     job.saveName = reportName + ".pdf";
-    saveReportPdf(reportFile, pdfToGen, reportParams);
+    saveReportPdf(reportFile, context, reportParams);
   }
 
   protected File getFileReport(String reportName, String reportInfo)
@@ -128,13 +133,15 @@ public class JasperPlugin extends BasePdfPlugin
   /**
    * Takes 4 reportParams: jdbcConnection, reportFile, reportPDF, reportParams
    * @param reportFile file di modello del report Jasper Report (.jrxml)
-   * @param reportPDF file pdf da salvare,
+   * @param context parametri
    * @param reportParams parametri da utilizzare per la creazione del report.
    * @throws java.lang.Exception
    */
-  protected void saveReportPdf(File reportFile, File reportPDF, Map reportParams)
+  protected void saveReportPdf(File reportFile, PrintContext context, Map reportParams)
      throws Exception
   {
+    File reportPDF = (File) context.get(PrintContext.PDFTOGEN_KEY);
+
     // usiamo la versione esterna: salva i parametri in un file binario su disco
     File tmpParams = getTmpFile();
 

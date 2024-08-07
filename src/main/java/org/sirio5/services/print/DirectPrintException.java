@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Nicola De Nisco
+ * Copyright (C) 2024 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,30 +15,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.sirio5.services.print.plugin;
+package org.sirio5.services.print;
 
-import org.apache.commons.configuration2.Configuration;
-import org.sirio5.utils.factory.CoreAbstractPoolPluginFactory;
+import static org.sirio5.services.localization.INT.I;
 
 /**
- * Costruttore dei generatori di pdf.
+ * Questa eccezione non è un vero e proprio errore,
+ * ma segnala che l'elaborazione di una stampa è in
+ * corso e verrà inviata alla stampante appena pronta.
+ *
  * @author Nicola De Nisco
  */
-public class PdfGeneratorFactory extends CoreAbstractPoolPluginFactory<PdfGenPlugin>
+public class DirectPrintException extends Exception
 {
-  private static final PdfGeneratorFactory theInstance = new PdfGeneratorFactory();
+  public PdfPrint.JobInfo job = null;
+  public Throwable err = null;
 
-  private PdfGeneratorFactory()
+  public DirectPrintException(PdfPrint.JobInfo job)
   {
+    super(I("Elaborazione del job %s in corso", job.jobCode));
+    this.job = job;
   }
 
-  public static PdfGeneratorFactory getInstance()
+  public DirectPrintException(PdfPrint.JobInfo job, Throwable err)
   {
-    return theInstance;
-  }
-
-  public void configure(Configuration cfg)
-  {
-    super.configure(cfg, "plugin");
+    super((I("Errore durante l'elaborazione del job %s: %s", job.jobCode, err.getMessage())), err);
+    this.job = job;
+    this.err = err;
   }
 }

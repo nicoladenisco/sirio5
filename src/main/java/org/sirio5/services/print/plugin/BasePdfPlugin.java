@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -21,17 +21,15 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import java.io.*;
-import java.util.*;
-
-import org.sirio5.services.formatter.DataFormatter;
-import org.sirio5.services.formatter.NumFormatter;
-import org.sirio5.services.formatter.ValutaFormatter;
-import org.sirio5.services.print.PdfPrint;
-import org.sirio5.services.print.AbstractReportParametersInfo;
-
 import org.apache.commons.configuration2.Configuration;
 import org.apache.turbine.services.TurbineServices;
 import org.sirio5.services.CoreServiceException;
+import org.sirio5.services.formatter.DataFormatter;
+import org.sirio5.services.formatter.NumFormatter;
+import org.sirio5.services.formatter.ValutaFormatter;
+import org.sirio5.services.print.AbstractReportParametersInfo;
+import org.sirio5.services.print.PdfPrint;
+import org.sirio5.services.print.PrintContext;
 
 /**
  * Funzioni di utlitià per i plugin.
@@ -47,51 +45,70 @@ abstract public class BasePdfPlugin implements PdfGenPlugin
   protected PdfPrint print = null;
 
   @Override
-  public void configure(String pluginName, Configuration cfg, File dirTmp) throws Exception
+  public boolean isInitialized()
   {
-    this.dirTmp = dirTmp;
+    return print != null;
+  }
+
+  @Override
+  public void configure(String pluginName, Configuration cfg)
+     throws Exception
+  {
     df = (DataFormatter) (TurbineServices.getInstance().getService(DataFormatter.SERVICE_NAME));
     vf = (ValutaFormatter) (TurbineServices.getInstance().getService(ValutaFormatter.SERVICE_NAME));
     nf = (NumFormatter) (TurbineServices.getInstance().getService(NumFormatter.SERVICE_NAME));
     print = (PdfPrint) (TurbineServices.getInstance().getService(PdfPrint.SERVICE_NAME));
+    dirTmp = print.getWorkTmpFile("print-plugin-" + pluginName);
   }
 
   @Override
-  public void getParameters(int idUser,
-     String reportName, String reportInfo, Map params, AbstractReportParametersInfo rpb)
+  public void getParameters(int idUser, PrintContext context)
      throws Exception
   {
-    rpb.initGeneric(idUser, reportName, reportInfo, params);
+    String reportName = context.getAsString(PrintContext.REPORT_NAME_KEY);
+    String reportInfo = context.getAsString(PrintContext.REPORT_INFO_KEY);
+    AbstractReportParametersInfo rpb = (AbstractReportParametersInfo) context.get(PrintContext.PBEAN_KEY);
+    rpb.initGeneric(idUser, reportName, reportInfo, context);
   }
 
-  protected File getTmpFile() throws Exception
+  protected File getTmpFile()
+     throws Exception
   {
+    if(!dirTmp.isDirectory())
+      if(!dirTmp.mkdirs())
+        throw new IOException("Impossibile creare la directory " + dirTmp.getAbsolutePath());
+
     File ftmp = File.createTempFile("pdfplg", ".tmp", dirTmp);
     ftmp.deleteOnExit();
     return ftmp;
   }
 
-  public void die(String cause) throws Exception
+  public void die(String cause)
+     throws Exception
   {
     throw new CoreServiceException(cause);
   }
 
-  protected String fmtDim(double dim) throws Exception
+  protected String fmtDim(double dim)
+     throws Exception
   {
     return nf.format(dim, 1, 2);
   }
 
-  protected String fmtQta(double qta) throws Exception
+  protected String fmtQta(double qta)
+     throws Exception
   {
     return nf.format(qta, 0, 2);
   }
 
-  protected String fmtSconto(double sconto) throws Exception
+  protected String fmtSconto(double sconto)
+     throws Exception
   {
     return nf.format(sconto, 0, 0);
   }
 
-  protected String fmtValuta(double importo) throws Exception
+  protected String fmtValuta(double importo)
+     throws Exception
   {
     return vf.fmtValuta(importo);
   }

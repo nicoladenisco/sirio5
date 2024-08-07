@@ -86,4 +86,13 @@ public class TableCacheData
   {
     return removeDeleted ? lsValuesUndeleted.iterator() : lsValues.iterator();
   }
+
+  /**
+   * Ritorna numero di record nella cache (compreso i cancellati).
+   * @return numero di record
+   */
+  public int getSize()
+  {
+    return lsValues == null ? 0 : lsValues.size();
+  }
 }

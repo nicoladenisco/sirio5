@@ -17,6 +17,7 @@
  */
 package org.sirio5.beans;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -166,16 +167,17 @@ public class BeanFactory
    * Estrazione/costruzione di un bean di sessione.
    * Vedi getFromSession() per una descrizione dettagliata.
    * Uso interno.
+   * @param <T>
    * @param data oggetto rundata con relativa sessione
    * @param beanClass classe del bean
    * @param key stringa nome attributo di sessione
    * @return una istanza del bean
    * @throws Exception
    */
-  public static CoreBaseBean getFromSession(RunData data, Class beanClass, String key)
+  public static <T extends CoreBaseBean> T getFromSession(RunData data, Class<T> beanClass, String key)
      throws Exception
   {
-    CoreBaseBean bean = (CoreBaseBean) data.getSession().getAttribute(key);
+    T bean = (T) data.getSession().getAttribute(key);
 
     if(bean == null)
     {
@@ -188,7 +190,7 @@ public class BeanFactory
     if(!bean.isValid((CoreRunData) data))
     {
       removeFromSession(data, key);
-      CoreBaseBean newBean = createBean(beanClass);
+      T newBean = createBean(beanClass);
       newBean.init((CoreRunData) data);
       newBean.preserveData((CoreRunData) data, bean);
       data.getSession().setAttribute(key, newBean);
@@ -212,19 +214,28 @@ public class BeanFactory
   /**
    * Creazione istanza di bean con verifica di override.
    * Uso interno.
+   * @param <T> classe del bean (deve estendere CoreBaseBean)
    * @param beanClass classe del bean
    * @return una istanza del bean
    * @throws Exception
    */
-  public static CoreBaseBean createBean(Class beanClass)
-     throws Exception
+  public static <T extends CoreBaseBean> T createBean(Class<T> beanClass)
   {
     String myPackage = ClassOper.getClassPackage(beanClass);
     String className = ClassOper.getClassName(beanClass);
     Class beanClassOverride = ClassOper.loadClass(getClassnameOverride(className), myPackage, basePaths);
     if(beanClassOverride != null)
       beanClass = beanClassOverride;
-    return (CoreBaseBean) beanClass.newInstance();
+
+    try
+    {
+      Constructor<T> c = beanClass.getConstructor();
+      return c.newInstance();
+    }
+    catch(Exception ex)
+    {
+      throw new RuntimeException("Failed to create bean " + beanClass, ex);
+    }
   }
 
   /**
@@ -358,16 +369,17 @@ public class BeanFactory
    * Estrazione/costruzione di un bean di token.
    * Vedi getFromSession() per una descrizione dettagliata.
    * Uso interno.
+   * @param <T>
    * @param data pacchetto dati associati al token
    * @param beanClass classe del bean
    * @param key stringa nome attributo di sessione
    * @return una istanza del bean
    * @throws Exception
    */
-  public static CoreTokenBean getFromToken(TokenAuthItem data, Class beanClass, String key)
+  public static <T extends CoreTokenBean> T getFromToken(TokenAuthItem data, Class<T> beanClass, String key)
      throws Exception
   {
-    CoreTokenBean bean = (CoreTokenBean) data.getAttribute(key);
+    T bean = (T) data.getAttribute(key);
 
     if(bean == null)
     {
@@ -380,7 +392,7 @@ public class BeanFactory
     if(!bean.isValid(data))
     {
       removeFromToken(data, key);
-      CoreTokenBean newBean = createTokenBean(beanClass);
+      T newBean = createTokenBean(beanClass);
       newBean.init(data);
       newBean.preserveData(data, bean);
       data.setAttribute(key, newBean);
@@ -404,11 +416,12 @@ public class BeanFactory
   /**
    * Creazione istanza di bean con verifica di override.
    * Uso interno.
+   * @param <T>
    * @param beanClass classe del bean
    * @return una istanza del bean
    * @throws Exception
    */
-  public static CoreTokenBean createTokenBean(Class beanClass)
+  public static <T extends CoreTokenBean> T createTokenBean(Class<T> beanClass)
      throws Exception
   {
     String myPackage = ClassOper.getClassPackage(beanClass);
@@ -416,6 +429,15 @@ public class BeanFactory
     Class beanClassOverride = ClassOper.loadClass(getClassnameOverride(className), myPackage, basePaths);
     if(beanClassOverride != null)
       beanClass = beanClassOverride;
-    return (CoreTokenBean) beanClass.newInstance();
+
+    try
+    {
+      Constructor<T> c = beanClass.getConstructor();
+      return c.newInstance();
+    }
+    catch(Exception ex)
+    {
+      throw new RuntimeException("Failed to create bean " + beanClass, ex);
+    }
   }
 }

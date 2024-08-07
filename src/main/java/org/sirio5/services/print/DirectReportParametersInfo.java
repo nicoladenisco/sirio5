@@ -62,4 +62,10 @@ public class DirectReportParametersInfo extends AbstractReportParametersInfo
   {
     return reportInfo;
   }
+
+  @Override
+  public String getDataMaker()
+  {
+    return null;
+  }
 }

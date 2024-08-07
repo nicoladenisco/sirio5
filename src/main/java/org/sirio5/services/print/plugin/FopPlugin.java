@@ -23,7 +23,6 @@ import java.util.*;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.Query;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.*;
@@ -33,6 +32,7 @@ import org.commonlib5.utils.CommonFileUtils;
 import org.commonlib5.utils.OsIdent;
 import org.sirio5.services.print.AbstractReportParametersInfo;
 import org.sirio5.services.print.PdfPrint;
+import org.sirio5.services.print.PrintContext;
 import org.sirio5.services.print.XmlGenerationError;
 import org.sirio5.utils.LI;
 import org.sirio5.utils.SU;
@@ -46,17 +46,28 @@ import org.sirio5.utils.TR;
 public class FopPlugin extends BasePdfPlugin
 {
   /** Logging */
-  private static Log log = LogFactory.getLog(FopPlugin.class);
+  private static final Log log = LogFactory.getLog(FopPlugin.class);
   protected String xmlbaseuri = null;
   // posizione dell'applicazione fop
   protected String fopAppLocation = null;
+  /** mapping del nome del report all'effettiva jsp per la generazione dell'XML */
+  protected final Map<String, String> mapReport2Jsp = new HashMap<>();
 
   @Override
-  public void configure(String pluginName, Configuration cfg, File dirTmp)
+  public void configure(String pluginName, Configuration cfg)
      throws Exception
   {
-    super.configure(pluginName, cfg, dirTmp);
+    super.configure(pluginName, cfg);
     xmlbaseuri = cfg.getString("xmlbaseuri", null);
+
+    // carica il mapping nomereport -> jsp relativa da setup
+    String[] mapping = cfg.getStringArray("mapping");
+    for(int i = 0; i < mapping.length; i++)
+    {
+      String[] ss = SU.split(mapping[i], '|');
+      if(ss.length >= 2)
+        mapReport2Jsp.put(ss[0], ss[1]);
+    }
 
     // legge locazione dell'applicazione fopApp (NON DAL SERVIZIO)
     if((fopAppLocation = TR.getString("path.app.fop")) == null)
@@ -64,34 +75,38 @@ public class FopPlugin extends BasePdfPlugin
   }
 
   @Override
-  public void buildPdf(PdfPrint.JobInfo job, int idUser, String reportName, String reportInfo, Map params, AbstractReportParametersInfo pbean, File pdfToGen, HttpSession sessione)
+  public void buildPdf(PdfPrint.JobInfo job, int idUser, PrintContext context)
      throws Exception
   {
+    String reportName = context.getAsString(PrintContext.REPORT_NAME_KEY);
+    String reportInfo = context.getAsString(PrintContext.REPORT_INFO_KEY);
+    AbstractReportParametersInfo pbean = (AbstractReportParametersInfo) context.get(PrintContext.PBEAN_KEY);
+
     // estrae i soli parametri relativi al report sotto forma di stringa
     Map reportParams = null;
     if(pbean != null)
-      reportParams = pbean.parseParameterString(params);
+      reportParams = pbean.parseParameterString(context);
 
-    doGetXmlReport(reportName, params, pdfToGen, reportParams);
+    if(reportName.isEmpty())
+      die("Nome report non specificato nella richiesta.");
+
+    String jspName = mapReport2Jsp.getOrDefault(reportName, reportName);
+    doGetXmlReport(jspName, context, reportParams);
   }
 
-  //Process the HTTP Get request
-  protected File doGetXmlReport(String sJsp, Map params, File fPdf, Map reportParams)
+  protected File doGetXmlReport(String sJsp, PrintContext context, Map reportParams)
      throws Exception
   {
+    File fPdf = (File) context.get(PrintContext.PDFTOGEN_KEY);
+
     File fopSheetDir = print.getConfXlsFile("fop");
     if(!fopSheetDir.isDirectory())
       die("La directory " + fopSheetDir + " non esiste o non è leggibile.");
 
-    // esrae nome della JSP per la generazione dell'XML
-    print.ASSERT(sJsp != null, "sJsp != null");
-    if(!sJsp.endsWith(".jsp"))
-      sJsp += ".jsp";
-
     // estrae nome del file XSL per conversione dati XML
     File xslFile = null;
     {
-      String xslParam = (String) params.get(PdfPrint.XSL_REQUEST_PARAM);
+      String xslParam = context.getAsString(PdfPrint.XSL_REQUEST_PARAM);
 
       // se non e' stato specificato il foglio di stile
       // cerca di individuarne uno con nomejsp.xsl oppure nomejsp2fop.xsl
@@ -115,7 +130,7 @@ public class FopPlugin extends BasePdfPlugin
       }
     }
 
-    String sessionid = (String) params.get(PdfPrint.SESSION_ID);
+    String sessionid = context.getAsString(PdfPrint.SESSION_ID);
     print.ASSERT(sessionid != null, "sessionid != null");
 
     // costruisce url per chiamare la JSP per generare l'XML
@@ -134,7 +149,7 @@ public class FopPlugin extends BasePdfPlugin
 
     if(reportParams == null || reportParams.isEmpty())
     {
-      String query = (String) params.get(PdfPrint.QUERY_STRING);
+      String query = context.getAsString(PdfPrint.QUERY_STRING);
       if(query != null)
         sUrl += "?" + query;
     }

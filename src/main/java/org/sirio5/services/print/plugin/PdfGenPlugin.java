@@ -17,19 +17,17 @@
  */
 package org.sirio5.services.print.plugin;
 
-import java.io.File;
-import java.util.Map;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
-import org.sirio5.services.print.AbstractReportParametersInfo;
 import org.sirio5.services.print.PdfPrint;
+import org.sirio5.services.print.PrintContext;
+import org.sirio5.utils.factory.CoreBasePoolPlugin;
 
 /**
  * Interfaccia di un plugin per la generazione di pdf.
  *
  * @author Nicola De Nisco
  */
-public interface PdfGenPlugin
+public interface PdfGenPlugin extends CoreBasePoolPlugin
 {
   /**
    * Configurazione e inizializzazione del plugin.
@@ -39,35 +37,25 @@ public interface PdfGenPlugin
    * @param dirTmp
    * @throws Exception
    */
-  public void configure(String pluginName, Configuration cfg, File dirTmp)
+  public void configure(String pluginName, Configuration cfg)
      throws Exception;
 
   /**
    * Restituisce un bean con i parametri per la stampa richiesta.
    * @param idUser the value of idUser
-   * @param reportName the value of reportName
-   * @param reportInfo the value of reportInfo
-   * @param params parametri accessori del plugin
-   * @param info report info da popolare
+   * @param context
    * @throws Exception
    */
-  public void getParameters(int idUser, String reportName, String reportInfo, Map params, AbstractReportParametersInfo info)
+  public void getParameters(int idUser, PrintContext context)
      throws Exception;
 
   /**
    * Funzione per la generazione del pdf.
    * @param job
    * @param idUser
-   * @param reportName
-   * @param reportInfo
-   * @param params
-   * @param pbean
-   * @param pdfToGen
-   * @param sessione
+   * @param context
    * @throws Exception
    */
-  public void buildPdf(PdfPrint.JobInfo job, int idUser,
-     String reportName, String reportInfo, Map params,
-     AbstractReportParametersInfo pbean, File pdfToGen, HttpSession sessione)
+  public void buildPdf(PdfPrint.JobInfo job, int idUser, PrintContext context)
      throws Exception;
 }

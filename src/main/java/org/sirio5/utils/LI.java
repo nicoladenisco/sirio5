@@ -41,6 +41,8 @@ public class LI extends HtmlUtils
   /** aggancia il settaggio a quello del tool ui (link relativi/assoluti) */
   private static final boolean imagesFromSkin = TR.getBoolean("images.icons.fromskin", true);
 
+  private static String __myContextPath = null;
+
   /**
    * Ritorna la uri (http://.../pgm/template/mia.vm)
    * del file di modello vm indicato.
@@ -72,20 +74,25 @@ public class LI extends HtmlUtils
       if(s == null)
         return null;
 
-      __myContextPath = ("/" + s + "/").replace("//", "/");
-      if(!wantRelative)
-      {
-        StringBuilder sb = new StringBuilder();
-        sd.getHostUrl(sb);
-        sb.append(__myContextPath);
-        __myContextPath = sb.toString();
-      }
+      setContextPath(s);
     }
 
     return __myContextPath;
   }
 
-  private static String __myContextPath = null;
+  public static void setContextPath(String s)
+  {
+    __myContextPath = ("/" + s + "/").replace("//", "/");
+
+    if(!wantRelative)
+    {
+      StringBuilder sb = new StringBuilder();
+      ServerData sd = Turbine.getDefaultServerData();
+      sd.getHostUrl(sb);
+      sb.append(__myContextPath);
+      __myContextPath = sb.toString();
+    }
+  }
 
   public static String getIconAwesome(String iconName, String alt)
   {
@@ -203,14 +210,15 @@ public class LI extends HtmlUtils
    */
   public static String getLinkUrl(String url)
   {
-    if(!url.startsWith("http:"))
-      if(url.startsWith("@action/"))
-        return getContextPath() + APP_PREFIX + "/action/" + url.substring(8);
-      else if(url.contains(".vm"))
-        return getContextPath() + APP_PREFIX + "/template/" + url;
-      else
-        return mergePath(getContextPath(), url);
-    return url;
+    if(url.startsWith("http://") || url.startsWith("https://"))
+      return url;
+
+    if(url.startsWith("@action/"))
+      return getContextPath() + APP_PREFIX + "/action/" + url.substring(8);
+    else if(url.contains(".vm"))
+      return getContextPath() + APP_PREFIX + "/template/" + url;
+    else
+      return mergePath(getContextPath(), url);
   }
 
   /**
@@ -224,6 +232,11 @@ public class LI extends HtmlUtils
   public static String getLinkUrlwParams(String url, Map params)
   {
     return mergeUrl(getLinkUrl(url), params);
+  }
+
+  public static String getLinkUrlPairParams(String url, Object... params)
+  {
+    return mergeUrlPairTestUnique(getLinkUrl(url), params);
   }
 
   /**

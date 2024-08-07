@@ -18,7 +18,6 @@
 package org.sirio5.services.print;
 
 import java.util.Iterator;
-import java.util.Map;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
@@ -78,21 +77,23 @@ abstract public class AbstractAsyncPdfPrint extends AbstractPdfPrint
    * Avvia il processo di stampa di un job.
    * @param idUser
    * @param codiceStampa codice dalla stampa richiesta
-   * @param params parametri per la stampa
+   * @param context parametri per la stampa
+   * @param sessione
    * @return il descrittore informazioni sul job
    * @throws java.lang.Exception
    */
   @Override
-  public JobInfo generatePrintJob(int idUser, String codiceStampa, Map params, HttpSession sessione)
+  public JobInfo generatePrintJob(int idUser,
+     String codiceStampa, PrintContext context, HttpSession sessione)
      throws Exception
   {
-    if(SU.checkTrueFalse(params.get("SYNC_REQUEST"), false))
-      return super.generatePrintJob(idUser, codiceStampa, params, sessione);
+    if(SU.checkTrueFalse(context.get("SYNC_REQUEST"), false))
+      return super.generatePrintJob(idUser, codiceStampa, context, sessione);
 
     AsyncPdfJob job = createJob();
-    AbstractReportParametersInfo ri = getParameters(idUser, codiceStampa, params);
+    AbstractReportParametersInfo ri = getParameters(idUser, codiceStampa, context);
 
-    job.init(this, idUser, ri.getPlugin(), ri.getNome(), ri.getInfo(), params, ri, sessione);
+    job.init(this, idUser, ri.getPlugin(), context);
     job.start();
     job.join(tWaitSeconds * 1000);
 
@@ -108,20 +109,27 @@ abstract public class AbstractAsyncPdfPrint extends AbstractPdfPrint
    * @param pluginName tipo del plugin richiesto
    * @param reportName nome del report richiesto
    * @param reportInfo
-   * @param params parametri accessori del plugin
+   * @param context parametri accessori del plugin
+   * @param sessione
    * @return il descrittore informazioni sul job
    * @throws java.lang.Exception
    */
   @Override
-  public JobInfo generatePrintJob(int idUser, String pluginName, String reportName, String reportInfo, Map params, HttpSession sessione)
+  public JobInfo generatePrintJob(int idUser,
+     String pluginName, String reportName, String reportInfo, PrintContext context, HttpSession sessione)
      throws Exception
   {
-    if(SU.checkTrueFalse(params.get("SYNC_REQUEST"), false))
-      return super.generatePrintJob(idUser, pluginName, reportName, reportInfo, params, sessione);
+    if(SU.checkTrueFalse(context.get("SYNC_REQUEST"), false))
+      return super.generatePrintJob(idUser, pluginName, reportName, reportInfo, context, sessione);
 
     AsyncPdfJob job = createJob();
+    DirectReportParametersInfo pbean = new DirectReportParametersInfo(reportName, reportInfo);
+    context.put(PrintContext.PBEAN_KEY, pbean);
+    context.put(PrintContext.REPORT_INFO_KEY, reportInfo);
+    context.put(PrintContext.REPORT_NAME_KEY, reportName);
+    context.put(PrintContext.SESSION_KEY, sessione);
 
-    job.init(this, idUser, pluginName, reportName, reportInfo, params, null, sessione);
+    job.init(this, idUser, pluginName, context);
     job.start();
     job.join(tWaitSeconds * 1000);
 

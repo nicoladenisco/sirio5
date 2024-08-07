@@ -18,8 +18,6 @@
 package org.sirio5.services.print;
 
 import java.util.Date;
-import java.util.Map;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.commonlib5.exec.ExecHelper;
@@ -37,32 +35,24 @@ import org.sirio5.utils.SU;
 public class AsyncPdfJob
 {
   /** Logging */
-  private static Log log = LogFactory.getLog(AsyncPdfJob.class);
+  private static final Log log = LogFactory.getLog(AsyncPdfJob.class);
   // variabili locali
   protected JobInfo info = null;
   protected Thread thRun = null;
+  protected PrintContext ctx;
   protected AbstractAsyncPdfPrint service = null;
-  protected String pluginName, reportName, reportInfo;
-  protected Map params = null;
-  protected AbstractReportParametersInfo ri = null;
-  protected HttpSession sessione = null;
+  protected String pluginName;
 
-  public void init(AbstractAsyncPdfPrint service, int idUser, String pluginName,
-     String reportName, String reportInfo, Map params,
-     AbstractReportParametersInfo ri, HttpSession sessione)
+  public void init(AbstractAsyncPdfPrint service, int idUser, String pluginName, PrintContext ctx)
      throws Exception
   {
     this.service = service;
     this.pluginName = pluginName;
-    this.reportName = reportName;
-    this.reportInfo = reportInfo;
-    this.params = params;
-    this.ri = ri;
-    this.sessione = sessione;
+    this.ctx = ctx;
 
     info = new JobInfo();
     info.jobCode = generateJobCode();
-    info.uri = "PLG:" + pluginName + "|RN:" + reportName;
+    info.uri = "PLG:" + pluginName + "|RN:" + ctx.getAsString(PrintContext.REPORT_NAME_KEY);
     info.tStart = new Date();
     info.idUser = idUser;
   }
@@ -91,8 +81,10 @@ public class AsyncPdfJob
   {
     try
     {
-      info.filePdf = service.makePdf(info, info.idUser,
-         pluginName, reportName, reportInfo, params, ri, sessione);
+      AbstractReportParametersInfo pbean = (AbstractReportParametersInfo) ctx.get(PrintContext.PBEAN_KEY);
+      String dataMaker = pbean == null ? null : pbean.getDataMaker();
+
+      info.filePdf = service.makePdfInternal(info, info.idUser, pluginName, dataMaker, ctx);
       info.percCompleted = 100;
 
       if(info.printer != null)

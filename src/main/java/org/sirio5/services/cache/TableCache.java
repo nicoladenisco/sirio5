@@ -29,6 +29,7 @@ import org.apache.torque.om.NumberKey;
 import org.apache.torque.om.ObjectKey;
 import org.apache.torque.om.Persistent;
 import org.apache.torque.om.StringKey;
+import org.sirio5.CoreConst;
 import org.sirio5.utils.SU;
 
 /**
@@ -43,7 +44,7 @@ import org.sirio5.utils.SU;
  */
 public class TableCache<T extends ColumnAccessByName> implements Iterable<T>
 {
-  private Class cls;
+  private final Class cls;
   private String tableName;
   private static final String TABLE_CACHE_CLASS = "TableCache";
 
@@ -432,8 +433,29 @@ public class TableCache<T extends ColumnAccessByName> implements Iterable<T>
     String tname = getTableName();
     TableCacheData data = new TableCacheData();
     data.populateData(cls);
-    CACHE.addObject(TABLE_CACHE_CLASS, tname, new CachedObject(data));
+    CACHE.addObject(TABLE_CACHE_CLASS, tname, new CachedObject(data, getExpiries(data)));
     return data;
+  }
+
+  /**
+   * Determina il tempo di permanenza nella cache per il blocco dati.
+   * @param data blocco dati
+   * @return permanenza in cache (millisecondi)
+   */
+  protected long getExpiries(TableCacheData data)
+  {
+    int numRec = data.getSize();
+
+    // 1000 o superiore 1 minuto
+    if(numRec >= 1000)
+      return CoreConst.ONE_MINUTE_MILLIS;
+
+    // da 500 a 1000 tempo di permanenza 5 minuti
+    if(numRec >= 500)
+      return 5 * CoreConst.ONE_MINUTE_MILLIS;
+
+    // per default 30 minuti
+    return 30 * CoreConst.ONE_MINUTE_MILLIS;
   }
 
   private static final Object semaforo = new Object();

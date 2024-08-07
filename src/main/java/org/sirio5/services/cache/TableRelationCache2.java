@@ -391,6 +391,18 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
   }
 
   /**
+   * Estrae tutti gli oggetti con un campo pari al valore richiesto.
+   * @param cm riferimento al campo da cercare
+   * @param valueFilter valore del viltro
+   * @param ignoreDeleted se vero ignora cancellati (STATO_REC ge 10)
+   * @return lista di oggetti
+   */
+  public List<T> extractByFieldValuePeerName(ColumnMap cm, Object valueFilter, boolean ignoreDeleted)
+  {
+    return extractByFieldValuePeerName(cm.getColumnName(), valueFilter, ignoreDeleted);
+  }
+
+  /**
    * Ritorna il primo oggetto che soddisfa il filtro.
    * @param fn espressione lambda del filtro
    * @return oggetto o null

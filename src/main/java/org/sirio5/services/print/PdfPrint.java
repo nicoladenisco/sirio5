@@ -71,25 +71,26 @@ public interface PdfPrint extends CoreServiceExtension
    * Restituisce un bean con i parametri per la stampa richiesta.
    * @param idUser
    * @param codiceStampa codice dalla stampa richiesta
-   * @param params parametri accessori del plugin
+   * @param context parametri accessori
    * @return eventuali campi per il report
    * @throws java.lang.Exception errore durante la stampa
    * @throws IllegalAccessException utente non autorizzato
    */
-  public AbstractReportParametersInfo getParameters(int idUser, String codiceStampa, Map params)
+  public AbstractReportParametersInfo getParameters(int idUser, String codiceStampa, PrintContext context)
      throws Exception, IllegalAccessException;
 
   /**
    * Avvia il processo di stampa di un job.
    * @param idUser
    * @param codiceStampa codice dalla stampa richiesta
-   * @param params parametri accessori del plugin
+   * @param context parametri accessori
    * @param sessione
    * @return il descrittore informazioni sul job
    * @throws java.lang.Exception errore durante la stampa
    * @throws IllegalAccessException utente non autorizzato
    */
-  public JobInfo generatePrintJob(int idUser, String codiceStampa, Map params, HttpSession sessione)
+  public JobInfo generatePrintJob(int idUser,
+     String codiceStampa, PrintContext context, HttpSession sessione)
      throws Exception, IllegalAccessException;
 
   /**
@@ -98,14 +99,14 @@ public interface PdfPrint extends CoreServiceExtension
    * @param pluginName tipo del plugin richiesto
    * @param reportName nome del report richiesto
    * @param reportInfo informazioni supplementari per il plugin
-   * @param params parametri accessori del plugin
+   * @param context parametri accessori
    * @param sessione
    * @return il descrittore informazioni sul job
    * @throws java.lang.Exception errore durante la stampa
    * @throws IllegalAccessException utente non autorizzato
    */
-  public JobInfo generatePrintJob(int idUser, String pluginName,
-     String reportName, String reportInfo, Map params, HttpSession sessione)
+  public JobInfo generatePrintJob(int idUser,
+     String pluginName, String reportName, String reportInfo, PrintContext context, HttpSession sessione)
      throws Exception, IllegalAccessException;
 
   /**
