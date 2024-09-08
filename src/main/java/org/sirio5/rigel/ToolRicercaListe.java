@@ -44,9 +44,9 @@ public class ToolRicercaListe extends HtmlMascheraRicercaGenericaNoscript
   public ToolRicercaListe(BuilderRicercaGenerica brg, RigelTableModel rtm,
      RigelI18nInterface i18n, String unique, String url)
   {
-    super(brg, rtm, i18n);
     this.unique = unique;
     this.url = url;
+    init(brg, rtm, i18n);
   }
 
   public String getUnique()

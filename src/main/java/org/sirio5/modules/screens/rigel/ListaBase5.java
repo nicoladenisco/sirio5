@@ -77,7 +77,9 @@ abstract public class ListaBase5 extends RigelEditBaseScreen
      throws Exception
   {
     String nometab = tm.getQuery().getVista();
-    return new HtmlMascheraRicercaGenericaNoscript(new SqlBuilderRicercaGenerica(tm, nometab), tm, i18n);
+    HtmlMascheraRicercaGenericaNoscript rv = new HtmlMascheraRicercaGenericaNoscript();
+    rv.init(new SqlBuilderRicercaGenerica(tm, nometab), tm, i18n);
+    return rv;
   }
 
   @Override
