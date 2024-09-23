@@ -25,6 +25,7 @@ import org.apache.turbine.services.pull.ApplicationTool;
 import org.apache.turbine.services.velocity.VelocityService;
 import org.apache.turbine.util.RunData;
 import org.apache.velocity.context.Context;
+import org.sirio5.rigel.ToolRenderDatatableRigel2;
 import org.sirio5.rigel.ToolRenderListeRigel;
 import org.sirio5.utils.SU;
 
@@ -37,7 +38,8 @@ import org.sirio5.utils.SU;
 public class RigelListeTool
    implements ApplicationTool
 {
-  private ToolRenderListeRigel render = new ToolRenderListeRigel();
+  private final ToolRenderListeRigel renderListe = new ToolRenderListeRigel();
+  private final ToolRenderDatatableRigel2 renderDatatable = new ToolRenderDatatableRigel2();
   private static final AtomicInteger counter = new AtomicInteger();
   private VelocityService velocity;
 
@@ -123,6 +125,35 @@ public class RigelListeTool
       ctx.put("paramsMap", mp);
     }
 
-    return render.renderHtml(data, ctx);
+    return renderListe.renderHtml(data, ctx);
+  }
+
+  /**
+   * Elabora HTML per una datable agganciata ad una lista rigel.
+   * @param data dati di richiesta
+   * @param lista lista rigel richiesta
+   * @param params parametri nella forma 'chiave=valore, chiave=valore'
+   * @return html completo
+   * @throws Exception
+   */
+  public String datatable(RunData data, String lista, String params)
+     throws Exception
+  {
+    ParameterParser pp = data.getParameters();
+    pp.setString("type", lista);
+    Context ctx = velocity.getContext(data);
+
+    // per la datatable questa è 0; se proprio devo inserire nella stessa pagina
+    // più liste uguali devo differenziarle con count=1, count=2 in params
+    ctx.put("count", 0);
+
+    // aggiunge i parametri specificati in params
+    if(params != null)
+    {
+      Map<String, String> mp = SU.string2Map(params, ",", true);
+      ctx.put("paramsMap", mp);
+    }
+
+    return renderDatatable.renderHtml(data, ctx);
   }
 }

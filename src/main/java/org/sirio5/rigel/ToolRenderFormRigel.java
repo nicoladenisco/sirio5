@@ -27,6 +27,8 @@ import org.apache.velocity.util.ClassUtils;
 import org.rigel5.SetupHolder;
 import org.rigel5.table.RigelTableModel;
 import org.rigel5.table.html.wrapper.HtmlWrapperBase;
+import static org.sirio5.CoreConst.HTML_END_CUT;
+import static org.sirio5.CoreConst.HTML_START_CUT;
 import org.sirio5.modules.screens.rigel.FormBase;
 import org.sirio5.services.localization.INT;
 import org.sirio5.utils.CoreRunData;
@@ -117,12 +119,17 @@ public class ToolRenderFormRigel extends FormBase
       throw new Exception(INT.I("Context non presente in sessione; tool non disponibile."));
 
     String html = renderHtml(data, ctx);
+    return cutHtml(html);
+  }
 
+  protected String cutHtml(String html)
+  {
     // da tutto l'html estrae solo la parte racchiusa da <form></form>
     // il resto non si può toccare
+
     int pos1, pos2;
-    if((pos1 = html.indexOf("<!-- __START_CUT__ -->")) != -1)
-      if((pos2 = html.indexOf("<!-- __END_CUT__ -->", pos1)) != -1)
+    if((pos1 = html.indexOf(HTML_START_CUT)) != -1)
+      if((pos2 = html.indexOf(HTML_END_CUT, pos1)) != -1)
         return html.substring(pos1, pos2);
 
     return html;

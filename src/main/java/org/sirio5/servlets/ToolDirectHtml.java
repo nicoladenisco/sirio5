@@ -31,6 +31,7 @@ import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.rundata.RunDataService;
 import org.apache.turbine.services.velocity.VelocityService;
 import org.commonlib5.utils.SimpleTimer;
+import org.sirio5.rigel.ToolRenderDatatableRigel2;
 import org.sirio5.rigel.ToolRenderFormRigel;
 import org.sirio5.rigel.ToolRenderListeRigel;
 import org.sirio5.utils.CoreRunData;
@@ -48,6 +49,7 @@ public class ToolDirectHtml extends HttpServlet
   private static final Log log = LogFactory.getLog(ToolDirectHtml.class);
   private final ToolRenderListeRigel renderListe = new ToolRenderListeRigel();
   private final ToolRenderFormRigel renderForm = new ToolRenderFormRigel();
+  private final ToolRenderDatatableRigel2 renderDatatable = new ToolRenderDatatableRigel2();
   private RunDataService rundataService = null;
   private VelocityService velocityService = null;
 
@@ -138,6 +140,9 @@ public class ToolDirectHtml extends HttpServlet
         case "form":
           runForm(data, out);
           break;
+        case "datatable":
+          runDatatable(data, out);
+          break;
         default:
           throw new ServletException(data.i18n("Richiesta non elaborabile: %s", sRequest));
       }
@@ -170,6 +175,13 @@ public class ToolDirectHtml extends HttpServlet
      throws Exception
   {
     String html = renderForm.renderHtml(data);
+    out.print(html);
+  }
+
+  private void runDatatable(CoreRunData data, PrintWriter out)
+     throws Exception
+  {
+    String html = renderDatatable.renderJson(data);
     out.print(html);
   }
 }

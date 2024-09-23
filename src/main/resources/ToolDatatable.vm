@@ -1,0 +1,16 @@
+<!-- INIZIO ToolDatatable.vm -->
+
+<!-- __START_CUT__ -->
+
+<div id="data_${unique}" style="display: inline" class="table-responsive manina">
+
+  <!-- html principale -->
+  <div class="rigel_body" style="padding: 2px;">
+    $htpage.getHtml("body")
+  </div>
+
+</div>
+
+<!-- __END_CUT__ -->
+
+<!-- FINE ToolDatatable.vm -->

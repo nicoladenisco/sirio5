@@ -228,4 +228,7 @@ public class CoreConst
   public static final long[] EMPTY_LONG_ARRAY = new long[]
   {
   };
+
+  public static final String HTML_END_CUT = "<!-- __END_CUT__ -->";
+  public static final String HTML_START_CUT = "<!-- __START_CUT__ -->";
 }
