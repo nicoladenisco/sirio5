@@ -31,7 +31,7 @@ import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.rundata.RunDataService;
 import org.apache.turbine.services.velocity.VelocityService;
 import org.commonlib5.utils.SimpleTimer;
-import org.sirio5.rigel.ToolRenderDatatableRigel2;
+import org.sirio5.rigel.ToolRenderDatatableRigel;
 import org.sirio5.rigel.ToolRenderFormRigel;
 import org.sirio5.rigel.ToolRenderListeRigel;
 import org.sirio5.utils.CoreRunData;
@@ -49,7 +49,7 @@ public class ToolDirectHtml extends HttpServlet
   private static final Log log = LogFactory.getLog(ToolDirectHtml.class);
   private final ToolRenderListeRigel renderListe = new ToolRenderListeRigel();
   private final ToolRenderFormRigel renderForm = new ToolRenderFormRigel();
-  private final ToolRenderDatatableRigel2 renderDatatable = new ToolRenderDatatableRigel2();
+  private final ToolRenderDatatableRigel renderDatatable = new ToolRenderDatatableRigel();
   private RunDataService rundataService = null;
   private VelocityService velocityService = null;
 

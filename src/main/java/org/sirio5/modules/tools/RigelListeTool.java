@@ -25,7 +25,7 @@ import org.apache.turbine.services.pull.ApplicationTool;
 import org.apache.turbine.services.velocity.VelocityService;
 import org.apache.turbine.util.RunData;
 import org.apache.velocity.context.Context;
-import org.sirio5.rigel.ToolRenderDatatableRigel2;
+import org.sirio5.rigel.ToolRenderDatatableRigel;
 import org.sirio5.rigel.ToolRenderListeRigel;
 import org.sirio5.utils.SU;
 
@@ -39,7 +39,7 @@ public class RigelListeTool
    implements ApplicationTool
 {
   private final ToolRenderListeRigel renderListe = new ToolRenderListeRigel();
-  private final ToolRenderDatatableRigel2 renderDatatable = new ToolRenderDatatableRigel2();
+  private final ToolRenderDatatableRigel renderDatatable = new ToolRenderDatatableRigel();
   private static final AtomicInteger counter = new AtomicInteger();
   private VelocityService velocity;
 

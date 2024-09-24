@@ -21,29 +21,29 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.fulcrum.parser.ParameterParser;
 import org.apache.turbine.util.RunData;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.util.ClassUtils;
-import org.commonlib5.utils.HtmlTableJsonConverter;
+import org.commonlib5.utils.ArrayMap;
 import org.json.JSONObject;
-import org.rigel5.SetupHolder;
-import org.rigel5.glue.table.AlternateColorTableAppBase;
-import org.rigel5.table.html.AbstractHtmlTablePagerFilter;
-import org.rigel5.table.html.RigelHtmlPage;
-import org.rigel5.table.html.wrapper.HtmlWrapperBase;
-import org.rigel5.table.peer.PeerBuilderRicercaGenerica;
-import org.rigel5.table.peer.html.PeerTableModel;
+import org.rigel5.RigelI18nInterface;
+import org.rigel5.db.sql.FiltroData;
+import org.rigel5.table.FiltroListe;
+import org.rigel5.table.RigelColumnDescriptor;
+import org.rigel5.table.RigelTableModel;
+import org.rigel5.table.html.hTable;
 import org.rigel5.table.sql.SqlBuilderRicercaGenerica;
-import org.rigel5.table.sql.html.SqlTableModel;
-import static org.sirio5.CoreConst.*;
-import org.sirio5.modules.screens.rigel.ListaBase5;
-import org.sirio5.modules.screens.rigel.ListaInfo;
+import org.rigel5.table.sql.xml.SqlTableModel;
+import org.rigel5.table.sql.xml.SqlWrapperListaXml;
 import org.sirio5.services.localization.INT;
+import org.sirio5.services.modellixml.MDL;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.SU;
+import org.sirio5.utils.TR;
 import org.sirio5.utils.velocity.VelocityParser;
 
 /**
@@ -55,121 +55,11 @@ import org.sirio5.utils.velocity.VelocityParser;
  *
  * @author Nicola De Nisco
  */
-public class ToolRenderDatatableRigel extends ListaBase5
+public class ToolRenderDatatableRigel
 {
   protected final ToolRigelUIManagerDatatable uim = new ToolRigelUIManagerDatatable();
   protected final ToolCustomUrlBuilder urb = new ToolCustomUrlBuilder();
-  protected String unique = null, funcNameEdit, funcNameSubmit, funcNameSplit, formName, bodyName;
-  protected int counter;
   protected static final Pattern pTableClass = Pattern.compile("class=[\'|\"](.+?)[\'|\"]");
-
-  @Override
-  public boolean isPopup()
-  {
-    return false;
-  }
-
-  @Override
-  public boolean isEditPopup()
-  {
-    return true;
-  }
-
-  @Override
-  protected String makeSelfUrl(RunData data, String type)
-  {
-    if(unique == null)
-      unique = "LISTA_" + SU.purge(type) + "_" + counter;
-
-    return data.getContextPath() + "/rigeltool/datatable/type/" + type + "/unique/" + unique;
-  }
-
-  @Override
-  protected void makeContextHtml(HtmlWrapperBase lso, ListaInfo li, CoreRunData data, Context context, String baseUri)
-     throws Exception
-  {
-    CoreCustomUrlBuilder ub = (CoreCustomUrlBuilder) SetupHolder.getUrlBuilder();
-    urb.setBaseMainForm(ub.getBaseMainForm());
-    urb.setBaseMainList(ub.getBaseMainList());
-    urb.setBasePopupForm(ub.getBasePopupForm());
-    urb.setBasePopupList(ub.getBasePopupList());
-
-    context.put("unique", unique);
-    funcNameEdit = "rigel.apriEditTool";
-    context.put("funcNameEdit", funcNameEdit);
-    funcNameSubmit = "submit_" + unique;
-    context.put("funcNameSubmit", funcNameSubmit);
-    formName = "fo_" + unique;
-    context.put("formName", formName);
-    bodyName = "body_" + unique;
-    context.put("bodyName", bodyName);
-
-    lso.setUim(uim);
-
-    ParameterParser pp = data.getParameters();
-    AlternateColorTableAppBase act = (AlternateColorTableAppBase) (lso.getTbl());
-    act.setDatatable(true);
-    act.setAuthDelete(isAuthorizedDelete(data));
-    act.setPopup(SU.checkTrueFalse(pp.getString("popup"), true));
-    act.setEditPopup(SU.checkTrueFalse(pp.getString("editPopup"), true));
-    act.setAuthSel(SU.checkTrueFalse(pp.getString("authSel"), true));
-    act.setPopupEditFunction(funcNameEdit);
-    act.setUrlBuilder(urb);
-    urb.setFunc(li.func);
-    urb.setType(li.type);
-
-    // aggiunge la classe rigel-datatable e l'id; il valore originale viene salvato per chiamate successive
-    String tableStatement = SU.okStr(context.get("tableStatement"), act.getTableStatement());
-    Matcher m1 = pTableClass.matcher(tableStatement);
-    if(m1.find())
-    {
-      String classes = m1.group(1) + " rigel-datatable";
-      String newtblsta = m1.replaceAll("class='" + classes + "' id='idtable_" + unique + "'");
-      act.setTableStatement(newtblsta);
-      context.put("tableStatement", tableStatement);
-    }
-    else
-    {
-      throw new Exception("il tag table deve avere una definizione di classe CSS");
-    }
-
-    AbstractHtmlTablePagerFilter flt = (AbstractHtmlTablePagerFilter) lso.getPager();
-    flt.setFormName(formName);
-    //flt.setUim(uim);
-    flt.setI18n(new RigelHtmlI18n(data));
-    String baseurl = flt.getBaseSelfUrl();
-    context.put("selfurl", baseurl);
-
-    if(lso.getPtm() instanceof SqlTableModel)
-    {
-      SqlTableModel tm = (SqlTableModel) lso.getPtm();
-      String nometab = tm.getQuery().getVista();
-      flt.setMascheraRicerca(new ToolRicercaDatatable(new SqlBuilderRicercaGenerica(tm, nometab),
-         tm, act.getI18n(), unique, baseurl));
-    }
-    else if(lso.getPtm() instanceof PeerTableModel)
-    {
-      PeerTableModel tm = (PeerTableModel) lso.getPtm();
-      flt.setMascheraRicerca(new ToolRicercaDatatable(new PeerBuilderRicercaGenerica(tm, tm.getTableMap()),
-         tm, act.getI18n(), unique, baseurl));
-    }
-
-    // la prima volta si presuppone non ci siano filtri, quindi il numero di record totali
-    long numRecords = flt.getTotalRecords();
-    if(!context.containsKey("recordsTotal"))
-      context.put("recordsTotal", numRecords);
-
-    // numero di record secondo il filtro applicato
-    context.put("recordsFiltered", numRecords);
-
-    super.makeContextHtml(lso, li, data, context, baseUri);
-  }
-
-  public void buildCtx(RunData data, Context ctx)
-     throws Exception
-  {
-    doBuildTemplate2((CoreRunData) data, ctx);
-  }
 
   /**
    * Produce JSON per il Tool delle liste.
@@ -204,53 +94,8 @@ public class ToolRenderDatatableRigel extends ListaBase5
     if(ctx == null)
       throw new Exception(INT.I("Context non presente in sessione; tool non disponibile."));
 
-    String html = renderHtml(data);
-
-    // converte html in json
-    // TODO: da rifare: conversione non possibile
-    HtmlTableJsonConverter cvt = new HtmlTableJsonConverter();
-    String jdata = cvt.convertHtml2Json(html);
-
-    JSONObject rv = new JSONObject();
-    rv.put("draw", "0");
-    rv.put("recordsTotal", ctx.get("recordsTotal"));
-    rv.put("recordsFiltered", ctx.get("recordsFiltered"));
-    rv.put("data", jdata);
-
+    JSONObject rv = renderCoreJson((CoreRunData) data, ctx);
     return rv.toString();
-  }
-
-  /**
-   * Produce HTML per il Tool delle liste.
-   * Questa funzione viene chiamata dalla servlet ajax ToolDirectHtml.
-   * @param data dati di chiamata
-   * @return HTML della lista
-   * @throws Exception
-   */
-  public String renderHtml(RunData data)
-     throws Exception
-  {
-    String ctxUnique = data.getParameters().getString("unique");
-    Context ctx = (Context) data.getSession().getAttribute(ctxUnique);
-    if(ctx == null)
-      throw new Exception(INT.I("Context non presente in sessione; tool non disponibile."));
-
-    unique = ctxUnique;
-    String html = renderHtml(data, ctx);
-    return cutHtml(html);
-  }
-
-  protected String cutHtml(String html)
-  {
-    // da tutto l'html estrae solo la parte racchiusa da <form></form>
-    // il resto non si può toccare
-
-    int pos1, pos2;
-    if((pos1 = html.indexOf(HTML_START_CUT)) != -1)
-      if((pos2 = html.indexOf(HTML_END_CUT, pos1)) != -1)
-        return html.substring(pos1, pos2);
-
-    return html;
   }
 
   /**
@@ -263,34 +108,30 @@ public class ToolRenderDatatableRigel extends ListaBase5
   public synchronized String renderHtml(RunData data, Context ctx)
      throws Exception
   {
-    boolean suppressEmpty = false;
-    String suppressEmptyMessage = "";
-    counter = (int) ctx.get("count");
-    unique = null;
+    int counter = (int) ctx.get("count");
+    String type = data.getParameters().getString("type");
+    String unique = "LISTA_" + SU.purge(type) + "_" + counter;
+    boolean footer = false;
 
     // recupera parametri del tool e li passa in RunData
     Map<String, String> mp = (Map<String, String>) ctx.get("paramsMap");
     if(mp != null)
     {
-      suppressEmpty = SU.checkTrueFalse(mp.get("suppressEmpty"));
-      suppressEmptyMessage = SU.okStr(mp.get("suppressEmptyMessage"), suppressEmptyMessage);
-
       for(Map.Entry<String, String> entry : mp.entrySet())
       {
         String key = entry.getKey();
         String value = entry.getValue();
         data.getParameters().setString(key, value);
       }
+
+      footer = SU.checkTrueFalse(mp.get("footer"), footer);
     }
 
     // costruisce tutti i componenti di pagina
-    buildCtx(data, ctx);
+    buildCtx((CoreRunData) data, type, unique, footer, ctx);
 
     // salva il context in sessione per le successive chiamate dalla servlet ajax
     data.getSession().setAttribute(unique, ctx);
-
-    if(suppressEmpty && SU.parse(ctx.get("numrows"), -1) == 0)
-      return suppressEmptyMessage;
 
     StringWriter writer = new StringWriter(512);
     // renderizzazione Velocity con il modello caricato da risorsa
@@ -302,33 +143,177 @@ public class ToolRenderDatatableRigel extends ListaBase5
       vp.parseReader(reader, writer, "ToolDatatable.vm");
     }
 
-    String html = cutHtml(writer.toString());
-
-    String js
-       = "\n"
-       + "<SCRIPT>\n"
-       + "    // attivazione datatable per rigel\n"
-       + "    $(\"#idtable_" + unique + "\").DataTable({\n"
-       + "      ajax: \"" + data.getContextPath() + "/rigeltool/datatable/unique/" + unique + "\",\n"
-       + "      deferLoading: " + ctx.get("recordsTotal") + ",\n"
-       + "      processing: true,\n"
-       + "      serverSide: true\n"
-       + "    });\n"
-       + "</SCRIPT>\n"
-       + "\n";
-
-    // rimaneggia javascript sostituendo submit con funzione specifica
-    String url = (String) ctx.get("selfurl");
-    return SU.strReplace(html + js,
-       "document." + formName + ".submit();",
-       "rigel.submitTool('" + unique + "', '" + url + "')");
+    return writer.toString();
   }
 
-  @Override
-  public void formatHtmlLista(int filtro, RigelHtmlPage page, Context context)
+  private void buildCtx(CoreRunData data, String type, String unique, boolean footer, Context ctx)
      throws Exception
   {
-    context.put("filtro", filtro);
-    context.put("htpage", page);
+    SqlWrapperListaXml wxml = MDL.getListaXmlSql(type);
+    wxml.init();
+    ctx.put("wrapper", wxml);
+    ctx.put("unique", unique);
+    ctx.put("counter", new AtomicInteger(1));
+
+    String tagTabelleList = TR.getString("tag.tabelle.list", "TABLE WIDTH=\"100%\" class=\"table\""); // NOI18N
+    String tableStatement = "";
+
+    // aggiunge la classe rigel-datatable e l'idir; il valore originale viene salvato per chiamate successive
+    Matcher m1 = pTableClass.matcher(tagTabelleList);
+    if(m1.find())
+    {
+      String classes = m1.group(1) + " rigel-datatable";
+      tableStatement = m1.replaceAll("class='" + classes + "' id='idtable_" + unique + "'");
+      ctx.put("tableStatement", tableStatement);
+    }
+    else
+    {
+      tableStatement = tagTabelleList + " class='rigel-datatable' id='idtable_" + unique + "'";
+      ctx.put("tableStatement", tableStatement);
+    }
+
+    String commonHeader = doHeaderHtml(wxml.getPtm());
+    ctx.put("commonHeader", commonHeader);
+    if(footer)
+      ctx.put("visFooter", true);
+  }
+
+  private JSONObject renderCoreJson(CoreRunData data, Context ctx)
+     throws Exception
+  {
+    RigelI18nInterface i18n = new RigelHtmlI18n(data);
+    ParameterParser pp = data.getParameters();
+    int rStart = pp.getInt("start");
+    int rLimit = data.getParameters().getInt("length");
+    String search = data.getParameters().getString("search[value]");
+
+    SqlWrapperListaXml wxml = (SqlWrapperListaXml) ctx.get("wrapper");
+    SqlTableModel stm = (SqlTableModel) wxml.getPtm();
+
+    int count = 1;
+    ArrayMap<Integer, Integer> mapOrder = new ArrayMap<>();
+    for(int i = 0; i < stm.getColumnCount(); i++)
+    {
+      int col = SU.parse(pp.getObject("order[" + i + "][column]"), -1);
+      String dir = SU.okStr(pp.getObject("order[" + i + "][dir]")).toUpperCase();
+
+      if(col != -1)
+      {
+        int idir = 0;
+        if(dir.matches("ASC"))
+          idir = count++;
+        if(dir.matches("DESC"))
+          idir = 1000 + (count++);
+
+        mapOrder.put(col, idir);
+      }
+    }
+
+    FiltroListe cSelezione = (FiltroListe) ctx.get("cSelezione");
+    if(cSelezione == null || !checkFiltroValido(stm, cSelezione, search, mapOrder))
+    {
+      cSelezione = creaFiltro(stm, i18n, search, mapOrder);
+      ctx.put("cSelezione", cSelezione);
+    }
+
+    stm.getQuery().setOffset(rStart);
+    stm.getQuery().setLimit(rLimit);
+    stm.getQuery().setFiltro((FiltroData) (cSelezione.getOggFiltro()));
+    stm.rebind();
+
+    AtomicInteger counter = (AtomicInteger) ctx.get("counter");
+    JSONObject out = new JSONObject();
+    out.put("draw", counter.getAndIncrement());
+    out.put("recordsTotal", stm.getTotalRecords());
+    out.put("recordsFiltered", stm.getTotalRecords());
+
+    ToolJsonDatatable table = new ToolJsonDatatable();
+    table.setModel(stm);
+    table.setColumnModel(stm.getColumnModel());
+    table.doRows(out);
+
+    return out;
+  }
+
+  /**
+   * Produce l'header della tabella
+   * @throws java.lang.Exception
+   */
+  private String doHeaderHtml(RigelTableModel tableModel)
+     throws Exception
+  {
+    hTable table = new hTable();
+    table.setModel(tableModel);
+    table.setColumnModel(tableModel.getColumnModel());
+    table.setHeaderStatement("tr");
+    table.setColheadStatement("th");
+
+    StringBuilder html = new StringBuilder();
+
+    for(int i = 0; i < tableModel.getColumnCount(); i++)
+    {
+      html.append(table.doCellHeader(i));
+    }
+
+    return html.toString().replace("/TD", "/th");
+  }
+
+  /**
+   * In base alle impostazioni utente crea il FiltroListe con
+   * all'interno gli opportuni filtri necessari.
+   * @param params
+   * @param stm
+   * @param i18n
+   * @return
+   * @throws java.lang.Exception
+   */
+  private FiltroListe creaFiltro(SqlTableModel stm, RigelI18nInterface i18n, String search, Map<Integer, Integer> mapOrder)
+     throws Exception
+  {
+    if(!stm.isInitalized())
+      throw new Exception(i18n.msg("Oggetto table model non inizializzato."));
+
+    ToolMascheraRicercaGenericaDatatable mgr = new ToolMascheraRicercaGenericaDatatable();
+    mgr.init(new SqlBuilderRicercaGenerica(stm, "dummy"), stm, i18n);
+    FiltroListe fl = new FiltroListe();
+    fl.setOggFiltro(mgr.buildCriteriaSafe(search, mapOrder));
+    fl.salvaInfoColonne(stm);
+    return fl;
+  }
+
+  private boolean checkFiltroValido(SqlTableModel stm, FiltroListe cSelezione, String search, Map<Integer, Integer> mapOrder)
+     throws Exception
+  {
+    cSelezione.recuperaInfoColonne(stm);
+
+    for(int i = 0; i < stm.getColumnCount(); i++)
+    {
+      RigelColumnDescriptor cd = stm.getColumn(i);
+      Integer direzione = mapOrder.get(i);
+
+      // verifica per colonna prima in sorting e ora non piu
+      if(direzione == null && cd.getFiltroSort() != 0)
+        return false;
+
+      // verifica per colonna prima in sorting e ora con direzione diversa ASC/DESC
+      if(direzione != null && direzione != cd.getFiltroSort())
+        return false;
+
+      int simpleSearchColumn = 0, simpleSearchWeight = 0;
+
+      if(!cd.isEscludiRicerca() && ((cd.getFiltroSort() % 1000) > simpleSearchWeight))
+      {
+        simpleSearchColumn = cd.getFiltroSort() > 1000 ? -(i + 1) : (i + 1);
+        simpleSearchWeight = cd.getFiltroSort() % 1000;
+      }
+
+      if(cd.getRicercaSemplice() == 0)
+        continue;
+
+      if(!SU.isEqu(search, cd.getFiltroValore()))
+        return false;
+    }
+
+    return true;
   }
 }
