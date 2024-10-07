@@ -47,6 +47,12 @@ public class EditWithIcon implements CustomColumnEdit
   }
 
   @Override
+  public boolean haveCustomHtml()
+  {
+    return false;
+  }
+
+  @Override
   public boolean haveAddHtml()
   {
     return true;
