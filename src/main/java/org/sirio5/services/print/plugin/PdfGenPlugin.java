@@ -17,7 +17,6 @@
  */
 package org.sirio5.services.print.plugin;
 
-import org.apache.commons.configuration2.Configuration;
 import org.sirio5.services.print.PdfPrint;
 import org.sirio5.services.print.PrintContext;
 import org.sirio5.utils.factory.CoreBasePoolPlugin;
@@ -29,17 +28,6 @@ import org.sirio5.utils.factory.CoreBasePoolPlugin;
  */
 public interface PdfGenPlugin extends CoreBasePoolPlugin
 {
-  /**
-   * Configurazione e inizializzazione del plugin.
-   * Il plugin puo' usare parametri dal servizio PdfPrint.
-   * @param pluginName
-   * @param cfg
-   * @param dirTmp
-   * @throws Exception
-   */
-  public void configure(String pluginName, Configuration cfg)
-     throws Exception;
-
   /**
    * Restituisce un bean con i parametri per la stampa richiesta.
    * @param idUser the value of idUser

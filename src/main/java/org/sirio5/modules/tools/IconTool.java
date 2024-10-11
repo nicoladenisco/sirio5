@@ -123,6 +123,12 @@ public class IconTool extends I18nTool
     return getService().getImgLista();
   }
 
+  public String getImgRicerca()
+     throws Exception
+  {
+    return getService().getImgLista();
+  }
+
   public String getImgEditItem()
      throws Exception
   {
@@ -151,6 +157,12 @@ public class IconTool extends I18nTool
      throws Exception
   {
     return getService().getImgCollapse();
+  }
+
+  public String getImgCalendario()
+     throws Exception
+  {
+    return getService().getImgEditData();
   }
 
   /**

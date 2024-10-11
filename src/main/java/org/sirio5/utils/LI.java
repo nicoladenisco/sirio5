@@ -44,7 +44,7 @@ public class LI extends HtmlUtils
   private static String __myContextPath = null;
 
   /**
-   * Ritorna la uri (http://.../pgm/template/mia.vm)
+   * Ritorna la uri (http://.../app/template/mia.vm)
    * del file di modello vm indicato.
    * @param data
    * @param templatePage
@@ -276,10 +276,14 @@ public class LI extends HtmlUtils
       return getImgAwesomeFas(SU.okStr(icon.substring(4)), text);
     if(icon.startsWith("far:"))
       return getImgAwesomeFar(SU.okStr(icon.substring(4)), text);
+    if(icon.startsWith("fab:"))
+      return getImgAwesomeFab(SU.okStr(icon.substring(4)), text);
     if(icon.startsWith("fas-spin:"))
       return getImgAwesomeFasSpin(SU.okStr(icon.substring(9)), text);
     if(icon.startsWith("far-spin:"))
       return getImgAwesomeFarSpin(SU.okStr(icon.substring(9)), text);
+    if(icon.startsWith("fab-spin:"))
+      return getImgAwesomeFabSpin(SU.okStr(icon.substring(9)), text);
 
     return LI.getIconHtml(icon, text);
   }

@@ -148,7 +148,8 @@ public class jsrefxmlBean
     {
       fl.setOffset(rStart);
       fl.setLimit(RECORD_PER_PASSATA);
-      fl.setIgnoreCase(true);
+      //se nella selezione si utilizzano campi interi, questo provoca errore
+      //fl.setIgnoreCase(true);
       List data = rInfo.getPle().getRecords(fl);
       ptm.rebind(data);
       tbl.doRows(out);

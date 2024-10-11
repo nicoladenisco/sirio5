@@ -34,6 +34,7 @@ import org.sirio5.services.modellixml.modelliXML;
 import org.sirio5.services.token.TokenAuthService;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.DT;
+import org.sirio5.utils.LI;
 import org.sirio5.utils.SU;
 import org.sirio5.utils.TR;
 
@@ -138,6 +139,11 @@ public class CoreBaseBean implements HttpSessionBindingListener
   {
     return "<img src=\"" + ui.image(imgName) + "\" alt=\"" + tip
        + "\" title=\"" + tip + "\" border=\"0\">";
+  }
+
+  public String getIconGeneric(String iconName, String tip)
+  {
+    return LI.getImgIcon(iconName, tip);
   }
 
   public String getCurrJspName()

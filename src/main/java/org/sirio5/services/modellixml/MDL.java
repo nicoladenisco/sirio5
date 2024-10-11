@@ -187,6 +187,12 @@ public class MDL
     return getService().getImgCancellaRecord();
   }
 
+  public static String getImgLista()
+     throws Exception
+  {
+    return getService().getImgLista();
+  }
+
   public static String getImgEditData()
      throws Exception
   {

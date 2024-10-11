@@ -34,8 +34,8 @@ import org.commonlib5.xmlrpc.XmlRpcCostant;
 public class BaseXmlRpcClientUserAuth extends BaseXmlRpcClient
 {
   protected String idClient = null;
-  protected Hashtable initResult = null;
-  protected Hashtable initData = new Hashtable();
+  protected Map initResult = null;
+  protected Map initData = new HashMap();
   //
   public static final String TOKEN_MAGIG = "MDQOWHF!IWEQRGHUYRWVQNCWOEQ$DKPOQKEPO.QJEFWQE;UFNCLWRHV:OIWUERHFUISXJKLMql"; // NOI18N
 
@@ -58,7 +58,7 @@ public class BaseXmlRpcClientUserAuth extends BaseXmlRpcClient
    * @param pass password dell'utente
    * @throws Exception
    */
-  public void init(String user, String pass, Hashtable data)
+  public void init(String user, String pass, Map data)
      throws Exception
   {
     if(data != null)
@@ -71,7 +71,7 @@ public class BaseXmlRpcClientUserAuth extends BaseXmlRpcClient
     initClient(initData);
   }
 
-  public void initMagic(String user, String serverUUID, Hashtable data)
+  public void initMagic(String user, String serverUUID, Map data)
      throws Exception
   {
     String shHash = calcolaHashMagic(user, serverUUID);
@@ -93,7 +93,7 @@ public class BaseXmlRpcClientUserAuth extends BaseXmlRpcClient
    * @param sessionID identificativo della sessione HTTP (rilasciato dall'application server)
    * @throws Exception
    */
-  public void init(String sessionID, Hashtable data)
+  public void init(String sessionID, Map data)
      throws Exception
   {
     if(data != null)
@@ -111,20 +111,20 @@ public class BaseXmlRpcClientUserAuth extends BaseXmlRpcClient
    * @return parametri di risposta dal server
    * @throws Exception
    */
-  public Hashtable initClient(Hashtable data)
+  public Map initClient(Map data)
      throws Exception
   {
-    Vector params = new Vector();
+    List params = new ArrayList();
     params.add(data);
     Object rv = client.execute(stubName + ".initClient", params);
     if(rv instanceof XmlRpcException)
       throw new RemoteErrorException("Errore segnalato dal server remoto:\n"
          + ((Throwable) rv).getMessage(), (Throwable) rv);
 
-    if(!(rv instanceof Hashtable))
-      throw new RemoteErrorException("Tipo inaspettato nel valore di ritorno: era attesa una Hashtable.");
+    if(!(rv instanceof Map))
+      throw new RemoteErrorException("Tipo inaspettato nel valore di ritorno: era attesa una Map.");
 
-    initResult = (Hashtable) rv;
+    initResult = (Map) rv;
     String errorMessage = (String) initResult.get(XmlRpcCostant.RV_ERROR);
     if(errorMessage != null)
       throw new RemoteErrorException("Errore di comunicazione (lato server): " + errorMessage);
@@ -132,7 +132,7 @@ public class BaseXmlRpcClientUserAuth extends BaseXmlRpcClient
     if((idClient = (String) initResult.get(XmlRpcCostant.RV_CLIENT_ID)) == null)
       throw new RemoteErrorException("Autenticazione fallita: nessun codice utente ritornato.");
 
-    return (Hashtable) rv;
+    return (Map) rv;
   }
 
   /**
@@ -232,10 +232,10 @@ public class BaseXmlRpcClientUserAuth extends BaseXmlRpcClient
    * @deprecated usa i dati restituiti al logon (getInitResult)
    * @throws Exception
    */
-  public Vector getListaProfiliUtente(String clientID)
+  public List getListaProfiliUtente(String clientID)
      throws Exception
   {
-    return (Vector) call("getListaProfiliUtente", clientID);
+    return (List) call("getListaProfiliUtente", clientID);
   }
 
   /**

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@ package org.sirio5.utils.xmlrpc;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -43,7 +43,7 @@ import org.sirio5.services.token.TokenAuthService;
  */
 public class FileTransferServerHelper extends CoreTokenBean
 {
-  private String unique;
+  private final String unique;
   private static final Object semaforo = new Object();
   //
   public static final String REF_TRANSFER_CACHE_KEY = "refTransferCacheKey";
@@ -93,7 +93,7 @@ public class FileTransferServerHelper extends CoreTokenBean
     this.unique = "uu_" + System.currentTimeMillis();
   }
 
-  public Hashtable preparaDownload(String fileName, File toTransfer, int suggestBlockSize)
+  public Map preparaDownload(String fileName, File toTransfer, int suggestBlockSize)
      throws Exception
   {
     synchronized(semaforo)
@@ -210,7 +210,7 @@ public class FileTransferServerHelper extends CoreTokenBean
     }
   }
 
-  public Hashtable preparaUpload(String fileName, int fileSize, int suggestBlockSize)
+  public Map preparaUpload(String fileName, int fileSize, int suggestBlockSize)
      throws Exception
   {
     synchronized(semaforo)

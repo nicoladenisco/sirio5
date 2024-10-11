@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.StringTokenizer;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
@@ -65,12 +66,13 @@ abstract public class AbstractCoreSecurity extends BaseService
   private static final Log log = LogFactory.getLog(AbstractCoreSecurity.class);
   //
   protected boolean autoSavePermessi = true, permessiNocase = true, enableLdap = false;
-  protected KeyCalculator kCalc = new KeyCalculator();
   protected String urlLdap, domainLdap;
   protected String[] userMapLdap;
-  protected HashMap<String, String> userMappingLdap = new HashMap<>();
   protected SecurityService turbineSecurity;
   protected PermissionManager pman;
+
+  protected final KeyCalculator kCalc = new KeyCalculator();
+  protected final Map<String, String> userMappingLdap = new HashMap<>();
 
   protected boolean enableStrictPassword = true, enableWeakPassword = false;
   protected int ttlpasswordDays = 180, minLenPassword = 8;

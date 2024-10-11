@@ -50,7 +50,7 @@ final public class CalendarioBean extends CoreBaseBean
   private String monthName;
   private StringBuilder htmlOpMesi, htmlOpAnni, html2;
   private Locale loc = null;
-  private int useBootstrapDialog = 0;
+  private int bootstrapVersion = 0;
   protected RigelHtmlI18n i18n = null;
   private LocalizationService ls;
 
@@ -77,7 +77,7 @@ final public class CalendarioBean extends CoreBaseBean
       oggiy += 1900;
 
     data.getParameters().setProperties(this);
-    useBootstrapDialog = TR.getInt("useBootstrapDialog", useBootstrapDialog);
+    bootstrapVersion = TR.getInt("bootstrapVersion", bootstrapVersion);
   }
 
   @Override
@@ -88,14 +88,14 @@ final public class CalendarioBean extends CoreBaseBean
     data.getParameters().setProperties(this);
   }
 
-  public int getUseBootstrapDialog()
+  public int getBootstrapVersion()
   {
-    return useBootstrapDialog;
+    return bootstrapVersion;
   }
 
-  public void setUseBootstrapDialog(int useBootstrapDialog)
+  public void setBootstrapVersion(int bootstrapVersion)
   {
-    this.useBootstrapDialog = useBootstrapDialog;
+    this.bootstrapVersion = bootstrapVersion;
   }
 
   /**
@@ -203,10 +203,11 @@ final public class CalendarioBean extends CoreBaseBean
         if(gg == oggig && mm == oggim && yy == oggiy)
           style = "cal_toda";
 
-        switch(useBootstrapDialog)
+        switch(bootstrapVersion)
         {
-          case 2: // bootstrap 5
-          case 1: // bootstrap 3
+          case 5: // bootstrap 5
+          case 4: // bootstrap 4
+          case 3: // bootstrap 3
           {
             html2.append("<TD WIDTH=50 HEIGHT=30 CLASS=\"").append(style).
                append("\" onclick=\"").append(func).append("('").append(sDate).
@@ -214,10 +215,11 @@ final public class CalendarioBean extends CoreBaseBean
             break;
           }
           case 0: // nessuno
+          default:
           {
-            html2.append("<TD WIDTH=50 HEIGHT=30 CLASS=\"").append(style)
-               .append("\" onclick=\"changeDay('").append(sDate).append("')\">")
-               .append(gg).append("</TD>\r\n");
+            html2.append("<TD WIDTH=50 HEIGHT=30 CLASS=\"").append(style).
+               append("\" onclick=\"").append(func).append("('").append(sDate).
+               append("'); chiudiCalendario();\">").append(gg).append("</TD>\r\n"); // NOI18N
             break;
           }
         }
@@ -427,14 +429,15 @@ final public class CalendarioBean extends CoreBaseBean
 
   protected String fmtOption(String spg, String sug, String descrizione)
   {
-    switch(useBootstrapDialog)
+    switch(bootstrapVersion)
     {
-      case 2: // bootstrap 5
+      case 5: // bootstrap 5
+      case 4: // bootstrap 4
       {
         return "<li><a class=\"dropdown-item\" href=\"#\" onclick=\""
            + fint + "('" + spg + "|" + sug + "'); chiudiCalendario();\">" + descrizione + "</a></li>\n"; // NOI18N
       }
-      case 1: // bootstrap 3
+      case 3: // bootstrap 3
       {
         return "<li role=\"presentation\"><a role=\"menuitem\" tabindex=\"-1\" href=\"#\" onclick=\""
            + fint + "('" + spg + "|" + sug + "'); chiudiCalendario();\">" + descrizione + "</a></li>\n"; // NOI18N

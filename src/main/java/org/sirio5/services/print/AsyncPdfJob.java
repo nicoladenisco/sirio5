@@ -89,6 +89,11 @@ public class AsyncPdfJob
 
       if(info.printer != null)
         manageDirectPrint();
+
+      synchronized(this)
+      {
+        notify();
+      }
     }
     catch(Exception e)
     {
@@ -117,6 +122,19 @@ public class AsyncPdfJob
   {
     if(isRunning())
       thRun.join(timeout);
+  }
+
+  public synchronized boolean waitForCompletation(long timeout)
+  {
+    try
+    {
+      wait(timeout);
+      return isRunning();
+    }
+    catch(Exception e)
+    {
+      return false;
+    }
   }
 
   protected void manageDirectPrint()

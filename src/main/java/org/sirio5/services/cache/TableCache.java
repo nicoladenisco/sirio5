@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.fulcrum.cache.CachedObject;
 import org.apache.fulcrum.cache.ObjectExpiredException;
+import org.apache.torque.map.ColumnMap;
 import org.apache.torque.map.TableMap;
 import org.apache.torque.om.ColumnAccessByName;
 import org.apache.torque.om.NumberKey;
@@ -162,6 +163,31 @@ public class TableCache<T extends ColumnAccessByName> implements Iterable<T>
   public T findByPeername(String peerName, Object valueFilter, boolean ignoreDeleted)
      throws Exception
   {
+    TableCacheData tc = getFromCache();
+    for(Iterator itr = tc.getIterator(ignoreDeleted); itr.hasNext();)
+    {
+      ColumnAccessByName val = (ColumnAccessByName) itr.next();
+      if(SU.isEqu(valueFilter, val.getByPeerName(peerName)))
+        return (T) val;
+    }
+
+    return null;
+  }
+
+  /**
+   * Recupera record usando un campo qualsiasi come filtro.
+   * Se la tabella contiene il campo indicato ritorna il primo record con
+   * il valore del campo match del filtro (vedi getByName dell'oggetto Peer).
+   * @param peerColumn campo per il filtro
+   * @param valueFilter valore del filtro
+   * @param ignoreDeleted se vero ignora cancellati logicamente (stato_rec)
+   * @return oggetto oppure null
+   * @throws Exception
+   */
+  public T findByPeername(ColumnMap peerColumn, Object valueFilter, boolean ignoreDeleted)
+     throws Exception
+  {
+    String peerName = peerColumn.getColumnName();
     TableCacheData tc = getFromCache();
     for(Iterator itr = tc.getIterator(ignoreDeleted); itr.hasNext();)
     {
@@ -427,6 +453,13 @@ public class TableCache<T extends ColumnAccessByName> implements Iterable<T>
     return rv;
   }
 
+  /**
+   * Carica il blocco dati e lo salva nella cache.
+   * Il tempo di permanenza nella cache è determinato dalle dimensioni del blocco.
+   * Per salvaguardare la memoria, più grande è il blocco, minore è il tempo di ritenuta.
+   * @return blocco dati
+   * @throws Exception
+   */
   public TableCacheData reload()
      throws Exception
   {

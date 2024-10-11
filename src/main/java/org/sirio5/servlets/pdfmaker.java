@@ -218,15 +218,27 @@ public class pdfmaker extends HttpServlet
     if(job != null && job == NULL_JOB)
       return;
 
-    if(job != null && job.filePdf != null)
+    // verifica se la cache e' ancora valida
+    if(job != null)
     {
-      // verifica se la cache e' ancora valida
-      if(!job.filePdf.exists()
-         || (System.currentTimeMillis() - job.filePdf.lastModified()) > TIME_EXPIRIES)
+      // se il file PDF esiste controlla che non sia più vecchio di TIME_EXPIRIES
+      if(job.filePdf != null)
       {
-        job.filePdf.delete();
-        job = null;
-        htReq.remove(cacheKey);
+        if(!job.filePdf.exists() || (System.currentTimeMillis() - job.filePdf.lastModified()) > TIME_EXPIRIES)
+        {
+          job.filePdf.delete();
+          job = null;
+          htReq.remove(cacheKey);
+        }
+      }
+      else
+      {
+        // se il file PDF non è stato creato usa il timer di creazione
+        if(job.stCreated.isElapsed(TIME_EXPIRIES))
+        {
+          job = null;
+          htReq.remove(cacheKey);
+        }
       }
     }
 
@@ -472,7 +484,7 @@ public class pdfmaker extends HttpServlet
 
       File tmp = File.createTempFile("risposta", ".html");
       VelocityParser vp = new VelocityParser(ctx);
-      vp.parseFileToFile(template, tmp);
+      vp.parseFileToFile("setup/" + template, tmp);
       pgmlog.info("Risposta template in " + tmp.getAbsolutePath());
       FU.sendFileAsHTML(request, response, tmp, false);
       tmp.delete();

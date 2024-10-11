@@ -2,9 +2,11 @@
 
 <SCRIPT LANGUAGE="JavaScript">
 
+  var table_${unique};
+
   jQuery(function () {
 
-    $("#idtable_${unique}").DataTable({
+    table_${unique} = $("#idtable_${unique}").DataTable({
 
       stateSave: true,
       stateSaveCallback: function (settings, data) {
@@ -22,8 +24,17 @@
       serverSide: true,
       bAutoWidth: false,
 
-      columnDefs: [{ type: 'html' }]
+      columnDefs: [{type: 'html'}]
     });
+
+    #if($func)
+    table_${unique}.on('click', 'tbody tr', function () {
+      let data = table_${unique}.row(this).data();
+
+      //console.log('You clicked on ' + data[0] + "'s row ($func)");
+      $func
+    });
+    #end
   });
 
 </SCRIPT>

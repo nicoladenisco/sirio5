@@ -21,6 +21,7 @@ import java.io.*;
 import java.util.*;
 import javax.servlet.http.HttpSession;
 import org.apache.fulcrum.cache.CachedObject;
+import org.commonlib5.utils.SimpleTimer;
 import org.sirio5.services.CoreServiceExtension;
 
 /**
@@ -65,6 +66,7 @@ public interface PdfPrint extends CoreServiceExtension
     public int idUser = 0;            // utente che ha richiesto la stampa
     public String tipoMime;           // tipo mime del file prodotto
     public String printer;            // eventuale stampante per invio diretto
+    public final SimpleTimer stCreated = new SimpleTimer();
   }
 
   /**

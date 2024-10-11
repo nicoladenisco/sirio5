@@ -37,6 +37,7 @@ import org.sirio5.utils.SU;
  * in una unica query tutti i peer collegati (ES: List[AnAnagrafiche]) e
  * quindi di recuparli attraverso le funzioni findByPrimaryKey.
  * NON utilizza la GlobalCache.
+ * Questa versione differisce da TableRelationCache2 per l'uso di doSelectJoinAllForBeans al posto di doSelect.
  *
  * @author Nicola De Nisco
  * @param <T> Tipo di oggetti recuperati
@@ -44,7 +45,7 @@ import org.sirio5.utils.SU;
  */
 public class TableRelationCache3<T extends Persistent, O extends Persistent> extends ArrayList<T>
 {
-  private Map<ObjectKey, Persistent> mapValues = new HashMap<ObjectKey, Persistent>();
+  private final Map<ObjectKey, Persistent> mapValues = new HashMap<>();
   private String tableName;
 
   /**

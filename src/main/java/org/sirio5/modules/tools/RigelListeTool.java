@@ -139,6 +139,12 @@ public class RigelListeTool
   public String datatable(RunData data, String lista, String params)
      throws Exception
   {
+    return datatableFilter(data, lista, null, params);
+  }
+
+  public String datatableFilter(RunData data, String lista, String filter, String params)
+     throws Exception
+  {
     ParameterParser pp = data.getParameters();
     pp.setString("type", lista);
     Context ctx = velocity.getContext(data);
@@ -151,8 +157,13 @@ public class RigelListeTool
     if(params != null)
     {
       Map<String, String> mp = SU.string2Map(params, ",", true);
-      ctx.put("paramsMap", mp);
+      if(!mp.isEmpty())
+        ctx.put("paramsMap", mp);
     }
+
+    // aggiunge il filtro
+    if(filter != null)
+      ctx.put("freeFilter", filter);
 
     return renderDatatable.renderHtml(data, ctx);
   }

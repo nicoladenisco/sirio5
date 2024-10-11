@@ -25,6 +25,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.*;
 import org.apache.turbine.*;
 import org.apache.turbine.services.*;
+import org.commonlib5.utils.ClassOper;
 import org.commonlib5.utils.CommonFileUtils;
 import org.commonlib5.utils.OsIdent;
 import org.commonlib5.utils.StringOper;
@@ -168,7 +169,7 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
 
       try
       {
-        return (CoreAppSanity) Class.forName(aa).newInstance();
+        return (CoreAppSanity) ClassOper.createObject(aa, null, null);
       }
       catch(Exception ex)
       {
@@ -187,32 +188,14 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
 
     try
     {
+      setInit(false);
+
       synchronized(semaforoInit)
       {
         if(!initEseguito)
         {
-          log.info("Attivo inizializzazione variabili statiche globali dei servizi.");
-          initEseguito = true;
-
-          try
-          {
-            localInit();
-
-            CoreAppSanity san = getSanitizer();
-            if(san != null)
-              san.sanityApplication(this);
-
-            initCompletato = true;
-          }
-          catch(Exception e)
-          {
-            String s = "ERRORE FATALE INIZIALIZZAZIONE (esecuzione compromessa/non possibile): "
-               + e.getMessage();
-            log.error(s, e);
-            ALLARM.fatal("CORE", "Init", s, 0);
-            setInit(false);
+          if(!oneTimeInit())
             return;
-          }
         }
         else
         {
@@ -242,6 +225,36 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
       log.error(s, e);
       ALLARM.fatal(getName(), "Init", s, 0);
       setInit(false);
+    }
+  }
+
+  /**
+   * Esegue inizializzazione estesa servizi sirio.
+   * @return vero se l'inizializzazione è avvenuta con successo
+   */
+  protected boolean oneTimeInit()
+  {
+    log.info("Attivo inizializzazione variabili statiche globali dei servizi.");
+    initEseguito = true;
+
+    try
+    {
+      localInit();
+
+      CoreAppSanity san = getSanitizer();
+      if(san != null)
+        san.sanityApplication(this);
+
+      initCompletato = true;
+      return true;
+    }
+    catch(Exception e)
+    {
+      String s = "ERRORE FATALE INIZIALIZZAZIONE (esecuzione compromessa/non possibile): "
+         + e.getMessage();
+      log.error(s, e);
+      ALLARM.fatal("CORE", "Init", s, 0);
+      return false;
     }
   }
 
@@ -309,6 +322,7 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
 
     // pulisce la directory /var/nomeapp/tmp
     // NON POSSIBILE: se applicazione ha piu moduli distrugge init dei vari moduli
+    // se questa funzionalità è richiesta può essere spostata nel sanitizer personalizzato per l'applicazione.
     // CommonFileUtils.deleteDir(new File(pathWorkTmp), false);
     //
     // se non già fatto imposta un UUID univoco per questa istanza

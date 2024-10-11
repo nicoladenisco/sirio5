@@ -18,6 +18,7 @@
 package org.sirio5.services.print;
 
 import java.util.Iterator;
+import java.util.Map;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
@@ -92,6 +93,10 @@ abstract public class AbstractAsyncPdfPrint extends AbstractPdfPrint
 
     AsyncPdfJob job = createJob();
     AbstractReportParametersInfo ri = getParameters(idUser, codiceStampa, context);
+    context.put(PrintContext.PBEAN_KEY, ri);
+    context.put(PrintContext.REPORT_INFO_KEY, ri.getInfo());
+    context.put(PrintContext.REPORT_NAME_KEY, ri.getNome());
+    context.put(PrintContext.SESSION_KEY, sessione);
 
     job.init(this, idUser, ri.getPlugin(), context);
     job.start();

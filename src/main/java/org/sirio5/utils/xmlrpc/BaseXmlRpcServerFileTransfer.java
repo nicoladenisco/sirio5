@@ -42,7 +42,7 @@ import org.sirio5.utils.SU;
 public class BaseXmlRpcServerFileTransfer extends BaseXmlRpcServerUserAuth
    implements FileTransfer
 {
-  public FileTransferServerHelper getHelper(TokenAuthItem token)
+  protected FileTransferServerHelper getHelper(TokenAuthItem token)
      throws Exception
   {
     return BeanFactory.getFromToken(token, FileTransferServerHelper.class);

@@ -20,6 +20,7 @@ package org.sirio5.rigel;
 import org.json.JSONArray;
 import org.rigel5.table.RigelColumnDescriptor;
 import org.rigel5.table.xml.jsonTable;
+import org.sirio5.utils.CoreRunData;
 
 /**
  * Tabella rigel specializzata per la produzione di JSON adatto alla datatable.
@@ -28,6 +29,10 @@ import org.rigel5.table.xml.jsonTable;
  */
 public class ToolJsonDatatable extends jsonTable
 {
+  public void setRunData(CoreRunData data)
+  {
+  }
+
   @Override
   public void doRow(JSONArray out, int row)
      throws Exception

@@ -509,7 +509,7 @@ public class CoreModelliXML extends AbstractCoreBaseService
        + "<script LANGUAGE=\"JavaScript\">\r\n"
        + "function restartd_" + nomeCampo + "(strdate) {\r\n"
        + "      document." + nomeForm + "." + nomeCampo + ".value = strdate;\r\n"
-       + "      calwindow.close();\r\n"
+       + "      chiudiCalendario();\r\n"
        + "}\r\n"
        + "</SCRIPT>\r\n";
   }
@@ -539,7 +539,7 @@ public class CoreModelliXML extends AbstractCoreBaseService
        + "<script LANGUAGE=\"JavaScript\">\r\n"
        + "function restartd_" + nomeCampoInizio + "(strdate) {\r\n"
        + "      document." + nomeForm + "." + nomeCampoInizio + ".value = strdate;\r\n"
-       + "      calwindow.close();\r\n"
+       + "      chiudiCalendario();\r\n"
        + "}\r\n"
        + "function restartd_" + nomeCampoInizio + "_" + nomeCampoFine + "(ss) {\r\n"
        + "      var idx = ss.indexOf(\"|\");\r\n"
@@ -547,7 +547,7 @@ public class CoreModelliXML extends AbstractCoreBaseService
        + "      var s2  = ss.substring(idx+1);\r\n"
        + "      document." + nomeForm + "." + nomeCampoInizio + ".value = s1;\r\n"
        + "      document." + nomeForm + "." + nomeCampoFine + ".value = s2;\r\n"
-       + "      calwindow.close();\r\n"
+       + "      chiudiCalendario();\r\n"
        + "}\r\n"
        + "</SCRIPT>\r\n";
   }
@@ -577,7 +577,7 @@ public class CoreModelliXML extends AbstractCoreBaseService
        + "<script LANGUAGE=\"JavaScript\">\r\n"
        + "function restartd_" + nomeCampoFine + "(strdate) {\r\n"
        + "      document." + nomeForm + "." + nomeCampoFine + ".value = strdate;\r\n"
-       + "      calwindow.close();\r\n"
+       + "      chiudiCalendario();\r\n"
        + "}\r\n"
        + "function restartd_" + nomeCampoFine + "_" + nomeCampoInizio + "(ss) {\r\n"
        + "      var idx = ss.indexOf(\"|\");\r\n"
@@ -585,7 +585,7 @@ public class CoreModelliXML extends AbstractCoreBaseService
        + "      var s2  = ss.substring(idx+1);\r\n"
        + "      document." + nomeForm + "." + nomeCampoInizio + ".value = s1;\r\n"
        + "      document." + nomeForm + "." + nomeCampoFine + ".value = s2;\r\n"
-       + "      calwindow.close();\r\n"
+       + "      chiudiCalendario();\r\n"
        + "}\r\n"
        + "</SCRIPT>\r\n";
   }

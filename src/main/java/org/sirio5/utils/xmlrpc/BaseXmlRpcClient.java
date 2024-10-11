@@ -20,7 +20,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Vector;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xmlrpc.XmlRpcException;
@@ -103,15 +104,38 @@ public class BaseXmlRpcClient
   protected Object call(String method, Object... parameters)
      throws RemoteErrorException, XmlRpcException, IOException
   {
-    Vector params = new Vector();
-    params.addAll(Arrays.asList(parameters));
     if(stubName != null)
       method = stubName + "." + method;
-    Object rv = client.execute(method, params);
+    Object rv = client.execute(method, parameters);
     if(rv instanceof XmlRpcException)
       throw new RemoteErrorException("Errore segnalato dal server remoto: "
          + ((XmlRpcException) rv).getMessage(), (Throwable) rv);
     return rv;
+  }
+
+  protected List callAsList(String method, Object... parameters)
+     throws RemoteErrorException, XmlRpcException, IOException
+  {
+    Object rv = call(method, parameters);
+
+    if(rv instanceof List)
+      return (List) rv;
+
+    if(rv instanceof Object[])
+      return Arrays.asList((Object[]) rv);
+
+    throw new XmlRpcException("The return type is not compatible with List.");
+  }
+
+  protected Map callAsMap(String method, Object... parameters)
+     throws RemoteErrorException, XmlRpcException, IOException
+  {
+    Object rv = call(method, parameters);
+
+    if(rv instanceof Map)
+      return (Map) rv;
+
+    throw new XmlRpcException("The return type is not compatible with List.");
   }
 
   /**
@@ -184,7 +208,7 @@ public class BaseXmlRpcClient
      throws Exception
   {
     // tenta di connettersi alla porta XML-RPC del master
-    try (Socket s = new Socket(server, port))
+    try(Socket s = new Socket(server, port))
     {
       return s.getLocalAddress();
     }

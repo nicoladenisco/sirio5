@@ -87,6 +87,7 @@ public class CoreConst
   public static final String LOGIN_MODE = "LOGIN_MODE";
   public static final String LOGIN_JOURNAL = "LOGIN_JOURNAL";
   public static final String LOGIN_TOKEN_ITEM = "LOGIN_TOKEN_ITEM";
+  public static final String LOGIN_TOKEN_STRING = "LOGIN_TOKEN_STRING";
   public static final String USER_DIMENSION = "USER_DIMENSION";
 
   // un pollice espresso in millimetri

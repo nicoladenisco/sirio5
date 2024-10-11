@@ -52,7 +52,6 @@ abstract public class AbstractPdfPrint extends AbstractCoreBaseService
   public void coreInit()
      throws Exception
   {
-    String s;
     Configuration cfg = getConfiguration();
 
     enableCache = cfg.getBoolean("enableCache", true);
@@ -60,9 +59,9 @@ abstract public class AbstractPdfPrint extends AbstractCoreBaseService
     ParametroBuilderFactory.getInstance().configure(cfg);
     DatamakerGeneratorFactory.getInstance().configure(cfg);
 
-    PdfGeneratorFactory.getInstance().addBasePath("org.sirio6.services.print.plugin");
-    ParametroBuilderFactory.getInstance().addBasePath("org.sirio6.services.print.parametri");
-    DatamakerGeneratorFactory.getInstance().addBasePath("org.sirio6.services.print.datamaker");
+    PdfGeneratorFactory.getInstance().addBasePath("org.sirio5.services.print.plugin");
+    ParametroBuilderFactory.getInstance().addBasePath("org.sirio5.services.print.parametri");
+    DatamakerGeneratorFactory.getInstance().addBasePath("org.sirio5.services.print.datamaker");
 
     dirTmp = getWorkTmpFile("print");
     ASSERT_DIR_WRITE(dirTmp);

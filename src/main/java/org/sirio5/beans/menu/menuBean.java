@@ -66,7 +66,7 @@ abstract public class menuBean extends CoreBaseBean
     home = TR.getString("template.homepage", "Index.vm");
   }
 
-  protected String substMacro(String s)
+  public String substMacro(String s)
   {
     if(s != null)
     {

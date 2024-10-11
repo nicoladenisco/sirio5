@@ -50,7 +50,7 @@ import org.apache.velocity.runtime.parser.node.SimpleNode;
  */
 public class VelocityParser
 {
-  protected Context ctx;
+  protected final Context ctx;
 
   /**
    * Costruttore.
@@ -132,7 +132,7 @@ public class VelocityParser
   public void parseFileToFile(String fileModello, File output)
      throws Exception
   {
-    try (FileWriter fw = new FileWriter(output))
+    try(FileWriter fw = new FileWriter(output))
     {
       parseFile(fileModello, fw);
       fw.flush();
@@ -144,6 +144,7 @@ public class VelocityParser
    * L'oggetto Tenmplate potrà poi essere trasformato con il
    * suo metodo merge(context, writer).
    * @param reader sorgente dati
+   * @param templateName nome del file template
    * @return oggetto Template
    * @throws Exception
    */

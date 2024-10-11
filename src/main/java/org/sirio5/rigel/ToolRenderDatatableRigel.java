@@ -20,15 +20,21 @@ package org.sirio5.rigel;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.fulcrum.parser.ParameterParser;
 import org.apache.turbine.util.RunData;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.util.ClassUtils;
 import org.commonlib5.utils.ArrayMap;
+import org.commonlib5.utils.ClassOper;
+import org.commonlib5.utils.Pair;
+import org.jdom2.Element;
 import org.json.JSONObject;
 import org.rigel5.RigelI18nInterface;
 import org.rigel5.db.sql.FiltroData;
@@ -57,6 +63,8 @@ import org.sirio5.utils.velocity.VelocityParser;
  */
 public class ToolRenderDatatableRigel
 {
+  private static Log log = LogFactory.getLog(ToolRenderDatatableRigel.class);
+
   protected final ToolRigelUIManagerDatatable uim = new ToolRigelUIManagerDatatable();
   protected final ToolCustomUrlBuilder urb = new ToolCustomUrlBuilder();
   protected static final Pattern pTableClass = Pattern.compile("class=[\'|\"](.+?)[\'|\"]");
@@ -117,11 +125,12 @@ public class ToolRenderDatatableRigel
     Map<String, String> mp = (Map<String, String>) ctx.get("paramsMap");
     if(mp != null)
     {
+      ParameterParser pp = data.getParameters();
       for(Map.Entry<String, String> entry : mp.entrySet())
       {
         String key = entry.getKey();
         String value = entry.getValue();
-        data.getParameters().setString(key, value);
+        pp.setString(key, value);
       }
 
       footer = SU.checkTrueFalse(mp.get("footer"), footer);
@@ -155,6 +164,7 @@ public class ToolRenderDatatableRigel
     ctx.put("unique", unique);
     ctx.put("counter", new AtomicInteger(1));
 
+    String tclasses = data.getParameters().get("tclasses");
     String tagTabelleList = TR.getString("tag.tabelle.list", "TABLE WIDTH=\"100%\" class=\"table\""); // NOI18N
     String tableStatement = "";
 
@@ -163,6 +173,9 @@ public class ToolRenderDatatableRigel
     if(m1.find())
     {
       String classes = m1.group(1) + " rigel-datatable";
+      if(tclasses != null)
+        classes = classes + " " + tclasses.replace('|', ' ');
+
       tableStatement = m1.replaceAll("class='" + classes + "' id='idtable_" + unique + "'");
       ctx.put("tableStatement", tableStatement);
     }
@@ -172,10 +185,37 @@ public class ToolRenderDatatableRigel
       ctx.put("tableStatement", tableStatement);
     }
 
-    String commonHeader = doHeaderHtml(wxml.getPtm());
+    SqlTableModel stm = (SqlTableModel) wxml.getPtm();
+    String commonHeader = doHeaderHtml(stm);
     ctx.put("commonHeader", commonHeader);
     if(footer)
       ctx.put("visFooter", true);
+
+    Element eTabella = wxml.getEleXml();
+    Element fsrv = eTabella.getChild("foreign-server");
+    if(fsrv != null)
+    {
+      StringBuilder jsFunc = new StringBuilder(128);
+      String func = SU.okStr(fsrv.getAttributeValue("func"), "imposta");
+      jsFunc.append(func).append("(");
+
+      int c = 0;
+      List<Element> lsEleParametri = fsrv.getChildren();
+      for(Element ep : lsEleParametri)
+      {
+        String nomeCampo = ep.getTextTrim();
+        int col = stm.findColumn(nomeCampo);
+        if(col != -1)
+        {
+          if(c++ > 0)
+            jsFunc.append(",");
+          jsFunc.append("data[").append(col).append("]");
+        }
+      }
+
+      jsFunc.append(");");
+      ctx.put("func", jsFunc.toString());
+    }
   }
 
   private JSONObject renderCoreJson(CoreRunData data, Context ctx)
@@ -186,6 +226,21 @@ public class ToolRenderDatatableRigel
     int rStart = pp.getInt("start");
     int rLimit = data.getParameters().getInt("length");
     String search = data.getParameters().getString("search[value]");
+
+    // recupera parametri del tool e li passa in RunData
+    Map<String, String> mp = (Map<String, String>) ctx.get("paramsMap");
+    if(mp != null)
+    {
+      for(Map.Entry<String, String> entry : mp.entrySet())
+      {
+        String key = entry.getKey();
+        String value = entry.getValue();
+        pp.setString(key, value);
+      }
+    }
+
+    // recupera filtro libero impostato
+    String freeFilter = (String) ctx.get("freeFilter");
 
     SqlWrapperListaXml wxml = (SqlWrapperListaXml) ctx.get("wrapper");
     SqlTableModel stm = (SqlTableModel) wxml.getPtm();
@@ -209,25 +264,36 @@ public class ToolRenderDatatableRigel
       }
     }
 
-    FiltroListe cSelezione = (FiltroListe) ctx.get("cSelezione");
-    if(cSelezione == null || !checkFiltroValido(stm, cSelezione, search, mapOrder))
+    Pair<FiltroListe, FiltroListe> cSelezione = (Pair<FiltroListe, FiltroListe>) ctx.get("cSelezione");
+    if(cSelezione == null || !checkFiltroValido(stm, cSelezione.first, search, mapOrder, freeFilter))
     {
-      cSelezione = creaFiltro(stm, i18n, search, mapOrder);
+      cSelezione = creaFiltro(stm, i18n, search, mapOrder, freeFilter);
       ctx.put("cSelezione", cSelezione);
+      ctx.put("recordsTotal", stm.getTotalRecords(cSelezione.second));
+      ctx.put("recordsFiltered", stm.getTotalRecords(cSelezione.first));
     }
 
     stm.getQuery().setOffset(rStart);
     stm.getQuery().setLimit(rLimit);
-    stm.getQuery().setFiltro((FiltroData) (cSelezione.getOggFiltro()));
+    stm.getQuery().setFiltro((FiltroData) (cSelezione.first.getOggFiltro()));
     stm.rebind();
 
     AtomicInteger counter = (AtomicInteger) ctx.get("counter");
     JSONObject out = new JSONObject();
     out.put("draw", counter.getAndIncrement());
-    out.put("recordsTotal", stm.getTotalRecords());
-    out.put("recordsFiltered", stm.getTotalRecords());
+    out.put("recordsTotal", ctx.get("recordsTotal"));
+    out.put("recordsFiltered", ctx.get("recordsFiltered"));
 
-    ToolJsonDatatable table = new ToolJsonDatatable();
+    ToolJsonDatatable table = (ToolJsonDatatable) ctx.get("ToolJsonDatatable");
+    if(table == null)
+    {
+      String[] basePath = MDL.getWrapperCache(data).getBasePath();
+      if((table = getTableCustom(wxml.getEleXml(), basePath)) == null)
+        table = new ToolJsonDatatable();
+      ctx.put("ToolJsonDatatable", table);
+    }
+
+    table.setRunData(data);
     table.setModel(stm);
     table.setColumnModel(stm.getColumnModel());
     table.doRows(out);
@@ -247,13 +313,13 @@ public class ToolRenderDatatableRigel
     table.setColumnModel(tableModel.getColumnModel());
     table.setHeaderStatement("tr");
     table.setColheadStatement("th");
+    table.setNosize(true);
 
     StringBuilder html = new StringBuilder();
+    List<RigelColumnDescriptor> visibleColumn = tableModel.getVisibleColumn();
 
-    for(int i = 0; i < tableModel.getColumnCount(); i++)
-    {
+    for(int i = 0; i < visibleColumn.size(); i++)
       html.append(table.doCellHeader(i));
-    }
 
     return html.toString().replace("/TD", "/th");
   }
@@ -261,13 +327,17 @@ public class ToolRenderDatatableRigel
   /**
    * In base alle impostazioni utente crea il FiltroListe con
    * all'interno gli opportuni filtri necessari.
+   * Ritorna una coppia di filtri il primo completo (per il set di record)
+   * il secondo senza search (per il conteggio dei records totali)
    * @param params
    * @param stm
    * @param i18n
-   * @return
+   * @return coppia di filtri
    * @throws java.lang.Exception
    */
-  private FiltroListe creaFiltro(SqlTableModel stm, RigelI18nInterface i18n, String search, Map<Integer, Integer> mapOrder)
+  private Pair<FiltroListe, FiltroListe> creaFiltro(SqlTableModel stm, RigelI18nInterface i18n,
+     String search, ArrayMap<Integer, Integer> mapOrder,
+     String freeFilter)
      throws Exception
   {
     if(!stm.isInitalized())
@@ -275,16 +345,38 @@ public class ToolRenderDatatableRigel
 
     ToolMascheraRicercaGenericaDatatable mgr = new ToolMascheraRicercaGenericaDatatable();
     mgr.init(new SqlBuilderRicercaGenerica(stm, "dummy"), stm, i18n);
-    FiltroListe fl = new FiltroListe();
-    fl.setOggFiltro(mgr.buildCriteriaSafe(search, mapOrder));
-    fl.salvaInfoColonne(stm);
-    return fl;
+
+    Pair<FiltroListe, FiltroListe> rv = new Pair<>(new FiltroListe(), new FiltroListe());
+    FiltroData fd2 = (FiltroData) mgr.buildCriteriaSafe("", mapOrder);
+    FiltroData fd1 = (FiltroData) mgr.buildCriteriaSafe(search, mapOrder);
+
+    if(SU.isOkStr(freeFilter))
+    {
+      fd1.addFreeWhere(freeFilter);
+      fd2.addFreeWhere(freeFilter);
+    }
+
+    rv.first.setOggFiltro(fd1);
+    rv.first.salvaInfoColonne(stm);
+    rv.second.setOggFiltro(fd2);
+    return rv;
   }
 
-  private boolean checkFiltroValido(SqlTableModel stm, FiltroListe cSelezione, String search, Map<Integer, Integer> mapOrder)
+  private boolean checkFiltroValido(SqlTableModel stm, FiltroListe cSelezione,
+     String search, ArrayMap<Integer, Integer> mapOrder,
+     String freeFilter)
      throws Exception
   {
     cSelezione.recuperaInfoColonne(stm);
+    FiltroData fd = (FiltroData) cSelezione.getOggFiltro();
+
+    // se abbiamo un freeFilter e non è specificato in fd ritorna subito
+    if(fd.vFreeWhere.isEmpty() && SU.isOkStr(freeFilter))
+      return false;
+
+    // se il filtro libero è cambiato ritorna subito
+    if(!fd.vFreeWhere.isEmpty() && !SU.isEqu(freeFilter, fd.vFreeWhere.get(0)))
+      return false;
 
     for(int i = 0; i < stm.getColumnCount(); i++)
     {
@@ -315,5 +407,26 @@ public class ToolRenderDatatableRigel
     }
 
     return true;
+  }
+
+  protected ToolJsonDatatable getTableCustom(Element ele, String[] basePath)
+  {
+    Element eleCustom = ele.getChild("custom-classes"); // NOI18N
+    if(eleCustom == null)
+      return null;
+    String className = eleCustom.getChildTextTrim("table"); // NOI18N
+    if(className == null)
+      return null;
+
+    try
+    {
+      return (ToolJsonDatatable) ClassOper.loadClass(className, basePath).newInstance();
+    }
+    catch(Exception ex)
+    {
+      log.error("Impossibile istanziare la tabella custom " + className, ex);
+    }
+
+    return null;
   }
 }
