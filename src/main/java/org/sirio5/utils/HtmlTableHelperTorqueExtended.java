@@ -134,10 +134,10 @@ public class HtmlTableHelperTorqueExtended extends HtmlTableHelper
      throws Exception
   {
     HtmlTableHelperTorque ht = new HtmlTableHelperTorque();
-    ht.addFieldByName(i18n.msg("ID"), "NodiMedusaId");
+    ht.addFieldByName(i18n.msg("ID"), "NodiTopolinoId");
     ht.addFieldByName(i18n.msg("DESCRIZIONE"), "Descrizione");
     ht.addFieldByName(i18n.msg("UUID"), "Uniqueid");
-    ht.addFieldByName(i18n.msg("FUNZIONI"), "NodiMedusaId", (v) -> formattaFunzioniNodo((Integer) v));
+    ht.addFieldByName(i18n.msg("FUNZIONI"), "NodiTopolinoId", (obj, v) -> formattaFunzioniNodo(obj, (Integer) v));
     ht.buildFromTorque(lsNodi);
 
     StringBuilder sb = new StringBuilder(512);
