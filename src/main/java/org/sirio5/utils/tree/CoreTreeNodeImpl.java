@@ -254,6 +254,17 @@ public class CoreTreeNodeImpl<T> extends ArrayList<CoreTreeNodeImpl<T>>
     pp.getAncestor(l);
   }
 
+  public void getAncestor2(Collection l)
+  {
+    l.add(this);
+
+    if(getParent() == null || !(getParent() instanceof CoreTreeNodeImpl))
+      return;
+
+    CoreTreeNodeImpl<T> pp = (CoreTreeNodeImpl<T>) getParent();
+    pp.getAncestor2(l);
+  }
+
   public void sortTree(Comparator<? super T> c, boolean recursive)
   {
     if(isLeaf())
