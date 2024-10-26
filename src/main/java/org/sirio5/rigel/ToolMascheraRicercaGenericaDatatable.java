@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.rigel5.RigelI18nInterface;
 import org.rigel5.exceptions.InjectionDetectedException;
 import org.rigel5.table.BuilderRicercaGenerica;
+import static org.rigel5.table.BuilderRicercaGenerica.IDX_CRITERIA_LIKE;
 import org.rigel5.table.MascheraRicercaGenerica;
 import org.rigel5.table.RigelColumnDescriptor;
 import org.rigel5.table.RigelTableModel;
@@ -98,8 +99,9 @@ public class ToolMascheraRicercaGenericaDatatable implements MascheraRicercaGene
 
       if(search != null)
       {
-        cd.setFiltroTipo(1); // contiene
-        cd.setFiltroValore(search);
+        // usa regular expression per default
+        cd.setFiltroTipo(IDX_CRITERIA_LIKE);
+        cd.setFiltroValore("ri:" + search);
       }
     }
 

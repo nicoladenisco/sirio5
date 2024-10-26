@@ -25,7 +25,6 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.fulcrum.localization.LocalizationService;
 import org.apache.turbine.om.security.User;
-import org.apache.turbine.services.Service;
 import org.apache.turbine.services.TurbineServices;
 import org.apache.turbine.services.rundata.DefaultTurbineRunData;
 import org.apache.turbine.util.uri.TemplateURI;
@@ -66,7 +65,7 @@ public class CoreRunData extends DefaultTurbineRunData
     modXML = getService(modelliXML.SERVICE_NAME);
   }
 
-  public <T extends Service> T getService(String serviceName)
+  public <T> T getService(String serviceName)
   {
     return (T) TurbineServices.getInstance().getService(serviceName);
   }

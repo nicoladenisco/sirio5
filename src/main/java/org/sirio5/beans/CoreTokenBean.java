@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.turbine.services.Service;
 import org.apache.turbine.services.TurbineServices;
 import org.sirio5.services.token.TokenAuthItem;
 import org.sirio5.utils.DT;
@@ -93,7 +92,7 @@ public class CoreTokenBean implements CoreTokenBindingListener
   {
   }
 
-  public <T extends Service> T getService(String serviceName)
+  public <T> T getService(String serviceName)
   {
     return (T) TurbineServices.getInstance().getService(serviceName);
   }

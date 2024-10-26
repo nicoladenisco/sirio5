@@ -29,7 +29,6 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fulcrum.security.model.turbine.TurbineAccessControlList;
-import org.apache.turbine.services.Service;
 import org.apache.turbine.services.TurbineServices;
 import org.commonlib5.utils.LongOperListenerDouble;
 import org.rigel5.RigelI18nInterface;
@@ -497,7 +496,7 @@ public abstract class Task extends Thread
     return Collections.unmodifiableList(arFileCacheTickets);
   }
 
-  public <T extends Service> T getService(String serviceName)
+  public <T> T getService(String serviceName)
   {
     return (T) TurbineServices.getInstance().getService(serviceName);
   }
