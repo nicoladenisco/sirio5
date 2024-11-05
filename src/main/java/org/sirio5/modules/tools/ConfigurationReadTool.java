@@ -76,7 +76,17 @@ public class ConfigurationReadTool implements ApplicationTool
 
   public String getHomeLink(RunData data)
   {
-    TemplateURI uri = new TemplateURI(data, cfg.getString("template.homepage", "Index.vm"));
+    return getCfgLink(data, "template.homepage", "Index.vm");
+  }
+
+  public String getCfgLink(RunData data, String key)
+  {
+    return getCfgLink(data, key, "Index.vm");
+  }
+
+  public String getCfgLink(RunData data, String key, String defVal)
+  {
+    TemplateURI uri = new TemplateURI(data, cfg.getString(key, defVal));
     return uri.getRelativeLink();
   }
 
@@ -95,5 +105,15 @@ public class ConfigurationReadTool implements ApplicationTool
   {
     String val = cfg.getString(key);
     return StringOper.checkTrueFalse(val, defVal);
+  }
+
+  public boolean isEnabledExp()
+  {
+    return cfg.getInt("abilita.funzioni.sperimentali", 0) > 0;
+  }
+
+  public int getLevelExp()
+  {
+    return cfg.getInt("abilita.funzioni.sperimentali", 0);
   }
 }
