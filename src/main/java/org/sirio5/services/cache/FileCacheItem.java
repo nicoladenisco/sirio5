@@ -180,4 +180,24 @@ public class FileCacheItem extends CoreCachedObject
   {
     return addFileToCache(toStore, mimeType, fileName, copy, EXPIRES);
   }
+
+  /**
+   * Aggiunge il file nella cache con il ticket ricevuto.
+   * Il file viene mantenuto nella cache in una apposita directory
+   * per il tempo specificato da expires.
+   * Alla scadenza il file viene automaticamente distrutto.
+   * @param file file da salvare
+   * @param mimeType tipo mime del file (se null viene ricavato dal file)
+   * @param fileName nome del file (se null viene ricavato dal file)
+   * @param expires tempo di permanenza nella cache (millisecondi)
+   * @param ticket per il recupero del file
+   * @throws Exception
+   */
+  public static void addFileCacheItem(File file, String mimeType, String fileName, long expires, String ticket)
+     throws Exception
+  {
+    // aggiunge file alla cache
+    FileCacheItem item = new FileCacheItem(file, mimeType, fileName, expires);
+    CACHE.addObject(CACHE_FILE_SECTION, ticket, item);
+  }
 }

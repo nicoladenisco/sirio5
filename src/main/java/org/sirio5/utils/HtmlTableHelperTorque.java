@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.torque.map.ColumnMap;
 import org.apache.torque.om.ColumnAccessByName;
 import org.commonlib5.lambda.FunctionTrowException;
 import org.commonlib5.utils.HtmlTableHelper;
@@ -47,9 +48,19 @@ public class HtmlTableHelperTorque extends HtmlTableHelper
     return addFieldByName(caption, fieldName, null);
   }
 
+  public int addFieldByName(String caption, ColumnMap column)
+  {
+    return addFieldByName(caption, column, null);
+  }
+
   public int addFieldByPeerName(String caption, String fieldName)
   {
     return addFieldByPeerName(caption, fieldName, null);
+  }
+
+  public int addFieldByPeerName(String caption, ColumnMap column)
+  {
+    return addFieldByPeerName(caption, column, null);
   }
 
   public int addFieldByName(String caption, String fieldName, FunctionTrowException<Object, String> convert)
@@ -62,6 +73,11 @@ public class HtmlTableHelperTorque extends HtmlTableHelper
     return lsHolder.size();
   }
 
+  public int addFieldByName(String caption, ColumnMap column, FunctionTrowException<Object, String> convert)
+  {
+    return addFieldByName(caption, column.getJavaName(), convert);
+  }
+
   public int addFieldByPeerName(String caption, String peerName, FunctionTrowException<Object, String> convert)
   {
     Holder h = new Holder();
@@ -70,6 +86,11 @@ public class HtmlTableHelperTorque extends HtmlTableHelper
     h.convert = convert;
     lsHolder.add(h);
     return lsHolder.size();
+  }
+
+  public int addFieldByPeerName(String caption, ColumnMap column, FunctionTrowException<Object, String> convert)
+  {
+    return addFieldByPeerName(caption, column.getColumnName(), convert);
   }
 
   public void addRowTorque(ColumnAccessByName object)

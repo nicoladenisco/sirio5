@@ -142,7 +142,7 @@ public class CoreTlsManager
     }
     else
     {
-      log.error(INT.I("I files del keystore e/o del truststore non sono presenti o leggibili; uso settaggi di default della JVM."));
+      log.info(INT.I("I files del keystore e/o del truststore non sono presenti o leggibili; uso settaggi di default della JVM."));
     }
 
     if(!testCertificate)
@@ -175,22 +175,25 @@ public class CoreTlsManager
   }
 
   /**
-   * Setta l'ambiente TLS nel caso in cui
-   * il registry necessiti di autenticazione tramite certificato.
+   * Verifica l'handshake di un server raggiungibile son la url indicata.
+   * L'output è a console.
    *
+   * @param url
    * @throws java.lang.Exception
    */
-  public void setEnvTLS(String uri)
+  public void testEnvTLS(URL url)
      throws Exception
   {
-    URL url = new URL(uri);
     String host = url.getHost();
+    int port = url.getPort();
 
-    try
+    // apro la connessione e verifico il certificato
+    try(SSLSocket sslsocket = getTLSsocket(url))
     {
       // apro la connessione e verifico il certificato
-      SSLSocket sslsocket = getTLSsocket(url);
-      sslsocket.close();
+      sslsocket.startHandshake();
+
+      testCertificatoSSL(host, port, sslsocket);
     }
     catch(Exception ex)
     {
@@ -227,6 +230,15 @@ public class CoreTlsManager
     sslsocket.startHandshake();
 
     if(testCertificate)
+      testCertificatoSSL(host, port, sslsocket);
+
+    return sslsocket;
+  }
+
+  private void testCertificatoSSL(String host, int port, SSLSocket sslsocket)
+     throws CoreServiceException
+  {
+    try
     {
       boolean valid = true;
       log.debug(INT.I("Inizio verifica certificati per %s:%d", host, port));
@@ -256,8 +268,11 @@ public class CoreTlsManager
         throw new CoreServiceException(
            INT.I("Certificati forniti dal server non validi o scaduti (consultare log per i dettagli)."));
     }
-
-    return sslsocket;
+    catch(SSLPeerUnverifiedException ex)
+    {
+      throw new CoreServiceException(
+         INT.I("Errore generico durante la connessione con %s: %s", host, ex.getMessage()), ex);
+    }
   }
 
   public SSLServerSocket getTLSserverSocket(int port)
