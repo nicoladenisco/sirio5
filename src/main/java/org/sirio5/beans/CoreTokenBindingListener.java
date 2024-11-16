@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@ import org.sirio5.services.token.TokenAuthItem;
 
 /**
  * Ascoltatore eventi inserimento e rimozione oggetti da token.
- * Ha uno scopo e un funzionamento simile a {@link HttpSessionBindingListener}
+ * Ha uno scopo e un funzionamento simile a HttpSessionBindingListener.
  * @author Nicola De Nisco
  */
 public interface CoreTokenBindingListener

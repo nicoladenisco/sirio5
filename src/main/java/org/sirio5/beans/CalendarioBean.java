@@ -404,7 +404,6 @@ final public class CalendarioBean extends CoreBaseBean
 
   /**
    * Costruisce il contenuto combo box per le età.
-   * @param data
    * @return options del combo box
    * @throws Exception
    */

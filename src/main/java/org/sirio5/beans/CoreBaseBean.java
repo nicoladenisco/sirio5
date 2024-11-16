@@ -121,7 +121,7 @@ public class CoreBaseBean implements HttpSessionBindingListener
   /**
    * Data una url relativa torna l'url completa a seconda dell'ambiente.
    * La stringa si riferisce a una risorsa JSP
-   * ES url=jsmia.jsp -> http://localhost:8080/src/jsmia.jsp
+   * ES url=jsmia.jsp produce http://localhost:8080/src/jsmia.jsp
    * oppure http://mio.server.it:8080/miaapp/servlet/miaapp/template/jsmia.jsp
    * @param url parte ultima dell'url
    * @return url completa

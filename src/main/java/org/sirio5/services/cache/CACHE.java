@@ -57,8 +57,6 @@ public class CACHE
    * @param id The String id for the object.
    * @return A CachedObject.
    * @throws org.apache.fulcrum.cache.ObjectExpiredException
-   * @exception ObjectExpiredException, if the object has expired in
-   * the cache or not found.
    */
   public static CachedObject getObject(String objClass, String id)
      throws ObjectExpiredException
@@ -282,8 +280,7 @@ public class CACHE
    *
    * @param id The String id for the object.
    * @return A CachedObject.
-   * @exception ObjectExpiredException, if the object has expired in
-   * the cache or not found.
+   * @throws org.apache.fulcrum.cache.ObjectExpiredException
    */
   public static CachedObject getObject(String id)
      throws ObjectExpiredException

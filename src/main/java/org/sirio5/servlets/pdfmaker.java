@@ -53,17 +53,9 @@ import org.sirio5.utils.velocity.VelocityParser;
  * <p>
  * Nella configurazione dell'application server viene settato un alias
  * in modo che qualsiasi url che cominci con /pdf/ viene reindirizzato
- * a questa servlet.<br>
- * L'url tipica sara' qualcosa del tipo:<br>
- * <pre>
- * http://server/newstar/pdf/mia.jsp?xsl=mia2fop.xsl&parm1=val1...
- * </pre>
- * questa servlet chiama la JSP indicata salvando i dati XML
- * su un file temporano, quindi utilizza il motore fop per trasformare
- * questo XML in un PDF.
+ * a questa servlet.
  * </p>
  * @author Nicola De Nisco
- * @version 1.1
  */
 public class pdfmaker extends HttpServlet
 {

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -121,7 +121,7 @@ public interface CoreServiceExtension
    * della directory dell'applicazione web.
    * La path viene ritornata in modo consono alla piattaforma
    * di funzionamento (windows o Unix).
-   * ES index.jsp -> /usr/local/tdk/webapps/nomeapp/index.jsp
+   * ES index.jsp produce /usr/local/tdk/webapps/nomeapp/index.jsp
    * @param path una path qualsiasi all'interno dell'applicazione web
    * @return path assoluta nel file system
    */
@@ -132,7 +132,7 @@ public interface CoreServiceExtension
    * della directory dell'applicazione web.
    * La path viene ritornata in modo consono alla piattaforma
    * di funzionamento (windows o Unix).
-   * ES index.jsp -> /usr/local/tdk/webapps/nomeapp/index.jsp
+   * ES index.jsp produce /usr/local/tdk/webapps/nomeapp/index.jsp
    * @param path una path qualsiasi all'interno dell'applicazione web
    * @return File assoluto nel file system
    */
@@ -142,7 +142,7 @@ public interface CoreServiceExtension
    * Data una url relativa torna l'url completa a seconda dell'ambiente.
    * La stringa si riferisce a una risorsa qualsiasi riferita alla path
    * dell'applicazione
-   * ES url=img.gif -> http://localhost:8080/img.gif
+   * ES url=img.gif produce http://localhost:8080/img.gif
    * oppure http://mio.server.it:8080/miaapp/img.gif
    * @param url
    * @return
@@ -152,7 +152,7 @@ public interface CoreServiceExtension
   /**
    * Data una url relativa torna l'url completa a seconda dell'ambiente.
    * La stringa si riferisce a una risorsa JSP
-   * ES url=jsmia.jsp -> http://localhost:8080/src/jsmia.jsp
+   * ES url=jsmia.jsp produce http://localhost:8080/src/jsmia.jsp
    * oppure http://mio.server.it:8080/miaapp/servlet/miaapp/template/jsmia.jsp
    * @param url
    * @return

@@ -38,12 +38,9 @@ import org.sirio5.utils.SU;
  *
  * Le stringhe non presenti in translation.xml sono inviate alla log
  * con 'Unknow key [stringa non presente]'. Questo consente di
- * recuperarle velocemente con un codice tipo:
+ * recuperarle velocemente.
  *
- * <code>
- * cat services.log | perl -n -e'/Unknow key \[(.+)\]/ && print $1 . "\n"' | sort | uniq
- * </code>
- *
+ * <br>
  * FILENOI18N
  * @author Nicola De Nisco
  */
@@ -551,7 +548,6 @@ public class CoreLocalizationService extends DefaultLocalizationService
    * @param key la stringa da tradurre
    * @param locale la locale desiderata
    * @return la stringa tradotta o null
-   * @throws Exception
    */
   protected String subTranslation(String key, Locale locale)
   {

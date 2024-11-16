@@ -41,7 +41,6 @@ import org.apache.turbine.services.*;
  * pluggable service implementations.</li>
  * <li>Providing <code>Services</code> with a configuration based on
  * system wide configuration mechanism.</li>
- * </ul>
  * <li>Integration of TurbineServiceProviders for looking up
  * non-local services
  * </ul>

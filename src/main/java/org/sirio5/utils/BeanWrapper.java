@@ -711,7 +711,7 @@ public class BeanWrapper
   public int importFrom(Object obj, boolean ignoreNull)
      throws Exception
   {
-    return importFrom(obj, ignoreNull, null);
+    return importFrom(obj, ignoreNull, (String[]) null);
   }
 
   public int importFrom(Object obj, boolean ignoreNull, String... ignoreFields)
