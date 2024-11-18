@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -54,8 +54,10 @@ public class RigelUtils
   /**
    * Cancella (logicamente ovvero stato_rec=10) il record identificato
    * dalla stringa rappresentazione della chiave primaria passata.
-   * @param sKey stringa identificativa del record
-   * @param pwl getstore dati associato alla vista
+   * @param data
+   * @param sKey
+   * @param ptm
+   * @param idUser
    * @throws Exception
    */
   public static void deleteRecord(RunData data, String sKey, PeerTableModel ptm, int idUser)
@@ -77,8 +79,10 @@ public class RigelUtils
   /**
    * Cancella (logicamente ovvero stato_rec=10) il record identificato
    * dalla stringa rappresentazione della chiave primaria passata.
-   * @param sKey stringa identificativa del record
-   * @param pwl getstore dati associato alla vista
+   * @param data
+   * @param sKey
+   * @param ptm
+   * @param idUser
    * @throws Exception
    */
   public static void deleteRecord(RunData data, String sKey, SqlTableModel ptm, int idUser)
@@ -162,7 +166,7 @@ public class RigelUtils
 
   /**
    * Verifica se l'utente loggato ha il permesso di cancellazione per il form indicato.
-   * @param data descrittore di sessione
+   * @param session descrittore di sessione
    * @param wb wrapper del form
    * @return vero se è consentita la cancellazione
    * @throws Exception
@@ -178,7 +182,7 @@ public class RigelUtils
 
   /**
    * Verifica se l'utente loggato ha il permesso di creazione per il form indicato.
-   * @param data descrittore di sessione
+   * @param session descrittore di sessione
    * @param wb wrapper del form
    * @return vero se è consentita la creazione di nuovo record
    * @throws Exception
@@ -194,7 +198,7 @@ public class RigelUtils
 
   /**
    * Verifica se l'utente loggato ha il permesso di lettura per il form indicato.
-   * @param data descrittore di sessione
+   * @param session descrittore di sessione
    * @param wb wrapper del form
    * @return vero se è consentita la lettura
    * @throws Exception
@@ -210,7 +214,7 @@ public class RigelUtils
 
   /**
    * Verifica se l'utente loggato ha il permesso di scrittura per il form indicato.
-   * @param data descrittore di sessione
+   * @param session descrittore di sessione
    * @param wb wrapper del form
    * @return vero se è consentita la scrittura
    * @throws Exception

@@ -47,8 +47,7 @@ public class CoreCacheImp implements CoreCacheServices
 {
   protected HashMap<String, CacheBlock> htClasses = new HashMap<>();
   /**
-   * Initial size of hash table
-   * Value must be > 0.
+   * Initial size of hash table.
    * Default = 20
    */
   public static final int DEFAULT_INITIAL_CACHE_SIZE = 20;
@@ -62,7 +61,6 @@ public class CoreCacheImp implements CoreCacheServices
   public static final String CACHE_CHECK_FREQUENCY = "cache.check.frequency";
   /**
    * Cache check frequency in Millis (1000 Millis = 1 second).
-   * Value must be > 0.
    * Default = 15 seconds
    */
   public static final long DEFAULT_CACHE_CHECK_FREQUENCY = 15000; // 15 seconds
@@ -647,8 +645,6 @@ public class CoreCacheImp implements CoreCacheServices
    *
    * @param id The String id for the object.
    * @return A CachedObject.
-   * @exception ObjectExpiredException, if the object has expired in
-   * the cache.
    */
   @Override
   public CachedObject getObject(String id)

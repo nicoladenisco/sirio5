@@ -323,7 +323,6 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
    * Recupera il record richiesto.
    * @param id chiave primaria
    * @return oggetto oppure null
-   * @throws Exception
    */
   public T findByPrimaryKey(int id)
   {

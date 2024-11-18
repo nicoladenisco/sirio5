@@ -217,7 +217,6 @@ public class BeanFactory
    * @param <T> classe del bean (deve estendere CoreBaseBean)
    * @param beanClass classe del bean
    * @return una istanza del bean
-   * @throws Exception
    */
   public static <T extends CoreBaseBean> T createBean(Class<T> beanClass)
   {
@@ -293,7 +292,7 @@ public class BeanFactory
    * Registra helper per rimozione bean in risposta eventi di bus.
    * Questa funzione registra un helper per la rimozione automatica di un bean
    * dalla sessione quando sul bus messaggi viene captato uno qualunque degli eventi indicati.
-   * Internamente usa {@link #SessionRemoveBusHelper}.
+   * Internamente usa SessionRemoveBusHelper.
    * @param session sessione di riferimento per la registrazione dell'helper
    * @param beanClass classe del bean da rimuovere (la stessa utilizzata per getFromSession())
    * @param msgIDs eventi che causano la rimozione dalla sessione
