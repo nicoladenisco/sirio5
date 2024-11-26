@@ -72,11 +72,13 @@ public class JasperPlugin extends BasePdfPlugin
   public void getParameters(int idUser, PrintContext context)
      throws Exception
   {
-    String reportName = context.getAsString(PrintContext.REPORT_NAME_KEY);
-    String reportInfo = context.getAsString(PrintContext.REPORT_INFO_KEY);
     AbstractReportParametersInfo pbean = (AbstractReportParametersInfo) context.get(PrintContext.PBEAN_KEY);
+    String reportName = context.getAsString(PrintContext.REPORT_NAME_KEY, pbean.getNome());
+    String reportInfo = context.getAsString(PrintContext.REPORT_INFO_KEY, pbean.getInfo());
 
     File reportFile = getFileReport(reportName, reportInfo);
+    context.put("reportFile", reportFile);
+
     pbean.initForJasper(idUser, reportName, reportFile, context);
   }
 
@@ -149,13 +151,13 @@ public class JasperPlugin extends BasePdfPlugin
     {
       PropertyManager pm = new PropertyManager();
       pm.addAll(reportParams);
-      try (FileOutputStream fos = new FileOutputStream(tmpParams.getAbsolutePath() + ".debug"))
+      try(FileOutputStream fos = new FileOutputStream(tmpParams.getAbsolutePath() + ".debug"))
       {
         pm.save(fos);
       }
     }
 
-    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tmpParams)))
+    try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tmpParams)))
     {
       oos.writeObject(reportParams);
     }

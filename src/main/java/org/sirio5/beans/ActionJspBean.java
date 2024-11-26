@@ -47,6 +47,8 @@ import org.sirio5.utils.SU;
  */
 public class ActionJspBean
 {
+  public static final String FILTERED_CONTEXT_DATA_KEY = "data";
+
   RunDataService rd = (RunDataService) TurbineServices.getInstance().getService(RunDataService.SERVICE_NAME);
   VelocityService vs = (VelocityService) TurbineServices.getInstance().getService(VelocityService.SERVICE_NAME);
   AssemblerBrokerService abs = (AssemblerBrokerService) TurbineServices.getInstance()
@@ -89,7 +91,7 @@ public class ActionJspBean
       action.doPerform(data, ctx);
 
       // recupera oggetto dati di ritorno
-      Object filteredData = ctx.get("data");
+      Object filteredData = ctx.get(FILTERED_CONTEXT_DATA_KEY);
 
       if(filteredData == null)
       {
@@ -103,8 +105,13 @@ public class ActionJspBean
       }
       else
       {
-        // passa solo il contenuto di 'data'
-        if(filteredData instanceof Map)
+        if(filteredData instanceof JSONObject)
+        {
+          Set<String> ks = ((JSONObject) filteredData).keySet();
+          for(String chiave : ks)
+            json.put(chiave, ((JSONObject) filteredData).get(chiave));
+        }
+        else if(filteredData instanceof Map)
         {
           Set keys = ((Map) filteredData).keySet();
           for(Object chiave : keys)
@@ -113,6 +120,10 @@ public class ActionJspBean
         else if(filteredData instanceof Collection)
         {
           json.put("array", (Collection) filteredData);
+        }
+        else
+        {
+          json.put("data", filteredData);
         }
       }
 

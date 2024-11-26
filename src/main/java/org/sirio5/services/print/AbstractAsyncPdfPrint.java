@@ -91,12 +91,13 @@ abstract public class AbstractAsyncPdfPrint extends AbstractPdfPrint
     if(SU.checkTrueFalse(context.get("SYNC_REQUEST"), false))
       return super.generatePrintJob(idUser, codiceStampa, context, sessione);
 
+    context.put(PrintContext.SESSION_KEY, sessione);
+
     AsyncPdfJob job = createJob();
     AbstractReportParametersInfo ri = getParameters(idUser, codiceStampa, context);
     context.put(PrintContext.PBEAN_KEY, ri);
     context.put(PrintContext.REPORT_INFO_KEY, ri.getInfo());
     context.put(PrintContext.REPORT_NAME_KEY, ri.getNome());
-    context.put(PrintContext.SESSION_KEY, sessione);
 
     job.init(this, idUser, ri.getPlugin(), context);
     job.start();
@@ -127,12 +128,13 @@ abstract public class AbstractAsyncPdfPrint extends AbstractPdfPrint
     if(SU.checkTrueFalse(context.get("SYNC_REQUEST"), false))
       return super.generatePrintJob(idUser, pluginName, reportName, reportInfo, context, sessione);
 
+    context.put(PrintContext.SESSION_KEY, sessione);
+
     AsyncPdfJob job = createJob();
     DirectReportParametersInfo pbean = new DirectReportParametersInfo(reportName, reportInfo);
     context.put(PrintContext.PBEAN_KEY, pbean);
     context.put(PrintContext.REPORT_INFO_KEY, reportInfo);
     context.put(PrintContext.REPORT_NAME_KEY, reportName);
-    context.put(PrintContext.SESSION_KEY, sessione);
 
     job.init(this, idUser, pluginName, context);
     job.start();

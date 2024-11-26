@@ -80,6 +80,9 @@ abstract public class AbstractPdfPrint extends AbstractCoreBaseService
 
     AbstractReportParametersInfo f_info = createReportInfo(codiceStampa);
     context.put(PrintContext.PBEAN_KEY, f_info);
+    context.put(PrintContext.REPORT_INFO_KEY, f_info.getInfo());
+    context.put(PrintContext.REPORT_NAME_KEY, f_info.getNome());
+
     PdfGeneratorFactory.getInstance().runPlugin(f_info.getPlugin(), (plg) -> plg.getParameters(idUser, context));
 
     CACHE.addContent(CACHE_CLASS_PARAM_INFO, codiceStampa, f_info);
@@ -91,11 +94,13 @@ abstract public class AbstractPdfPrint extends AbstractCoreBaseService
      String codiceStampa, PrintContext context, HttpSession sessione)
      throws Exception
   {
+    context.put(PrintContext.SESSION_KEY, sessione);
+
     AbstractReportParametersInfo ri = getParameters(idUser, codiceStampa, context);
+
     context.put(PrintContext.PBEAN_KEY, ri);
     context.put(PrintContext.REPORT_INFO_KEY, ri.getInfo());
     context.put(PrintContext.REPORT_NAME_KEY, ri.getNome());
-    context.put(PrintContext.SESSION_KEY, sessione);
 
     JobInfo info = new JobInfo();
     info.idUser = idUser;

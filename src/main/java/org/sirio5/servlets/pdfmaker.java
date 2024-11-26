@@ -40,21 +40,9 @@ import org.sirio5.utils.pdf.PDFutils;
 import org.sirio5.utils.velocity.VelocityParser;
 
 /**
- * <p>
- * Title: Servlet di supporto per la generazione di PDF al volo.</p>
- * <p>
- * Description: questa servlet ha il compito di assistere la generazione
- * la volo di PDF utilizzati per le stampe on line di Newstar.</p>
- * <p>
- * La generazione dei PDF avviene utilizzando per ogni stampa una
- * corrispettiva JSP che genera i dati XML necessari. Questi uniti ad
- * un opportuno foglio di stile XSL vengono elaborati dall'applicazione
- * FOP (vedi www.apache.org) per generare il relativo PDF.</p>
- * <p>
- * Nella configurazione dell'application server viene settato un alias
- * in modo che qualsiasi url che cominci con /pdf/ viene reindirizzato
- * a questa servlet.
- * </p>
+ * Servlet di supporto per la generazione di PDF al volo.<br>
+ * Questa servlet ha il compito di assistere la generazione
+ * la volo di PDF utilizzati per le stampe on line.
  * @author Nicola De Nisco
  */
 public class pdfmaker extends HttpServlet

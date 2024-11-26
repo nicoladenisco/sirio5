@@ -645,6 +645,7 @@ public class CoreCacheImp implements CoreCacheServices
    *
    * @param id The String id for the object.
    * @return A CachedObject.
+   * @throws ObjectExpiredException
    */
   @Override
   public CachedObject getObject(String id)

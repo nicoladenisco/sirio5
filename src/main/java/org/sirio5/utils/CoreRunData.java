@@ -552,8 +552,7 @@ public class CoreRunData extends DefaultTurbineRunData
   public Locale getUserLocale()
   {
     if(lsrv == null)
-      lsrv = (LocalizationService) TurbineServices.getInstance().
-         getService(LocalizationService.SERVICE_NAME);
+      lsrv = getService(LocalizationService.SERVICE_NAME);
 
     Locale userLocale = (Locale) getSession().getAttribute("userLocale");
 
@@ -569,8 +568,7 @@ public class CoreRunData extends DefaultTurbineRunData
   public String i18n(String key)
   {
     if(lsrv == null)
-      lsrv = (LocalizationService) TurbineServices.getInstance().
-         getService(LocalizationService.SERVICE_NAME);
+      lsrv = getService(LocalizationService.SERVICE_NAME);
 
     return lsrv.getString(null, getUserLocale(), key);
   }

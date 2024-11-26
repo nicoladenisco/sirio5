@@ -54,10 +54,10 @@ public class RigelUtils
   /**
    * Cancella (logicamente ovvero stato_rec=10) il record identificato
    * dalla stringa rappresentazione della chiave primaria passata.
-   * @param data
-   * @param sKey
-   * @param ptm
-   * @param idUser
+   * @param data dati di sessione
+   * @param sKey stringa identificativa del record
+   * @param ptm getstore dati associato alla vista
+   * @param idUser utente che esegue l'operazione
    * @throws Exception
    */
   public static void deleteRecord(RunData data, String sKey, PeerTableModel ptm, int idUser)
@@ -79,10 +79,10 @@ public class RigelUtils
   /**
    * Cancella (logicamente ovvero stato_rec=10) il record identificato
    * dalla stringa rappresentazione della chiave primaria passata.
-   * @param data
-   * @param sKey
-   * @param ptm
-   * @param idUser
+   * @param data dati di sessione
+   * @param sKey stringa identificativa del record
+   * @param ptm getstore dati associato alla vista
+   * @param idUser utente che esegue l'operazione
    * @throws Exception
    */
   public static void deleteRecord(RunData data, String sKey, SqlTableModel ptm, int idUser)

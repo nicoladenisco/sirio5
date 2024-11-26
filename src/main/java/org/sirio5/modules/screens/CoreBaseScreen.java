@@ -78,6 +78,7 @@ public class CoreBaseScreen extends VelocitySecureScreen
    *
    * @param pd Turbine information.
    * @return True if the user is authorized to access the screen.
+   * @throws Exception
    */
   @Override
   protected boolean isAuthorized(PipelineData pd)

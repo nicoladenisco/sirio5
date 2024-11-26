@@ -42,7 +42,7 @@ import org.apache.turbine.services.*;
  * <li>Providing <code>Services</code> with a configuration based on
  * system wide configuration mechanism.</li>
  * <li>Integration of TurbineServiceProviders for looking up
- * non-local services
+ * non-local services</li>
  * </ul>
  *
  * @author <a href="mailto:burton@apache.org">Kevin Burton</a>

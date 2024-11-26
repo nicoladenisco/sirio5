@@ -62,7 +62,8 @@ public interface CoreCacheServices extends GlobalCacheService
    * @param objClass classe degli oggetti
    * @param id The String id for the object.
    * @return A CachedObject.
-   * @throws org.apache.fulcrum.cache.ObjectExpiredException if the object has expired in
+   * @throws org.apache.fulcrum.cache.ObjectExpiredException
+   * if the object has expired in
    * the cache.
    */
   public CachedObject getObject(String objClass, String id)

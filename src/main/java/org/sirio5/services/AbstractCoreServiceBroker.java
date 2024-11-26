@@ -22,9 +22,10 @@ import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.Torque;
 import org.apache.torque.TorqueException;
 import org.apache.torque.criteria.Criteria;
+import org.apache.torque.util.TorqueConnection;
+import org.apache.torque.util.Transaction;
 import org.apache.turbine.services.InitializationException;
 import org.apache.turbine.services.ServiceManager;
 import org.apache.turbine.services.schedule.JobEntryTorque;
@@ -112,12 +113,8 @@ abstract public class AbstractCoreServiceBroker extends EffectiveBaseServiceBrok
   protected void sanityScheduler()
      throws InitializationException
   {
-    Connection con = null;
-
-    try
+    try(TorqueConnection con = Transaction.begin())
     {
-      con = Torque.getConnection();
-
       if(!DbUtils.existTableExact(con, JobEntryTorquePeer.TABLE_NAME))
         return;
 
@@ -137,12 +134,11 @@ abstract public class AbstractCoreServiceBroker extends EffectiveBaseServiceBrok
           deleteJob(job.getJobId(), con);
         }
       }
+
+      Transaction.commit(con);
     }
     catch(Exception ex)
     {
-      if(con != null)
-        Torque.closeConnection(con);
-
       throw new InitializationException(String.format("Errore fatale aggiornando lo scheduler."), ex);
     }
   }
