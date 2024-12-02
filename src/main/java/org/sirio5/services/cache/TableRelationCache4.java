@@ -49,6 +49,7 @@ import org.sirio5.utils.SU;
  * @param <O> Tipo di oggetti origine
  */
 public class TableRelationCache4<T extends Persistent, O extends Persistent> extends ArrayList<T>
+   implements TableRelationLink<T, O>
 {
   private final Class targetPeerClass;
   private final Method getRecords;
@@ -64,7 +65,7 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
         throw new Exception("Deve essere un oggetto Peer.");
 
       targetPeerClass = cls;
-      getRecords = targetPeerClass.getMethod("retrieveByPKs", Collection.class, Connection.class);
+      getRecords = getMetodPrimary(targetPeerClass);
       doSelect = targetPeerClass.getMethod("doSelect", Criteria.class, Connection.class);
       getTableMap = targetPeerClass.getMethod("getTableMap");
     }
@@ -127,7 +128,7 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
 
     for(ForeignKeyMap fkm : tmDettail.getTmap().getForeignKeys())
     {
-      if(fkm.getForeignTableName().equals(masterTableName))
+      if(equNomeTabella(fkm, masterTableName))
       {
         if(fkm.getColumns().size() != 1)
           throw new Exception("troppe colonne in chiave esterna: solo una supportata");
@@ -139,6 +140,19 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
     }
 
     throw new Exception("nessuna chiave esterna disponibile");
+  }
+
+  protected boolean equNomeTabella(ForeignKeyMap fkm, String masterTableName)
+  {
+    int pos;
+    String nomeForeign = fkm.getForeignTableName();
+
+    if((pos = nomeForeign.lastIndexOf('.')) != -1)
+      nomeForeign = nomeForeign.substring(pos + 1);
+    if((pos = masterTableName.lastIndexOf('.')) != -1)
+      masterTableName = nomeForeign.substring(pos + 1);
+
+    return nomeForeign.equals(masterTableName);
   }
 
   /**
@@ -273,7 +287,7 @@ public class TableRelationCache4<T extends Persistent, O extends Persistent> ext
     TableMap tm = (TableMap) getTableMap.invoke(null);
     for(ForeignKeyMap fkm : tm.getForeignKeys())
     {
-      if(fkm.getForeignTableName().equals(masterTableName))
+      if(equNomeTabella(fkm, masterTableName))
       {
         if(fkm.getColumns().size() != 1)
           throw new Exception("troppe colonne in chiave esterna: solo una supportata");

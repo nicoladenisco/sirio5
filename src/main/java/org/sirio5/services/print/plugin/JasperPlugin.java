@@ -21,7 +21,8 @@ import java.io.*;
 import java.util.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.logging.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.torque.Torque;
 import org.commonlib5.exec.ExecHelper;
 import org.commonlib5.utils.CommonFileUtils;
@@ -219,26 +220,24 @@ public class JasperPlugin extends BasePdfPlugin
     String pgm = jasPgm.getAbsolutePath();
     String[] cmd = (String[]) ArrayUtils.add(args, 0, pgm);
 
-    log.info("Lancio " + pgm);
+    log.info("Lancio " + SU.joinCommand(cmd));
     ExecHelper eh = ExecHelper.exec(cmd);
-
     int exitValue = eh.getStatus();
+    StringBuilder sb = new StringBuilder(128);
+    eh.getReportError(sb);
 
     if(exitValue != 0 || !reportPDF.canRead() || reportPDF.length() == 0)
     {
-      log.error("-STDOUT-------------------------------------");
-      log.error(eh.getOutput());
-      log.error("-STDERR-------------------------------------");
-      log.error(eh.getError());
+      log.error(sb.toString());
+
+      // byNIK: mistero misterioso; non logga i messaggi di questa classe; scrivo un file con l'errore
+      dirTmp.mkdirs();
+      File report = File.createTempFile("ERROR", ".txt", dirTmp);
+      CommonFileUtils.writeFileTxt(report, sb.toString(), "UTF-8");
+
       die(INT.I("Rendering jasper del PDF non completato. Vedi log per errori."));
     }
 
-    if(log.isDebugEnabled())
-    {
-      log.debug("-STDOUT-------------------------------------");
-      log.debug(eh.getOutput());
-      log.debug("-STDERR-------------------------------------");
-      log.debug(eh.getError());
-    }
+    log.debug(sb.toString());
   }
 }
