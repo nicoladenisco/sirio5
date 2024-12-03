@@ -28,6 +28,7 @@ import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
@@ -392,7 +393,14 @@ public class SU extends StringOper
 
   public static String join(Collection lsObj)
   {
-    return join(lsObj.iterator(), ',');
+    if(lsObj.isEmpty())
+      return "";
+
+    Object primo = lsObj.iterator().next();
+    if(primo instanceof Number)
+      return join(lsObj.iterator(), ',');
+
+    return join(lsObj.iterator(), ',', '\'');
   }
 
   public static int parseInt(Object val)
@@ -421,6 +429,11 @@ public class SU extends StringOper
   public static boolean isOlderThan(File toTest, long millisTimeout)
   {
     return toTest.exists() && (System.currentTimeMillis() - toTest.lastModified()) > millisTimeout;
+  }
+
+  public static boolean isOlderThan(File toTest, long duration, TimeUnit period)
+  {
+    return toTest.exists() && (System.currentTimeMillis() - toTest.lastModified()) > period.toMillis(duration);
   }
 
   /**
