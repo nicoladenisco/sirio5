@@ -44,6 +44,7 @@ import org.sirio5.utils.SU;
  * @param <O> Tipo di oggetti origine
  */
 public class TableRelationCache2<T extends Persistent, O extends Persistent> extends ArrayList<T>
+   implements TableRelationLink<T, O>
 {
   private final Map<ObjectKey, Persistent> mapValues = new HashMap<>();
 
@@ -178,7 +179,7 @@ public class TableRelationCache2<T extends Persistent, O extends Persistent> ext
       throw new RuntimeException("Deve essere un oggetto Peer.");
 
     // recupera tutti i record collegati attraverso il metodo
-    Method getRecords = cls.getMethod("retrieveByPKs", Collection.class, Connection.class);
+    Method getRecords = getMetodPrimary(cls);
     List lsValues = (List) getRecords.invoke(null, primaryKeys, con);
     loadData(lsValues);
   }
