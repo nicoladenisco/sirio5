@@ -63,6 +63,20 @@ abstract public class AbstractCoreServiceBroker extends EffectiveBaseServiceBrok
   public void init()
      throws InitializationException
   {
+    try
+    {
+      initSirio();
+    }
+    catch(Exception e)
+    {
+      log.error("ERRORE FATALE INIZIALIZZAZIONE SERVIZI.", e);
+      throw new InitializationException(e.getMessage(), e);
+    }
+  }
+
+  protected void initSirio()
+     throws Exception
+  {
     // primo caricamento mappatura servizi
     initMapping();
 
@@ -93,7 +107,7 @@ abstract public class AbstractCoreServiceBroker extends EffectiveBaseServiceBrok
     }
     catch(Throwable ex)
     {
-      log.error(I("Errore inizializzando Torque (Avalon) impossibile continuare."), ex);
+      log.error("Errore inizializzando Torque (Avalon) impossibile continuare.", ex);
       throw ex;
     }
   }

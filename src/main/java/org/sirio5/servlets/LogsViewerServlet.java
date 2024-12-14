@@ -20,10 +20,13 @@ package org.sirio5.servlets;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sirio5.CoreConst;
 import org.sirio5.beans.menu.LogsMenuGenerator;
 import org.sirio5.beans.menu.MenuItemBean;
@@ -37,6 +40,19 @@ import org.sirio5.utils.FU;
  */
 public class LogsViewerServlet extends HttpServlet
 {
+  private final static Log log = LogFactory.getLog(LogsViewerServlet.class);
+
+  private String forcePath;
+
+  @Override
+  public void init(ServletConfig config)
+     throws ServletException
+  {
+    super.init(config);
+
+    forcePath = config.getInitParameter("forcePath");
+  }
+
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
    * @param request servlet request
@@ -47,28 +63,33 @@ public class LogsViewerServlet extends HttpServlet
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
      throws ServletException, IOException
   {
-    List<MenuItemBean> arBeans = (List<MenuItemBean>) request.getSession()
-       .getAttribute(LogsMenuGenerator.MENU_LOGS_SESSION_KEY);
-
-    String sInfo = request.getPathInfo();
-    if(sInfo == null || sInfo.length() < 5)
-      throw new ServletException(INT.I("Richiesta non valida."));
-
-    String ssInfo = sInfo.substring(1);
-    MenuItemBean b = arBeans.stream()
-       .filter((s) -> ssInfo.equalsIgnoreCase(s.getDescrizione()))
-       .findFirst()
-       .orElse(null);
-
-    if(b == null)
-      throw new ServletException(INT.I("Richiesta non valida: log '%s' inesistente.", ssInfo));
-
     try
     {
-      FU.sendFileResponse(request, response, new File(b.getNote()), CoreConst.MIME_TXT + ";charset=utf-8", ssInfo, false);
+      List<MenuItemBean> arBeans = (List<MenuItemBean>) request.getSession()
+         .getAttribute(LogsMenuGenerator.MENU_LOGS_SESSION_KEY);
+
+      String sInfo = request.getPathInfo();
+      if(sInfo == null || sInfo.length() < 5)
+        throw new Exception(INT.I("Richiesta non valida."));
+
+      String ssInfo = sInfo.substring(1);
+      MenuItemBean b = arBeans.stream()
+         .filter((s) -> ssInfo.equalsIgnoreCase(s.getDescrizione()))
+         .findFirst()
+         .orElse(null);
+
+      if(b == null)
+        throw new Exception(INT.I("Richiesta non valida: log '%s' inesistente.", ssInfo));
+
+      File logFile = new File(b.getNote());
+      if(forcePath != null)
+        logFile = new File(forcePath, sInfo.substring(1));
+
+      FU.sendFileResponse(request, response, logFile, CoreConst.MIME_TXT + ";charset=utf-8", ssInfo, false);
     }
     catch(Exception ex)
     {
+      log.error(ex.getMessage(), ex);
       throw new ServletException(ex.getMessage(), ex);
     }
   }

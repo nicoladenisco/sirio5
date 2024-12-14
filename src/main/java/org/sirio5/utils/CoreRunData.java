@@ -430,6 +430,11 @@ public class CoreRunData extends DefaultTurbineRunData
     refresh = Integer.toString(tref);
   }
 
+  public void setRefresh(String link)
+  {
+    refresh = link;
+  }
+
   /**
    * Ritorna vero se l'utente è l'amministratore di sistema.
    * @return vero se utente 'turbine'

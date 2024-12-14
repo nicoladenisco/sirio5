@@ -35,12 +35,6 @@ import static org.sirio5.CoreConst.APP_PREFIX;
  */
 public class LI extends HtmlUtils
 {
-  /** aggancia il settaggio a quello del tool ui (link relativi/assoluti) */
-  private static final boolean wantRelative = TR.getBoolean("tool.ui.want.relative", true);
-
-  /** aggancia il settaggio a quello del tool ui (link relativi/assoluti) */
-  private static final boolean imagesFromSkin = TR.getBoolean("images.icons.fromskin", true);
-
   private static String __myContextPath = null;
 
   /**
@@ -53,7 +47,7 @@ public class LI extends HtmlUtils
   public static String getTemplateLink(RunData data, String templatePage)
   {
     TemplateURI tui = new TemplateURI(data, templatePage);
-    return wantRelative ? tui.getRelativeLink() : tui.getAbsoluteLink();
+    return tui.getRelativeLink();
   }
 
   /**
@@ -83,15 +77,6 @@ public class LI extends HtmlUtils
   public static void setContextPath(String s)
   {
     __myContextPath = ("/" + s + "/").replace("//", "/");
-
-    if(!wantRelative)
-    {
-      StringBuilder sb = new StringBuilder();
-      ServerData sd = Turbine.getDefaultServerData();
-      sd.getHostUrl(sb);
-      sb.append(__myContextPath);
-      __myContextPath = sb.toString();
-    }
   }
 
   public static String getIconAwesome(String iconName, String alt)
@@ -185,20 +170,13 @@ public class LI extends HtmlUtils
    */
   public static String getImageUrl(String nomeima)
   {
-    if(imagesFromSkin)
-    {
-      if(ps == null)
-        ps = (PullService) TurbineServices.getInstance().getService(PullService.SERVICE_NAME);
+    if(ps == null)
+      ps = (PullService) TurbineServices.getInstance().getService(PullService.SERVICE_NAME);
 
-      if(ui == null)
-        ui = (UITool) ps.getGlobalContext().get("ui");
+    if(ui == null)
+      ui = (UITool) ps.getGlobalContext().get("ui");
 
-      return ui.image(nomeima);
-    }
-    else
-    {
-      return getContextPath() + "images/" + nomeima;
-    }
+    return ui.image(nomeima);
   }
 
   /**

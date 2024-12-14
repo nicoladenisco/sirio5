@@ -32,6 +32,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import static org.sirio5.services.localization.INT.I;
+import org.sirio5.utils.ReadLog4j2ConfigHelper;
 import org.sirio5.utils.SU;
 import org.sirio5.utils.TR;
 import org.sirio5.utils.tree.CoreMenuTreeNode;
@@ -90,25 +91,20 @@ public class LogsMenuGenerator implements MenuGenerator
     return arBeans;
   }
 
+  /**
+   * carica il file di configurazione di Log4j leggendo
+   * le relative impostazioni dal TurbineResources.properties
+   *
+   * @return lista di bean, uno per ogni file di log
+   */
   private List<MenuItemBean> parse()
   {
-    List<MenuItemBean> arBeans;
-
-    // carica il file di configurazione di Log4j leggendo
-    // le relative impostazioni dal TurbineResources.properties
-    String sFile = TR.getString("log4j.file"); // NOI18N
-    if(SU.isOkStr(sFile))
-    {
-      File fileLog4j = new File(Turbine.getRealPath(sFile));
-      if(!fileLog4j.canRead())
-        return Collections.EMPTY_LIST;
-
-      if((arBeans = loadConfiguration(fileLog4j)) == null)
-        return Collections.EMPTY_LIST;
-
+    String sFile = null;
+    List<MenuItemBean> arBeans = loadConfiguration2Runtime();
+    if(arBeans != null)
       return arBeans;
-    }
 
+    // legge prima la nuova versione di Turbine 6
     sFile = TR.getString("log4j2.file"); // NOI18N
     if(SU.isOkStr(sFile))
     {
@@ -117,6 +113,20 @@ public class LogsMenuGenerator implements MenuGenerator
         return Collections.EMPTY_LIST;
 
       if((arBeans = loadConfiguration2(fileLog4j)) == null)
+        return Collections.EMPTY_LIST;
+
+      return arBeans;
+    }
+
+    // per compatibilita con versioni precedenti di Turbine
+    sFile = TR.getString("log4j.file"); // NOI18N
+    if(SU.isOkStr(sFile))
+    {
+      File fileLog4j = new File(Turbine.getRealPath(sFile));
+      if(!fileLog4j.canRead())
+        return Collections.EMPTY_LIST;
+
+      if((arBeans = loadConfiguration(fileLog4j)) == null)
         return Collections.EMPTY_LIST;
 
       return arBeans;
@@ -196,7 +206,9 @@ public class LogsMenuGenerator implements MenuGenerator
       HashSet<String> unique = new HashSet<>();
       for(Element efa : lsFileAppenders)
       {
-        String attrFile = efa.getAttributeValue("fileName").replace("${web:rootDir}", realPath);
+        String attrFile = efa.getAttributeValue("fileName")
+           .replace("${logdir}", realPath)
+           .replace("${web:rootDir}", realPath);
         unique.add(attrFile);
       }
 
@@ -223,6 +235,49 @@ public class LogsMenuGenerator implements MenuGenerator
     catch(Exception ex)
     {
       log.error(I("Errore leggendo il file %s:", fileLog4j.getAbsolutePath()), ex);
+      return null;
+    }
+  }
+
+  /**
+   * Caricamento nuova versione da runtime.
+   * @return
+   */
+  public List<MenuItemBean> loadConfiguration2Runtime()
+  {
+    try
+    {
+      ArrayList<MenuItemBean> arFiles = new ArrayList<>();
+
+      ReadLog4j2ConfigHelper l4jh = new ReadLog4j2ConfigHelper();
+      List<String> lsAppPaths = l4jh.getFileAppenderPath();
+      if(lsAppPaths.isEmpty())
+        return null;
+
+      HashSet<String> unique = new HashSet<>(lsAppPaths);
+      unique.stream().sorted().forEach((val) ->
+      {
+        int pos;
+        MenuItemBean b = new MenuItemBean();
+        b.setProgramma("/viewlogs/" + val);
+        b.setNote(val);
+        b.setDescrizione(val);
+        b.setFlag1("A");
+
+        if((pos = val.lastIndexOf('/')) != -1)
+        {
+          b.setDescrizione(val.substring(pos + 1));
+          b.setProgramma("/viewlogs/" + b.getDescrizione());
+        }
+
+        arFiles.add(b);
+      });
+
+      return arFiles;
+    }
+    catch(Exception ex)
+    {
+      log.error(ex.getMessage(), ex);
       return null;
     }
   }
