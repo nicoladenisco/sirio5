@@ -28,6 +28,9 @@ import org.commonlib5.exec.ExecHelper;
 import org.commonlib5.utils.CommonFileUtils;
 import org.commonlib5.utils.OsIdent;
 import org.commonlib5.utils.PropertyManager;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.sirio5.services.CoreServiceException;
 import org.sirio5.services.localization.INT;
 import org.sirio5.services.print.AbstractReportParametersInfo;
@@ -56,6 +59,9 @@ public class JasperPlugin extends BasePdfPlugin
   protected boolean useDB = true;
   // posizione applicazione esterna jasper
   protected String jasperAppLocation = null;
+  // impostazioni default db
+  protected String defaultDriver, defaultUri, defaultUser, defaultPass;
+  protected boolean forcedefault = false;
 
   @Override
   public void configure(String pluginName, Configuration cfg)
@@ -64,6 +70,11 @@ public class JasperPlugin extends BasePdfPlugin
     super.configure(pluginName, cfg);
     useDB = SU.isEqu(PLG_NAME_CON, pluginName);
 
+    forcedefault = cfg.getBoolean("forcedefault", forcedefault);
+    defaultDriver = cfg.getString("driver", "org.postgresql.Driver");
+    defaultUri = cfg.getString("url", "jdbc:localhost:sirio");
+    defaultUser = cfg.getString("user", "sirio");
+    defaultPass = cfg.getString("password", "sirio");
     // legge locazione dell'applicazione jasperApp (NON DAL SERVIZIO)
     if((jasperAppLocation = TR.getString("path.app.jas")) == null)
       die(INT.I("Directory processore Jasper non dichiarata a setup (vedi aaa-generic..): stampa non disponibile."));
@@ -175,12 +186,69 @@ public class JasperPlugin extends BasePdfPlugin
     }
     else
     {
-      // recuperiamo dal settaggio di Torque i dati per la connessione al db
+      if(forcedefault)
+      {
+        // eseguiamo chiamata con 6 parametri; esecuzione forzata a parametri di default
+        String[] cmdArray =
+        {
+          reportFile.getAbsolutePath(), tmpParams.getAbsolutePath(),
+          reportPDF.getAbsolutePath(), defaultDriver, defaultUri, defaultUser, defaultPass
+        };
+
+        runExternalJasperRender(cmdArray, reportPDF);
+        return;
+      }
       Configuration cfg = Torque.getConfiguration();
-      String dbDriver = cfg.getString("defaults.connection.driver", "org.postgresql.Driver");
-      String dbUri = cfg.getString("defaults.connection.url", "jdbc:localhost:sirio");
-      String dbUser = cfg.getString("defaults.connection.user", "sirio");
-      String dbPass = cfg.getString("defaults.connection.password", "sirio");
+      String factory = cfg.getString("defaults.jndifactory");
+      if(SU.isOkStr(factory))
+      {
+        // torque è configurato per l'uso di JNDI
+        runTorqueJndi(reportFile, tmpParams, reportPDF);
+      }
+      else
+      {
+        // torque è configurato per l'accesso diretto a JDBC
+        runTorqueClassic(reportFile, tmpParams, reportPDF);
+      }
+    }
+  }
+
+  /**
+   * Recuperiamo dalla configurazione JNDI di tomcat i dati per la connessione al db.
+   * @param reportFile
+   * @param tmpParams
+   * @param reportPDF
+   * @throws Exception
+   */
+  protected void runTorqueJndi(File reportFile, File tmpParams, File reportPDF)
+     throws Exception
+  {
+    String rootAppPath = print.getRealPath("/");
+    File confDir = new File(rootAppPath + "../../conf");
+    if(!confDir.isDirectory())
+    {
+      String catalinaHome = System.getenv("CATALINA_HOME");
+      confDir = new File(catalinaHome + "/conf");
+
+      if(!confDir.isDirectory())
+        die("Non riesco a rintracciare la directory conf di Tomcat.");
+    }
+
+    File contextXml = new File(confDir, "context.xml");
+    SAXBuilder builder = new SAXBuilder();
+    Document d = builder.build(contextXml);
+
+    List<Element> lsResch = d.getRootElement().getChildren("Resource");
+    for(Element er : lsResch)
+    {
+      String nome = er.getAttributeValue("name");
+      if(nome == null || !nome.startsWith("jdbc/"))
+        continue;
+
+      String dbDriver = er.getAttributeValue("driverClassName");
+      String dbUri = er.getAttributeValue("url");
+      String dbUser = er.getAttributeValue("username");
+      String dbPass = er.getAttributeValue("password");
 
       // eseguiamo chiamata con 6 parametri
       String[] cmdArray =
@@ -190,7 +258,35 @@ public class JasperPlugin extends BasePdfPlugin
       };
 
       runExternalJasperRender(cmdArray, reportPDF);
+      return;
     }
+    die("Nessuna risorsa JNDI identificata nella configurazione di Tomcat.");
+  }
+
+  /**
+   * recuperiamo dal settaggio di Torque i dati per la connessione al db.
+   * @param reportFile
+   * @param tmpParams
+   * @param reportPDF
+   * @throws Exception
+   */
+  protected void runTorqueClassic(File reportFile, File tmpParams, File reportPDF)
+     throws Exception
+  {
+    Configuration cfg = Torque.getConfiguration();
+    String dbDriver = cfg.getString("defaults.connection.driver", defaultDriver);
+    String dbUri = cfg.getString("defaults.connection.url", defaultUri);
+    String dbUser = cfg.getString("defaults.connection.user", defaultUser);
+    String dbPass = cfg.getString("defaults.connection.password", defaultPass);
+
+    // eseguiamo chiamata con 6 parametri
+    String[] cmdArray =
+    {
+      reportFile.getAbsolutePath(), tmpParams.getAbsolutePath(),
+      reportPDF.getAbsolutePath(), dbDriver, dbUri, dbUser, dbPass
+    };
+
+    runExternalJasperRender(cmdArray, reportPDF);
   }
 
   protected void runExternalJasperRender(String args[], File reportPDF)

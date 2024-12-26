@@ -235,11 +235,12 @@ abstract public class RigelEditBaseScreen extends CoreBaseScreen
       {
         if(cb.haveJavascript())
         {
-          script = cb.makeJavascript(lso.getPtm(), 0);
+          if((script = cb.makeJavascript(lso.getPtm(), 0)) == null)
+            log.warn("Bottone header marcato per javascript ma nessun javascipt possibile; ignorato.");
         }
         else
         {
-          // se url == null vuol dire che questo custom button non è applicabile
+          // se url == null vuol dire custom button non applicabile; non va segnalato, comportamento normale
           if((url = urlBuilder.buildUrlHeaderButton(popup, lso.getPtm(), cb)) == null)
             continue;
 
