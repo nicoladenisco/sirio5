@@ -75,6 +75,7 @@ public class JasperPlugin extends BasePdfPlugin
     defaultUri = cfg.getString("url", "jdbc:localhost:sirio");
     defaultUser = cfg.getString("user", "sirio");
     defaultPass = cfg.getString("password", "sirio");
+
     // legge locazione dell'applicazione jasperApp (NON DAL SERVIZIO)
     if((jasperAppLocation = TR.getString("path.app.jas")) == null)
       die(INT.I("Directory processore Jasper non dichiarata a setup (vedi aaa-generic..): stampa non disponibile."));
@@ -198,6 +199,7 @@ public class JasperPlugin extends BasePdfPlugin
         runExternalJasperRender(cmdArray, reportPDF);
         return;
       }
+
       Configuration cfg = Torque.getConfiguration();
       String factory = cfg.getString("defaults.jndifactory");
       if(SU.isOkStr(factory))
@@ -260,6 +262,7 @@ public class JasperPlugin extends BasePdfPlugin
       runExternalJasperRender(cmdArray, reportPDF);
       return;
     }
+
     die("Nessuna risorsa JNDI identificata nella configurazione di Tomcat.");
   }
 

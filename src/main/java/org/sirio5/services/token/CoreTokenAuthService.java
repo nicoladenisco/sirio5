@@ -377,7 +377,8 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
   {
     CachedObject obj = CACHE.getObjectQuiet(TOKEN_AUTH_CACHE_CLASS, id);
     if(obj == null)
-      throw new TokenExpiredException(INT.I("Autenticazione fallita o timeout della connessione."));
+      // NON rimuove TokenExpiredException ; viene intercettato per il rinnovo automatico delle connessioni
+      throw new TokenExpiredException("TokenExpiredException: " + INT.I("autenticazione fallita o timeout della connessione."));
 
     TokenAuthItem item = (TokenAuthItem) (obj.getContents());
     item.setLastAccess(new Date());
