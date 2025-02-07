@@ -65,7 +65,7 @@ public class CoreCustomUrlBuilder implements RigelCustomUrlBuilder
   protected String adJustUrl(boolean popup, String url)
   {
     // genera una path assoluta
-    if(HtmlUtils.isHttp(url))
+    if(url == null || HtmlUtils.isHttp(url))
       return url;
 
     url = parseMacro(popup, url);
@@ -95,6 +95,9 @@ public class CoreCustomUrlBuilder implements RigelCustomUrlBuilder
    */
   protected String parseMacro(boolean popup, String input)
   {
+    if(input == null)
+      return null;
+
     if(popup)
     {
       // se la maschera è in popup deve usare il form di popup ...

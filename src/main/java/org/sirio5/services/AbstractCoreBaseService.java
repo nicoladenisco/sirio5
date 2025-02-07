@@ -43,7 +43,7 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
   private static final Log log = LogFactory.getLog(AbstractCoreBaseService.class);
   /** semaforo per l'inizializzazione */
   private static final Object semaforoInit = new Object();
-  protected static boolean initEseguito = false, initCompletato = false;
+  protected static boolean initEseguito = false, initCompletato = false, databaseModificato = false;
   /** Variabili globali per tutti i servizi */
   protected static int aziendaId = 0;
   protected static String aziendaNome = null;
@@ -729,5 +729,15 @@ abstract public class AbstractCoreBaseService extends BaseService implements Cor
   public static boolean isInitEseguito()
   {
     return initEseguito;
+  }
+
+  public static boolean isDatabaseModificato()
+  {
+    return databaseModificato;
+  }
+
+  public static void setDatabaseModificato(boolean databaseModificato)
+  {
+    AbstractCoreBaseService.databaseModificato = databaseModificato;
   }
 }

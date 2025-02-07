@@ -123,12 +123,14 @@ public class ToolRenderListeRigel extends ListaBase5
     {
       SqlTableModel tm = (SqlTableModel) lso.getPtm();
       String nometab = tm.getQuery().getVista();
-      flt.setMascheraRicerca(new ToolRicercaListe(new SqlBuilderRicercaGenerica(tm, nometab), tm, act.getI18n(), unique, baseurl));
+      flt.setMascheraRicerca(new ToolRicercaListe(new SqlBuilderRicercaGenerica(tm, nometab),
+         tm, act.getI18n(), unique, baseurl));
     }
     else if(lso.getPtm() instanceof PeerTableModel)
     {
       PeerTableModel tm = (PeerTableModel) lso.getPtm();
-      flt.setMascheraRicerca(new ToolRicercaListe(new PeerBuilderRicercaGenerica(tm, tm.getTableMap()), tm, act.getI18n(), unique, baseurl));
+      flt.setMascheraRicerca(new ToolRicercaListe(new PeerBuilderRicercaGenerica(tm, tm.getTableMap()),
+         tm, act.getI18n(), unique, baseurl));
     }
 
     super.makeContextHtml(lso, li, data, context, baseUri);
@@ -212,7 +214,7 @@ public class ToolRenderListeRigel extends ListaBase5
 
     StringWriter writer = new StringWriter(512);
     // renderizzazione Velocity con il modello caricato da risorsa
-    try (InputStream is = ClassUtils.getResourceAsStream(getClass(), "/ToolLista.vm"))
+    try(InputStream is = ClassUtils.getResourceAsStream(getClass(), "/ToolLista.vm"))
     {
       InputStreamReader reader = new InputStreamReader(is, "UTF-8");
 
@@ -224,7 +226,7 @@ public class ToolRenderListeRigel extends ListaBase5
 
     // rimaneggia javascript sostituendo submit con funzione specifica
     String url = (String) ctx.get("selfurl");
-    return SU.strReplace(cutHtml(html),
+    return SU.strReplace(html,
        "document." + formName + ".submit();",
        "rigel.submitTool('" + unique + "', '" + url + "')");
   }
