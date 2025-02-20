@@ -20,6 +20,8 @@ package org.sirio5.utils;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+import org.commonlib5.utils.StringJoin;
 import org.rigel5.RigelI18nInterface;
 import org.sirio5.rigel.RigelDefaultI18n;
 
@@ -35,7 +37,7 @@ public class SirioGenericContext extends HashMap<String, Object>
    implements Serializable
 {
   private transient RigelI18nInterface i18n = new RigelDefaultI18n();
-  private StringBuilder message = new StringBuilder();
+  private final List<String> messages = new ArrayList<>();
   protected boolean mustSerializable = false;
 
   public SirioGenericContext()
@@ -51,7 +53,7 @@ public class SirioGenericContext extends HashMap<String, Object>
   {
     super(ctx);
     this.i18n = ctx.i18n;
-    this.message.append(ctx.message);
+    this.messages.addAll(ctx.messages);
     this.mustSerializable = ctx.mustSerializable;
   }
 
@@ -179,41 +181,64 @@ public class SirioGenericContext extends HashMap<String, Object>
 
   public SirioGenericContext clearMessage()
   {
-    message = new StringBuilder();
+    messages.clear();
     return this;
   }
 
   public SirioGenericContext setMessage(String msg)
   {
-    message = new StringBuilder(msg);
+    messages.clear();
+    messages.add(msg);
     return this;
   }
 
   public SirioGenericContext addMessage(String msg)
   {
-    message.append(msg);
+    messages.add(msg);
     return this;
   }
 
   public SirioGenericContext addMessages(List objs, String separator, String delimiter)
   {
-    message.append(SU.join(objs.iterator(), separator, delimiter));
+    messages.add(StringJoin.build(separator, delimiter).addObjects(objs, (o) -> o.toString()).join());
     return this;
   }
 
   public String getMessage()
   {
-    return message.toString();
+    switch(messages.size())
+    {
+      case 0:
+        return "";
+
+      case 1:
+        return messages.get(0);
+
+      default:
+        return StringJoin.build("\n").add(messages).join();
+    }
+  }
+
+  public List<String> getMessages()
+  {
+    return messages;
+  }
+
+  public List<String> getMessagesDistinct()
+  {
+    return messages.stream()
+       .sorted().distinct()
+       .collect(Collectors.toList());
   }
 
   public boolean haveMessage()
   {
-    return message.length() > 0;
+    return !messages.isEmpty();
   }
 
   public SirioGenericContext append(String br)
   {
-    message.append(br);
+    messages.add(br);
     return this;
   }
 

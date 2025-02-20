@@ -144,12 +144,28 @@ public interface TokenAuthService extends CoreServiceExtension
   /**
    * Decodifica token OAuth2.
    * Decodifica il token prodotto con encryptTokenOauth2 ritornando il JSON originario.
+   * La funzione verifica che la richiesta provenga dallo stesso indirizzo di generazione del token.
    * @param req richiesta HTTP per la ricostruzione del token
    * @param token token OAuth2
    * @return JSON contenuto nel token
    * @throws Exception
    */
-  public JSONObject decriptTokenOauth2(HttpServletRequest req, String token)
+  default public JSONObject decriptTokenOauth2(HttpServletRequest req, String token)
+     throws Exception
+  {
+    return decriptTokenOauth2(req, token, false);
+  }
+
+  /**
+   * Decodifica token OAuth2.
+   * Decodifica il token prodotto con encryptTokenOauth2 ritornando il JSON originario.
+   * @param req richiesta HTTP per la ricostruzione del token
+   * @param token token OAuth2
+   * @param decryptOnly se vero esegue solo la decodifica senza ulteriori controlli
+   * @return JSON contenuto nel token
+   * @throws Exception
+   */
+  public JSONObject decriptTokenOauth2(HttpServletRequest req, String token, boolean decryptOnly)
      throws Exception;
 
   /**

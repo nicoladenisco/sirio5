@@ -449,7 +449,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
   }
 
   @Override
-  public JSONObject decriptTokenOauth2(HttpServletRequest req, String token)
+  public JSONObject decriptTokenOauth2(HttpServletRequest req, String token, boolean decryptOnly)
      throws Exception
   {
     byte[] binToken = RSAEncryptUtils.decodeBASE64(token);
@@ -458,11 +458,14 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     RSAEncryptUtils.encryptDecryptFile(input, decrypt, puk, Cipher.DECRYPT_MODE);
 
     JSONObject jo = new JSONObject(new String(decrypt.getBytes(), "UTF-8"));
+    if(decryptOnly)
+      return jo;
 
     // caso speciale per localhost: ignora indirizzo di rilascio del token
     if("127.0.0.1".equals(req.getRemoteAddr()))
       return jo;
 
+    // controlla che l'indirizzo di generazione del token sia lo stesso della richiesta
     if(!SU.isEqu(jo.get("address"), req.getRemoteAddr()))
       throw new TokenAuthFailureException("Invalid address in request.");
 

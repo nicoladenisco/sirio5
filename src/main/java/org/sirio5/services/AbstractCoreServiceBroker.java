@@ -17,6 +17,7 @@
  */
 package org.sirio5.services;
 
+import java.io.File;
 import java.sql.Connection;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.apache.turbine.services.ServiceManager;
 import org.apache.turbine.services.schedule.JobEntryTorque;
 import org.apache.turbine.services.schedule.JobEntryTorquePeer;
 import org.apache.turbine.util.TurbineException;
+import org.commonlib5.utils.CommonFileUtils;
 import org.rigel5.db.DbUtils;
 import static org.sirio5.services.localization.INT.I;
 
@@ -77,6 +79,13 @@ abstract public class AbstractCoreServiceBroker extends EffectiveBaseServiceBrok
   protected void initSirio()
      throws Exception
   {
+    // se la directory temporanea principale di sistema non esiste
+    // oppure non è scrivibile il layer fulcrum si incazza a bestia
+    // tomcat modifica questa proprietà e non sempre la directory esiste
+    String tempRootDir = System.getProperty("java.io.tmpdir", ".");
+    log.info("tempRootDir=" + tempRootDir);
+    File tmpDir = new File(tempRootDir);
+    ASSERT_DIR_WRITE(tmpDir);
     // primo caricamento mappatura servizi
     initMapping();
 
@@ -230,6 +239,19 @@ abstract public class AbstractCoreServiceBroker extends EffectiveBaseServiceBrok
     catch(Exception e)
     {
       log.error("ricaricaOverrideSetup failure", e);
+    }
+  }
+
+  public void ASSERT_DIR_WRITE(File toTest)
+     throws Exception
+  {
+    toTest.mkdirs();
+    if(!(toTest.exists() && toTest.isDirectory() && CommonFileUtils.checkDirectoryWritable(toTest)))
+    {
+      String mess = "ASSERT_DIR_WRITE failed: la directory " + toTest.getAbsolutePath()
+         + " non esiste o non e' scrivibile.";
+      log.debug(mess);
+      throw new CoreServiceException(mess);
     }
   }
 }
