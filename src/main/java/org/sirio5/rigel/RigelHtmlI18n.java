@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -19,6 +19,7 @@ package org.sirio5.rigel;
 
 import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang.LocaleUtils;
 import org.sirio5.utils.CoreRunData;
 
 /**
@@ -40,6 +41,17 @@ public class RigelHtmlI18n extends RigelDefaultI18n
   public RigelHtmlI18n(CoreRunData data)
   {
     userLocale = lsrv.getLocale(data.getRequest());
+  }
+
+  public RigelHtmlI18n(String locale)
+  {
+    userLocale = LocaleUtils.toLocale(locale);
+  }
+
+  @Override
+  public Locale getUserLocale()
+  {
+    return userLocale;
   }
 
   @Override

@@ -64,6 +64,19 @@ public interface modelliXML extends CoreServiceExtension, WrapperBuilderInterfac
 
   /**
    * Ritorna i tags HTML necessari per un campo data con l'ausilio del calendario.
+   * @param nomeCampo nome HTML del campo
+   * @param nomeForm nome del form che contiene i controlli generati
+   * @param valore eventuale valore di default (puo' essere null)
+   * @param size dimensione richiesta
+   * @return l'HTML completo del campo e del javascript per l'editing
+   * @throws java.lang.Exception
+   */
+  public String getCampoDataJQuery(String nomeCampo, String nomeForm,
+     String valore, int size)
+     throws Exception;
+
+  /**
+   * Ritorna i tags HTML necessari per un campo data con l'ausilio del calendario.
    * Il campo generato verra' utilizzato con il suo gemello generato da
    * 'getCampoDataIntervalloFine' che genera il campo finale dell'intervallo.
    * @param nomeCampoInizio nome HTML del campo di inizio intervallo
@@ -91,6 +104,38 @@ public interface modelliXML extends CoreServiceExtension, WrapperBuilderInterfac
    * @throws java.lang.Exception
    */
   public String getCampoDataIntervalloFine(String nomeCampoInizio, String nomeCampoFine,
+     String nomeForm, String valore, int size)
+     throws Exception;
+
+  /**
+   * Ritorna i tags HTML necessari per un campo data con l'ausilio del calendario.
+   * Il campo generato verra' utilizzato con il suo gemello generato da
+   * 'getCampoDataIntervalloFine' che genera il campo finale dell'intervallo.
+   * @param nomeCampoInizio nome HTML del campo di inizio intervallo
+   * @param nomeCampoFine nome HTML del campo di fine intervallo
+   * @param nomeForm nome del form che contiene i controlli generati
+   * @param valore eventuale valore di default (puo' essere null)
+   * @param size dimensione richiesta
+   * @return l'HTML completo del campo di inizio intervallo e del javascript per l'editing
+   * @throws java.lang.Exception
+   */
+  public String getCampoDataIntervalloInizioJQuery(String nomeCampoInizio, String nomeCampoFine,
+     String nomeForm, String valore, int size)
+     throws Exception;
+
+  /**
+   * Ritorna i tags HTML necessari per un campo data con l'ausilio del calendario.
+   * Il campo generato verra' utilizzato con il suo gemello generato da
+   * 'getCampoDataIntervalloInizio' che genera il campo iniziale dell'intervallo.
+   * @param nomeCampoInizio nome HTML del campo di inizio intervallo
+   * @param nomeCampoFine nome HTML del campo di fine intervallo
+   * @param nomeForm nome del form che contiene i controlli generati
+   * @param valore eventuale valore di default (puo' essere null)
+   * @param size dimensione richiesta
+   * @return l'HTML completo del campo di fine intervallo e del javascript per l'editing
+   * @throws java.lang.Exception
+   */
+  public String getCampoDataIntervalloFineJQuery(String nomeCampoInizio, String nomeCampoFine,
      String nomeForm, String valore, int size)
      throws Exception;
 

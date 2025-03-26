@@ -166,6 +166,33 @@ public class BeanWrapper
     return getValue();
   }
 
+  public synchronized void setValueFromMap(Map values, String propName)
+     throws Exception
+  {
+    setValue(values.get(propName), propName);
+  }
+
+  public synchronized void setValueFromMap(Map values, String mapName, String propName)
+     throws Exception
+  {
+    setValue(values.get(mapName), propName);
+  }
+
+  public synchronized void setValueParseFromMap(Map values, String propName)
+     throws Exception
+  {
+    setValueParseFromMap(values, propName, propName);
+  }
+
+  public synchronized void setValueParseFromMap(Map values, String mapName, String propName)
+     throws Exception
+  {
+    String value = StringOper.okStrNull(values.get(mapName));
+
+    setPropDescr(propName);
+    Class vcl = getValClass();
+    setValue(parseValueNull(value, vcl));
+  }
   public synchronized void setValue(Object value, String propName)
      throws Exception
   {
@@ -335,6 +362,40 @@ public class BeanWrapper
 
     if(vcl.equals(java.util.Date.class))
       return invalid ? new java.util.Date() : DateTime.parseIsoFull(value, null);
+    return value;
+  }
+
+  public static Object parseValueNull(String value, Class vcl)
+     throws Exception
+  {
+    boolean invalid = value == null || value.trim().length() == 0;
+
+    if(vcl.equals(Integer.class))
+      return invalid ? Integer.valueOf(0) : Integer.valueOf(value);
+    if(vcl.equals(Float.class))
+      return invalid ? Float.valueOf(0.0f) : Float.valueOf(value);
+    if(vcl.equals(Boolean.class))
+      return invalid ? false : StringOper.checkTrueFalse(value, false);
+    if(vcl.equals(Double.class))
+      return invalid ? Double.valueOf(0.0) : Double.valueOf(value);
+
+    if(invalid)
+      return null;
+
+    if(vcl.equals(java.sql.Timestamp.class))
+    {
+      java.util.Date dtmp = (java.util.Date) DateTime.parseIsoFull(value, null);
+      return new java.sql.Timestamp(dtmp.getTime());
+    }
+
+    if(vcl.equals(java.sql.Date.class))
+    {
+      java.util.Date dtmp = (java.util.Date) DateTime.parseIsoFull(value, null);
+      return new java.sql.Date(dtmp.getTime());
+    }
+
+    if(vcl.equals(java.util.Date.class))
+      return DateTime.parseIsoFull(value, null);
 
     return value;
   }

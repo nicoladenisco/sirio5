@@ -134,6 +134,7 @@ public class CoreRigelUIManager5 extends DefaultUIManager
   protected String getJumpUrl(AbstractHtmlTablePager tp, HttpSession sessione, int rec)
      throws Exception
   {
-    return tp.getSelfUrl(rec, sessione);
+    String uri = tp.getSelfUrl(rec, sessione);
+    return "javascript:rigel.jumpNav('" + uri + "')";
   }
 }

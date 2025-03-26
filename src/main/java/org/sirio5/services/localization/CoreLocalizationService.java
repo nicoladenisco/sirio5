@@ -90,7 +90,7 @@ public class CoreLocalizationService extends DefaultLocalizationService
    */
   protected void caricaDefaultXML()
   {
-    try (InputStream is = this.getClass().getResourceAsStream(xmlPath))
+    try(InputStream is = this.getClass().getResourceAsStream(xmlPath))
     {
       SAXBuilder builder = new SAXBuilder();
       Document doc = builder.build(is);
@@ -145,7 +145,7 @@ public class CoreLocalizationService extends DefaultLocalizationService
 
     msgMap = new HashMap<String, String>();
 
-    try (InputStream is = this.getClass().getResourceAsStream(xmlPath))
+    try(InputStream is = this.getClass().getResourceAsStream(xmlPath))
     {
       SAXBuilder builder = new SAXBuilder();
       Document doc = builder.build(is);
@@ -552,5 +552,10 @@ public class CoreLocalizationService extends DefaultLocalizationService
   protected String subTranslation(String key, Locale locale)
   {
     return null;
+  }
+
+  public Locale getDisplayLocale()
+  {
+    return displayLocale;
   }
 }

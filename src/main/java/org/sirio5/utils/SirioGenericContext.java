@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import org.commonlib5.utils.StringJoin;
+import org.commonlib5.xmlrpc.MapParser;
 import org.rigel5.RigelI18nInterface;
 import org.sirio5.rigel.RigelDefaultI18n;
 
@@ -131,9 +132,25 @@ public class SirioGenericContext extends HashMap<String, Object>
     });
   }
 
+  public void putAllObjects(Map params)
+  {
+    params.forEach((k, v) ->
+    {
+      this.put(k.toString(), v);
+    });
+  }
   public Object getNotNull(String key)
   {
     Object rv = get(key);
+    if(rv == null)
+      throw new RuntimeException(i18n.msg("Il parametro '%s' non è presente nel context.", key));
+
+    return rv;
+  }
+
+  public String getNotNullAsString(String key)
+  {
+    String rv = SU.okStrNull(get(key));
     if(rv == null)
       throw new RuntimeException(i18n.msg("Il parametro '%s' non è presente nel context.", key));
 
@@ -537,5 +554,15 @@ public class SirioGenericContext extends HashMap<String, Object>
   {
     T val = (T) get(key);
     return val != null ? val : fun.call();
+  }
+
+  public MapParser getAsMapParser(String key)
+  {
+    return getAsMapParser(key, Collections.EMPTY_MAP);
+  }
+
+  public MapParser getAsMapParser(String key, Map defval)
+  {
+    return new MapParser((Map) get(key, defval));
   }
 }

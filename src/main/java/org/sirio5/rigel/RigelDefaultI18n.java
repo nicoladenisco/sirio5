@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -17,12 +17,14 @@
  */
 package org.sirio5.rigel;
 
+import java.util.Locale;
 import org.apache.fulcrum.localization.LocalizationService;
 import org.apache.turbine.services.TurbineServices;
 import org.rigel5.RigelI18nInterface;
 import org.rigel5.table.RigelColumnDescriptor;
 import org.rigel5.table.RigelTableModel;
 import org.rigel5.table.html.hTable;
+import org.sirio5.services.localization.CoreLocalizationService;
 
 /**
  * Interfaccia multilingua per RIGEL.
@@ -77,5 +79,16 @@ public class RigelDefaultI18n implements RigelI18nInterface
   {
     String value = resolveGenericMessage(defaultMessage);
     return String.format(value, args);
+  }
+
+  @Override
+  public Locale getUserLocale()
+  {
+    if(lsrv instanceof CoreLocalizationService)
+    {
+      return ((CoreLocalizationService) lsrv).getDisplayLocale();
+    }
+
+    return Locale.getDefault();
   }
 }

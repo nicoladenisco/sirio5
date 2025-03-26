@@ -53,6 +53,8 @@ final public class CalendarioBean extends CoreBaseBean
   private int bootstrapVersion = 0;
   protected RigelHtmlI18n i18n = null;
   private LocalizationService ls;
+  private boolean useJQuery = false;
+  private String idcc, idci, idcf;
 
   @Override
   public void init(CoreRunData data)
@@ -209,9 +211,18 @@ final public class CalendarioBean extends CoreBaseBean
           case 4: // bootstrap 4
           case 3: // bootstrap 3
           {
-            html2.append("<TD WIDTH=50 HEIGHT=30 CLASS=\"").append(style).
-               append("\" onclick=\"").append(func).append("('").append(sDate).
-               append("'); chiudiCalendario();\">").append(gg).append("</TD>\r\n"); // NOI18N
+            if(useJQuery)
+            {
+              html2.append("<TD WIDTH=50 HEIGHT=30 CLASS=\"").append(style).
+                 append("\" onclick=\"changeDayJQuery('").append(idcc).append("','").append(sDate).
+                 append("'); chiudiCalendario();\">").append(gg).append("</TD>\r\n"); // NOI18N
+            }
+            else
+            {
+              html2.append("<TD WIDTH=50 HEIGHT=30 CLASS=\"").append(style).
+                 append("\" onclick=\"").append(func).append("('").append(sDate).
+                 append("'); chiudiCalendario();\">").append(gg).append("</TD>\r\n"); // NOI18N
+            }
             break;
           }
           case 0: // nessuno
@@ -402,6 +413,140 @@ final public class CalendarioBean extends CoreBaseBean
     return rv.toString();
   }
 
+  public String computeIntervalsSmall()
+     throws Exception
+  {
+    StringBuilder rv = new StringBuilder(1024);
+    Calendar cal = new GregorianCalendar(loc);
+
+    if(true)
+    {
+      String spg = DT.formatData(today);
+      String sug = DT.formatData(today);
+      rv.append(fmtOption(spg, sug, i18n.msg("Oggi")));
+    }
+
+    if(true)
+    {
+      cal.setTime(today);
+      cal.add(Calendar.DAY_OF_YEAR, -1);
+      String spg = DT.formatData(cal.getTime());
+      String sug = DT.formatData(cal.getTime());
+      rv.append(fmtOption(spg, sug, i18n.msg("Ieri")));
+    }
+
+    if(true)
+    {
+      cal.setTime(today);
+      cal.add(Calendar.DAY_OF_YEAR, -2);
+      String spg = DT.formatData(cal.getTime());
+      String sug = DT.formatData(today);
+      rv.append(fmtOption(spg, sug, i18n.msg("Ultimi due giorni")));
+    }
+
+    if(true)
+    {
+      cal.setTime(today);
+      cal.add(Calendar.WEEK_OF_YEAR, -1);
+      String spg = DT.formatData(cal.getTime());
+      String sug = DT.formatData(today);
+      rv.append(fmtOption(spg, sug, i18n.msg("Ultima settimana")));
+    }
+
+    if(true)
+    {
+      cal.setTime(today);
+      int pg = cal.getActualMinimum(Calendar.DAY_OF_MONTH);
+      int ug = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+      cal.set(Calendar.DAY_OF_MONTH, pg);
+      String spg = DT.formatData(cal.getTime());
+      cal.set(Calendar.DAY_OF_MONTH, ug);
+      String sug = DT.formatData(cal.getTime());
+      rv.append(fmtOption(spg, sug, i18n.msg("Mese corrente")));
+    }
+
+    if(true)
+    {
+      cal.setTime(today);
+      cal.set(Calendar.DAY_OF_YEAR, 1);
+      String spg = DT.formatData(cal.getTime());
+      cal.set(Calendar.MONTH, Calendar.MARCH);
+      cal.set(Calendar.DAY_OF_MONTH, 31);
+      String sug = DT.formatData(cal.getTime());
+      rv.append(fmtOption(spg, sug, i18n.msg("Primo trimestre")));
+    }
+
+    if(oggim > Calendar.MARCH)
+    {
+      cal.setTime(today);
+      cal.set(Calendar.MONTH, Calendar.APRIL);
+      cal.set(Calendar.DAY_OF_MONTH, 1);
+      String spg = DT.formatData(cal.getTime());
+      cal.set(Calendar.MONTH, Calendar.JUNE);
+      cal.set(Calendar.DAY_OF_MONTH, 30);
+      String sug = DT.formatData(cal.getTime());
+      rv.append(fmtOption(spg, sug, i18n.msg("Secondo trimestre")));
+    }
+
+    if(oggim > Calendar.JUNE)
+    {
+      cal.setTime(today);
+      cal.set(Calendar.MONTH, Calendar.JULY);
+      cal.set(Calendar.DAY_OF_MONTH, 1);
+      String spg = DT.formatData(cal.getTime());
+      cal.set(Calendar.MONTH, Calendar.SEPTEMBER);
+      cal.set(Calendar.DAY_OF_MONTH, 30);
+      String sug = DT.formatData(cal.getTime());
+      rv.append(fmtOption(spg, sug, i18n.msg("Terzo trimestre")));
+    }
+
+    if(oggim > Calendar.SEPTEMBER)
+    {
+      cal.setTime(today);
+      cal.set(Calendar.MONTH, Calendar.OCTOBER);
+      cal.set(Calendar.DAY_OF_MONTH, 1);
+      String spg = DT.formatData(cal.getTime());
+      cal.set(Calendar.MONTH, Calendar.DECEMBER);
+      cal.set(Calendar.DAY_OF_MONTH, 31);
+      String sug = DT.formatData(cal.getTime());
+      rv.append(fmtOption(spg, sug, i18n.msg("Quarto trimestre")));
+    }
+
+    if(true)
+    {
+      cal.setTime(today);
+      cal.set(Calendar.DAY_OF_YEAR, 1);
+      String spg = DT.formatData(cal.getTime());
+      cal.set(Calendar.MONTH, Calendar.JUNE);
+      cal.set(Calendar.DAY_OF_MONTH, 30);
+      String sug = DT.formatData(cal.getTime());
+      rv.append(fmtOption(spg, sug, i18n.msg("Primo semestre")));
+    }
+
+    if(oggim > Calendar.JUNE)
+    {
+      cal.setTime(today);
+      cal.set(Calendar.MONTH, Calendar.JULY);
+      cal.set(Calendar.DAY_OF_MONTH, 1);
+      String spg = DT.formatData(cal.getTime());
+      cal.set(Calendar.MONTH, Calendar.DECEMBER);
+      cal.set(Calendar.DAY_OF_MONTH, 31);
+      String sug = DT.formatData(cal.getTime());
+      rv.append(fmtOption(spg, sug, i18n.msg("Secondo semestre")));
+    }
+
+    if(true)
+    {
+      cal.setTime(today);
+      cal.set(Calendar.DAY_OF_YEAR, 1);
+      String spg = DT.formatData(cal.getTime());
+      String sug = DT.formatData(today);
+      rv.append(fmtOption(spg, sug, i18n.msg("Dall'inizio dell'anno")));
+    }
+
+    return rv.toString();
+  }
+
   /**
    * Costruisce il contenuto combo box per le età.
    * @return options del combo box
@@ -433,8 +578,17 @@ final public class CalendarioBean extends CoreBaseBean
       case 5: // bootstrap 5
       case 4: // bootstrap 4
       {
-        return "<li><a class=\"dropdown-item\" href=\"#\" onclick=\""
-           + fint + "('" + spg + "|" + sug + "'); chiudiCalendario();\">" + descrizione + "</a></li>\n"; // NOI18N
+        if(useJQuery)
+        {
+          return "<li><a class=\"dropdown-item\" href=\"#\" onclick=\"changeDayJQueryI("
+             + "'" + idci + "','" + idcf + "',"
+             + "'" + spg + "','" + sug + "'); chiudiCalendario();\">" + descrizione + "</a></li>\n"; // NOI18N
+        }
+        else
+        {
+          return "<li><a class=\"dropdown-item\" href=\"#\" onclick=\""
+             + fint + "('" + spg + "|" + sug + "'); chiudiCalendario();\">" + descrizione + "</a></li>\n"; // NOI18N
+        }
       }
       case 3: // bootstrap 3
       {
@@ -571,5 +725,45 @@ final public class CalendarioBean extends CoreBaseBean
   public boolean isInterval()
   {
     return SU.isEquNocase(mode, INTERVAL);
+  }
+
+  public boolean isUseJQuery()
+  {
+    return useJQuery;
+  }
+
+  public void setUseJQuery(boolean useJQuery)
+  {
+    this.useJQuery = useJQuery;
+  }
+
+  public String getIdcc()
+  {
+    return idcc;
+  }
+
+  public void setIdcc(String idcc)
+  {
+    this.idcc = idcc;
+  }
+
+  public String getIdci()
+  {
+    return idci;
+  }
+
+  public void setIdci(String idci)
+  {
+    this.idci = idci;
+  }
+
+  public String getIdcf()
+  {
+    return idcf;
+  }
+
+  public void setIdcf(String idcf)
+  {
+    this.idcf = idcf;
   }
 }

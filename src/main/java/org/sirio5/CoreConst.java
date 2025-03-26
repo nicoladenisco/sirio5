@@ -138,6 +138,8 @@ public class CoreConst
 
   public static final String MIME_BINARY = "application/binary";
 
+  public static final String MIME_JSON = "application/json";
+  public static final String EXT_JSON = "json";
   public final static String MIME_PDFA = "application/pdf+text/x-cda-r2+xml"; //TipoMime CDA Tabella 2.11-1 AffinityDomain
 
   public final static String[] MIME_PDFs =

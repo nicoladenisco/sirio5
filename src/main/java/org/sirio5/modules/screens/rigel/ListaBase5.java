@@ -56,7 +56,7 @@ abstract public class ListaBase5 extends RigelEditBaseScreen
    * @return la lista se esiste altrimenti null
    * @throws Exception
    */
-  protected HtmlWrapperBase geListaCache(CoreRunData data, String type)
+  protected HtmlWrapperBase getListaCache(CoreRunData data, String type)
      throws Exception
   {
     HtmlWrapperBase hwb = null;
@@ -93,7 +93,7 @@ abstract public class ListaBase5 extends RigelEditBaseScreen
   public void doBuildTemplateListaInfo(CoreRunData data, Context context, ListaInfo li)
      throws Exception
   {
-    HtmlWrapperBase lso = geListaCache(data, li.type);
+    HtmlWrapperBase lso = getListaCache(data, li.type);
 
     synchronized(lso)
     {

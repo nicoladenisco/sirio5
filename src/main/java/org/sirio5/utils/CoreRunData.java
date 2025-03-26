@@ -73,20 +73,38 @@ public class CoreRunData extends DefaultTurbineRunData
   public String formatData(Date data)
      throws Exception
   {
-    return data == null ? "&nbsp;" : df.formatData(data);
+    return formatData(data, "&nbsp;");
   }
 
   public String formatDataFull(Date data)
      throws Exception
   {
-    return data == null ? "&nbsp;" : df.formatDataFull(data);
+    return formatDataFull(data, "&nbsp;");
   }
 
   public String formatDataOra(Date data)
      throws Exception
   {
+    return formatDataOra(data, "&nbsp;");
+  }
+
+  public String formatData(Date data, String defVal)
+     throws Exception
+  {
+    return data == null ? defVal : df.formatData(data);
+  }
+
+  public String formatDataFull(Date data, String defVal)
+     throws Exception
+  {
+    return data == null ? defVal : df.formatDataFull(data);
+  }
+
+  public String formatDataOra(Date data, String defVal)
+     throws Exception
+  {
     if(data == null)
-      return "&nbsp;";
+      return defVal;
 
     String s = df.formatDataFull(data);
     return s.substring(0, s.length() - 3);
@@ -504,6 +522,18 @@ public class CoreRunData extends DefaultTurbineRunData
     }
   }
 
+  public String getCampoDataJQuery(String nomeCampo, String nomeForm, String valore, int size)
+  {
+    try
+    {
+      return modXML.getCampoDataJQuery(nomeCampo, nomeForm, valore, size);
+    }
+    catch(Exception ex)
+    {
+      return "ERRORE: " + ex.getMessage();
+    }
+  }
+
   public String getCampoDataIntervalloInizio(String nomeCampoInizio, String nomeCampoFine,
      String nomeForm, String valore, int size)
   {
@@ -523,6 +553,32 @@ public class CoreRunData extends DefaultTurbineRunData
     try
     {
       return modXML.getCampoDataIntervalloFine(nomeCampoInizio, nomeCampoFine, nomeForm, valore, size);
+    }
+    catch(Exception ex)
+    {
+      return "ERRORE: " + ex.getMessage();
+    }
+  }
+
+  public String getCampoDataIntervalloInizioJQuery(String nomeCampoInizio, String nomeCampoFine,
+     String nomeForm, String valore, int size)
+  {
+    try
+    {
+      return modXML.getCampoDataIntervalloInizioJQuery(nomeCampoInizio, nomeCampoFine, nomeForm, valore, size);
+    }
+    catch(Exception ex)
+    {
+      return "ERRORE: " + ex.getMessage();
+    }
+  }
+
+  public String getCampoDataIntervalloFineJQuery(String nomeCampoInizio, String nomeCampoFine,
+     String nomeForm, String valore, int size)
+  {
+    try
+    {
+      return modXML.getCampoDataIntervalloFineJQuery(nomeCampoInizio, nomeCampoFine, nomeForm, valore, size);
     }
     catch(Exception ex)
     {

@@ -515,6 +515,23 @@ public class CoreModelliXML extends AbstractCoreBaseService
   }
 
   /**
+   * Ritorna i tags HTML necessari per un campo data con l'ausilio del calendario
+   * @param nomeCampo nome HTML del campo
+   * @param valore eventuale valore di default (puo' essere null)
+   * @param size dimensione richiesta
+   * @return l'HTML completo del campo e del javascript per l'editing
+   * @throws java.lang.Exception
+   */
+  @Override
+  public String getCampoDataJQuery(String nomeCampo, String nomeForm, String valore, int size)
+     throws Exception
+  {
+    return "<input name=\"" + nomeCampo + "\" size=\"" + size + "\" value=\"" + StringOper.okStr(valore) + "\">&nbsp;"
+       + "<a href=\"javascript:apriCalendarioJQuery('" + nomeCampo + "')\">"
+       + getImgEditData() + "</a>\r\n";
+  }
+
+  /**
    * Ritorna i tags HTML necessari per un campo data con l'ausilio del calendario.
    * Il campo generato verra' utilizzato con il suo gemello generato da
    * 'getCampoDataIntervalloFine' che genera il campo finale dell'intervallo.
@@ -588,6 +605,48 @@ public class CoreModelliXML extends AbstractCoreBaseService
        + "      chiudiCalendario();\r\n"
        + "}\r\n"
        + "</SCRIPT>\r\n";
+  }
+
+  /**
+   * Ritorna i tags HTML necessari per un campo data con l'ausilio del calendario.
+   * Il campo generato verra' utilizzato con il suo gemello generato da
+   * 'getCampoDataIntervalloFine' che genera il campo finale dell'intervallo.
+   * @param nomeCampoInizio nome HTML del campo di inizio intervallo
+   * @param nomeCampoFine nome HTML del campo di fine intervallo
+   * @param nomeForm nome del form
+   * @param valore eventuale valore di default (puo' essere null)
+   * @param size dimensione richiesta
+   * @return l'HTML completo del campo di inizio intervallo e del javascript per l'editing
+   * @throws java.lang.Exception
+   */
+  @Override
+  public String getCampoDataIntervalloInizioJQuery(String nomeCampoInizio, String nomeCampoFine, String nomeForm, String valore, int size)
+     throws Exception
+  {
+    return "<input id=\"" + nomeCampoInizio + "\" name=\"" + nomeCampoInizio + "\" size=\"" + size + "\" value=\"" + StringOper.okStr(valore) + "\">&nbsp;"
+       + "<a href=\"javascript:apriCalendarioIntervalloJQuery('" + nomeCampoInizio + "', '" + nomeCampoInizio + "','" + nomeCampoFine + "')\">"
+       + getImgEditData() + "</a>\r\n";
+  }
+
+  /**
+   * Ritorna i tags HTML necessari per un campo data con l'ausilio del calendario
+   * Il campo generato verra' utilizzato con il suo gemello generato da
+   * 'getCampoDataIntervalloInizio' che genera il campo iniziale dell'intervallo.
+   * @param nomeCampoInizio nome HTML del campo di inizio intervallo
+   * @param nomeCampoFine nome HTML del campo di fine intervallo
+   * @param nomeForm nome del form
+   * @param valore eventuale valore di default (puo' essere null)
+   * @param size dimensione richiesta
+   * @return l'HTML completo del campo di fine intervallo e del javascript per l'editing
+   * @throws java.lang.Exception
+   */
+  @Override
+  public String getCampoDataIntervalloFineJQuery(String nomeCampoInizio, String nomeCampoFine, String nomeForm, String valore, int size)
+     throws Exception
+  {
+    return "<input id=\"" + nomeCampoFine + "\" name=\"" + nomeCampoFine + "\" size=\"" + size + "\" value=\"" + StringOper.okStr(valore) + "\">&nbsp;"
+       + "<a href=\"javascript:apriCalendarioIntervalloJQuery('" + nomeCampoFine + "','" + nomeCampoInizio + "','" + nomeCampoFine + "')\">"
+       + getImgEditData() + "</a>\r\n";
   }
 
   /**
