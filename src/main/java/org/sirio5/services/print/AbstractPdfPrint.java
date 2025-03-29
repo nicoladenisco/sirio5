@@ -78,7 +78,7 @@ abstract public class AbstractPdfPrint extends AbstractCoreBaseService
         return info;
     }
 
-    AbstractReportParametersInfo f_info = createReportInfo(codiceStampa);
+    AbstractReportParametersInfo f_info = createReportInfo(codiceStampa, context);
     context.put(PrintContext.PBEAN_KEY, f_info);
     context.put(PrintContext.REPORT_INFO_KEY, f_info.getInfo());
     context.put(PrintContext.REPORT_NAME_KEY, f_info.getNome());
@@ -194,6 +194,6 @@ abstract public class AbstractPdfPrint extends AbstractCoreBaseService
     return null;
   }
 
-  abstract protected AbstractReportParametersInfo createReportInfo(String codiceStampa)
+  abstract protected AbstractReportParametersInfo createReportInfo(String codiceStampa, PrintContext context)
      throws Exception;
 }

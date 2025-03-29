@@ -334,20 +334,24 @@ public class pdfmaker extends HttpServlet
     // aggiunge al context eventuali informazioni
     info = completaPrintContext(context, sRequest, request, response);
 
-    // estrae il nome del plugin e quello del report dalla richiesta
-    // la richiesta è http://server/pdf/plugin/report?param1=val1&...
-    // oppure http://server/pdf/codiceStampa?param1=val1&...
-    int pos = 0;
-    String pluginName = null, reportName = null;
-    if((pos = sRequest.indexOf('/')) == -1)
+    // se completaPrintContext restituisce un job gia pronto lo usa
+    if(info == null)
     {
-      info = pp.generatePrintJob(idUser, sRequest, context, request.getSession());
-    }
-    else
-    {
-      pluginName = sRequest.substring(0, pos);
-      reportName = sRequest.substring(pos + 1);
-      info = pp.generatePrintJob(idUser, pluginName, reportName, null, context, request.getSession());
+      // estrae il nome del plugin e quello del report dalla richiesta
+      // la richiesta è http://server/pdf/plugin/report?param1=val1&...
+      // oppure http://server/pdf/codiceStampa?param1=val1&...
+      int pos = 0;
+      String pluginName = null, reportName = null;
+      if((pos = sRequest.indexOf('/')) == -1)
+      {
+        info = pp.generatePrintJob(idUser, sRequest, context, request.getSession());
+      }
+      else
+      {
+        pluginName = sRequest.substring(0, pos);
+        reportName = sRequest.substring(pos + 1);
+        info = pp.generatePrintJob(idUser, pluginName, reportName, null, context, request.getSession());
+      }
     }
 
     if(info == null)

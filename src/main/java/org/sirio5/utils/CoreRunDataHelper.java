@@ -29,6 +29,23 @@ import org.apache.turbine.util.TurbineException;
 
 /**
  * Helper per la generazione di un oggetto CoreRunData in posti strani (tipo JSP).
+ * Implementa Closeable per l'uso in un try with resource.
+ * L'oggetto CoreRunData viene inizializzato con i dati utente che sono quindi disponibili.
+ * <pre>
+ * <code>
+ *
+ * try(CoreRunDataHelper rh = new CoreRunDataHelper(request, response, config))
+ * {
+ *   CoreRunData data = rh.getCoreRunData()
+ *   ...
+ *   ...
+ *   LocalizationService ls = rh.getService(LocalizationService.ROLE);
+ *   ...
+ *   ...
+ * }
+ *
+ * </code>
+ * </pre>
  * @author Nicola De Nisco
  */
 public class CoreRunDataHelper implements Closeable
@@ -37,19 +54,38 @@ public class CoreRunDataHelper implements Closeable
   private RunDataService rundataService = null;
   private CoreRunData data;
 
-  public CoreRunDataHelper(HttpServletRequest req,
-     HttpServletResponse res,
-     ServletConfig config)
+  public CoreRunDataHelper(HttpServletRequest req, HttpServletResponse res, ServletConfig config)
      throws ServletException
   {
 
-    if((rundataService = (RunDataService) TurbineServices.getInstance()
-       .getService(RunDataService.SERVICE_NAME)) == null)
-      throw new ServletException("No RunData Service configured!");
+    if((rundataService = getService(RunDataService.SERVICE_NAME)) == null)
+      throw new ServletException("RunData Service is not configured!");
+    open(req, res, config);
+  }
+
+  /**
+   * Ricostruisce un oggetto CoreRunData.
+   * Viene chiamata dal costruttore e va usata solo se per qualche motivo
+   * è stata chiamata close() in modo esplicito e si vuole ricreare l'oggetto CoreRunData.
+   * @param req
+   * @param res
+   * @param config
+   * @return
+   * @throws ServletException
+   */
+  public CoreRunData open(HttpServletRequest req, HttpServletResponse res, ServletConfig config)
+     throws ServletException
+  {
+    if(data != null)
+      return data;
 
     try
     {
       data = (CoreRunData) rundataService.getRunData(req, res, config);
+
+      // Pull user information from session.
+      data.populate();
+      return data;
     }
     catch(TurbineException ex)
     {
@@ -63,10 +99,16 @@ public class CoreRunDataHelper implements Closeable
   {
     // restituisce RunData al pool
     rundataService.putRunData(data);
+    data = null;
   }
 
   public CoreRunData getCoreRunData()
   {
     return data;
+  }
+
+  final public <T> T getService(String serviceName)
+  {
+    return (T) TurbineServices.getInstance().getService(serviceName);
   }
 }
