@@ -458,6 +458,7 @@ public class CoreTokenAuthService extends AbstractCoreBaseService
     RSAEncryptUtils.encryptDecryptFile(input, decrypt, puk, Cipher.DECRYPT_MODE);
 
     JSONObject jo = new JSONObject(new String(decrypt.getBytes(), "UTF-8"));
+
     if(decryptOnly)
       return jo;
 

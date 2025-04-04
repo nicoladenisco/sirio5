@@ -57,9 +57,9 @@ public class CoreRunDataHelper implements Closeable
   public CoreRunDataHelper(HttpServletRequest req, HttpServletResponse res, ServletConfig config)
      throws ServletException
   {
-
     if((rundataService = getService(RunDataService.SERVICE_NAME)) == null)
       throw new ServletException("RunData Service is not configured!");
+
     open(req, res, config);
   }
 
@@ -85,6 +85,7 @@ public class CoreRunDataHelper implements Closeable
 
       // Pull user information from session.
       data.populate();
+
       return data;
     }
     catch(TurbineException ex)

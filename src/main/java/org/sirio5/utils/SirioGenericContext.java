@@ -139,6 +139,7 @@ public class SirioGenericContext extends HashMap<String, Object>
       this.put(k.toString(), v);
     });
   }
+
   public Object getNotNull(String key)
   {
     Object rv = get(key);

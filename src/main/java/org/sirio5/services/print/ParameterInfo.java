@@ -17,6 +17,7 @@
  */
 package org.sirio5.services.print;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,12 +31,12 @@ import org.sirio5.utils.SU;
  *
  * @author Nicola De Nisco.
  */
-public class ParameterInfo
+public class ParameterInfo implements Serializable
 {
   private String nome = "";
   private String nomeGemello = "";
   private String descrizione = "";
-  private List<Pair<String, String>> listaValori = new ArrayList<>();
+  private final List<Pair<String, String>> listaValori = new ArrayList<>();
   private Object valoreDefault = "";
   private Class tipo = null;
   private boolean intervalloInizio = false;

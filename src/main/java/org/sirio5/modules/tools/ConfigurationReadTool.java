@@ -116,6 +116,7 @@ public class ConfigurationReadTool implements ApplicationTool
   {
     return cfg.getInt("abilita.funzioni.sperimentali", 0);
   }
+
   public String getEnv(String nome)
   {
     return System.getenv(nome);

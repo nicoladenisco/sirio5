@@ -193,6 +193,7 @@ public class BeanWrapper
     Class vcl = getValClass();
     setValue(parseValueNull(value, vcl));
   }
+
   public synchronized void setValue(Object value, String propName)
      throws Exception
   {
@@ -362,6 +363,7 @@ public class BeanWrapper
 
     if(vcl.equals(java.util.Date.class))
       return invalid ? new java.util.Date() : DateTime.parseIsoFull(value, null);
+
     return value;
   }
 

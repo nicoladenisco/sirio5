@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -18,6 +18,7 @@
 package org.sirio5.modules.screens.rigel;
 
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 import org.sirio5.utils.CoreRunData;
 
 /**
@@ -38,18 +39,21 @@ public class ListaInfo
 
   /**
    * Imposta i parametri passati.
+   * @param data
+   * @return
    * @throws Exception
    */
   public static ListaInfo getFromSession(CoreRunData data)
      throws Exception
   {
+    HttpSession session = data.getSession();
     String stype = data.getParameters().getString("type",
-       (String) data.getSession().getAttribute("li:type"));
+       (String) session.getAttribute("li:type"));
 
     if(stype == null)
       throw new IllegalStateException(data.i18n("Il tipo lista non è rintracciabile; rivedere flusso."));
 
-    ListaInfo li = (ListaInfo) data.getSession().getAttribute("li:" + stype);
+    ListaInfo li = (ListaInfo) session.getAttribute("li:" + stype);
     if(li == null)
       li = new ListaInfo();
 
@@ -73,8 +77,21 @@ public class ListaInfo
     if((tmp = data.getParameters().getString("extraw")) != null)
       li.extraWhere = tmp;
 
-    data.getSession().setAttribute("li:type", stype);
-    data.getSession().setAttribute("li:" + stype, li);
+    session.setAttribute("li:type", stype);
+    session.setAttribute("li:" + stype, li);
     return li;
+  }
+
+  public static boolean haveInfo(CoreRunData data)
+  {
+    HttpSession session = data.getSession();
+    String stype = data.getParameters().getString("type",
+       (String) session.getAttribute("li:type"));
+
+    if(stype == null)
+      return false;
+
+    ListaInfo li = (ListaInfo) session.getAttribute("li:" + stype);
+    return li != null;
   }
 }

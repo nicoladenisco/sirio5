@@ -86,6 +86,7 @@ abstract public class AbstractCoreServiceBroker extends EffectiveBaseServiceBrok
     log.info("tempRootDir=" + tempRootDir);
     File tmpDir = new File(tempRootDir);
     ASSERT_DIR_WRITE(tmpDir);
+
     // primo caricamento mappatura servizi
     initMapping();
 

@@ -54,7 +54,7 @@ public interface PdfPrint extends CoreServiceExtension
   /**
    * Descrittore di un job di stampa.
    */
-  public static class JobInfo
+  public static class JobInfo implements Serializable
   {
     public String jobCode = null;     // codice del job
     public int percCompleted = 0;     // percentuale di completamento
