@@ -25,6 +25,8 @@ import javax.swing.table.TableColumnModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.turbine.om.security.User;
+import org.apache.turbine.services.TurbineServices;
+import org.apache.turbine.services.session.SessionService;
 import org.jdom2.Element;
 import org.rigel5.db.sql.FiltroData;
 import org.rigel5.table.FiltroListe;
@@ -43,16 +45,18 @@ import static org.sirio5.services.localization.INT.I;
 public class jsrefxmlBean
 {
   /** Logging */
-  private static Log log = LogFactory.getLog(jsrefxmlBean.class);
-  //
-  private String type;
-  private String sid;
-  private org.apache.turbine.om.security.User us;
-  private ReferenceXmlInfo rInfo = null;
+  private static final Log log = LogFactory.getLog(jsrefxmlBean.class);
+
+  protected String type;
+  protected String sid;
+  protected org.apache.turbine.om.security.User us;
+  protected ReferenceXmlInfo rInfo = null;
+  protected HttpServletRequest request;
+  protected HttpSession session;
+  protected SessionService sessionService;
+
   public static final String PARAM_INFO = "refxml:";
   public static final int RECORD_PER_PASSATA = 100;
-  private HttpServletRequest request;
-  private HttpSession session;
 
   protected xTable getTableCustom(Element ele)
   {
@@ -284,6 +288,12 @@ public class jsrefxmlBean
     this.request = request;
     this.session = request.getSession();
 
+    String sesid = request.getParameter("sesid");
+    if(sesid != null)
+    {
+      session = getSessionService().getSession(sesid);
+    }
+
     us = (User) session.getAttribute("turbine.user"); // NOI18N
     if(us == null)
       throw new Exception(I("Utente non autorizzato! Eseguire la logon con un utente valido."));
@@ -297,5 +307,16 @@ public class jsrefxmlBean
       throw new Exception(I("Permessi insufficienti per i dati richiesti. Contattare l'amministratore."));
 
     return us;
+  }
+
+  public SessionService getSessionService()
+  {
+    // don't care about synchronization, lookup is cheap
+    if(sessionService == null)
+    {
+      sessionService = (SessionService) TurbineServices.getInstance().getService(SessionService.SERVICE_NAME);
+    }
+
+    return sessionService;
   }
 }

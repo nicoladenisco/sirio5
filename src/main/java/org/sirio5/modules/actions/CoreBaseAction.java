@@ -17,9 +17,7 @@
  */
 package org.sirio5.modules.actions;
 
-import java.sql.SQLException;
 import java.util.Map;
-import org.apache.torque.TorqueException;
 import org.apache.turbine.modules.actions.VelocitySecureAction;
 import org.apache.turbine.pipeline.PipelineData;
 import org.apache.turbine.services.*;
@@ -28,15 +26,13 @@ import org.apache.turbine.util.uri.TemplateURI;
 import org.apache.velocity.context.Context;
 import org.sirio5.CsrfProtectionException;
 import org.sirio5.ErrorMessageException;
-import org.sirio5.RedirectMessageException;
 import org.sirio5.beans.BeanFactory;
 import org.sirio5.beans.CoreBaseBean;
 import org.sirio5.beans.NavigationStackBean;
-import org.sirio5.rigel.ConcurrentDatabaseModificationException;
-import org.sirio5.rigel.UnmodificableRecordException;
 import org.sirio5.services.modellixml.modelliXML;
 import org.sirio5.services.security.SEC;
 import org.sirio5.services.token.TokenAuthService;
+import org.sirio5.utils.CoreFatalErrorManager;
 import org.sirio5.utils.CoreRunData;
 import org.sirio5.utils.LI;
 import org.sirio5.utils.SU;
@@ -51,6 +47,7 @@ import org.sirio5.utils.TR;
 public class CoreBaseAction extends VelocitySecureAction
 {
   private Class beanClass = null;
+  public CoreFatalErrorManager errorManager = new CoreFatalErrorManager();
 
   public Class getBeanClass()
   {
@@ -235,38 +232,9 @@ public class CoreBaseAction extends VelocitySecureAction
     {
       super.perform(data);
     }
-    catch(ErrorMessageException ex)
+    catch(Throwable t)
     {
-      rdata.setMessage(ex.getMessage());
-    }
-    catch(TorqueException ex)
-    {
-      // ispeziona la causa per verificare se gestirla come sqlexception
-      if(ex.getCause() != null && ex.getCause() instanceof SQLException)
-      {
-        SQLException sqe = (SQLException) ex.getCause();
-        SU.reportNonFatalDatabaseError(rdata, sqe);
-      }
-      else
-        SU.reportNonFatalDatabaseError(rdata, ex);
-    }
-    catch(SQLException ex)
-    {
-      SU.reportNonFatalDatabaseError(rdata, ex);
-    }
-    catch(ConcurrentDatabaseModificationException ex)
-    {
-      SU.reportConcurrentDatabaseError(rdata, ex);
-    }
-    catch(UnmodificableRecordException ex)
-    {
-      SU.reportUnmodificableRecordError(rdata, ex);
-    }
-    catch(RedirectMessageException ex)
-    {
-      rdata.setMessage(ex.getMessage());
-      rdata.setRedirectURI(ex.getUri().toString());
-      rdata.setStatusCode(302);
+      errorManager.handleException(rdata, t, false);
     }
   }
 

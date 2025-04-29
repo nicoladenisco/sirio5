@@ -133,30 +133,35 @@ public class FopPlugin extends BasePdfPlugin
     String sessionid = context.getAsString(PdfPrint.SESSION_ID);
     print.ASSERT(sessionid != null, "sessionid != null");
 
+    // eventuale url esterna per la costruzione dell'xml.
+    String sUrl = context.getAsStringNull(PdfPrint.XML_BUILD_URL);
+
     // costruisce url per chiamare la JSP per generare l'XML
     // qualcosa del tipo 'http://localhost:8080/nomeapp/xml/mia.jsp;jsessionid=identificativosessione?param1=val1...'
     // NOTA: indipendentemente da come e' chiamata questa servlet
     // la chiamata alla JSP viene effettuata comunque su localhost:8080
     // ovvero direttametne all'istanza di Tomcat su cui viene eseguita questa servlet
-    String sUrl = null;
-    if(xmlbaseuri == null || SU.isEqu("AUTO", xmlbaseuri))
-      sUrl = LI.mergePath("http://localhost:" + getTomcatHttpPort(),
-         Turbine.getContextPath());
-    else
-      sUrl = xmlbaseuri;
-
-    sUrl = LI.mergePath(sUrl, "xml/" + sJsp + ";jsessionid=" + sessionid);
-
-    if(reportParams == null || reportParams.isEmpty())
+    if(sUrl == null)
     {
-      String query = context.getAsString(PdfPrint.QUERY_STRING);
-      if(query != null)
-        sUrl += "?" + query;
-    }
-    else
-    {
-      // aggiunge eventuali parametri dal form del report
-      sUrl = LI.mergeUrl(sUrl, reportParams);
+      if(xmlbaseuri == null || SU.isEqu("AUTO", xmlbaseuri))
+        sUrl = LI.mergePath("http://localhost:" + getTomcatHttpPort(),
+           Turbine.getContextPath());
+      else
+        sUrl = xmlbaseuri;
+
+      sUrl = LI.mergePath(sUrl, "xml/" + sJsp + ";jsessionid=" + sessionid);
+
+      if(reportParams == null || reportParams.isEmpty())
+      {
+        String query = context.getAsString(PdfPrint.QUERY_STRING);
+        if(query != null)
+          sUrl += "?" + query;
+      }
+      else
+      {
+        // aggiunge eventuali parametri dal form del report
+        sUrl = LI.mergeUrl(sUrl, reportParams);
+      }
     }
 
     log.info("sURL=" + sUrl);
@@ -227,7 +232,7 @@ public class FopPlugin extends BasePdfPlugin
     if(!fopPgm.exists())
       die("Programma di lancio fop non trovato: rivedere installazione fop.");
 
-    ArrayList<String> arStr = new ArrayList<String>();
+    ArrayList<String> arStr = new ArrayList<>();
     arStr.add(fopPgm.getAbsolutePath());
 
     // aggiunge i parametri opportuni

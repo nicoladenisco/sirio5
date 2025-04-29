@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2020 Nicola De Nisco
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.Action;
 import org.apache.commons.configuration2.Configuration;
-import org.sirio5.services.CoreServiceException;
 import org.sirio5.services.AbstractCoreBaseService;
+import org.sirio5.services.CoreServiceException;
 import org.sirio5.services.localization.INT;
 import org.sirio5.services.taskman.tasks.Task;
 import org.sirio5.services.taskman.tasks.TaskFactory;
@@ -38,7 +38,7 @@ import org.sirio5.utils.SU;
 public class CoreTaskManager extends AbstractCoreBaseService
    implements TaskManager
 {
-  protected ArrayList<Task> arTasks = new ArrayList<Task>();
+  protected final ArrayList<Task> arTasks = new ArrayList<>();
 
   @Override
   public void coreInit()
@@ -110,7 +110,7 @@ public class CoreTaskManager extends AbstractCoreBaseService
   public synchronized List<Task> getListaTaskUtente(int idUser)
      throws Exception
   {
-    ArrayList<Task> arUser = new ArrayList<Task>();
+    ArrayList<Task> arUser = new ArrayList<>();
 
     for(Task task : arTasks)
     {
@@ -132,7 +132,7 @@ public class CoreTaskManager extends AbstractCoreBaseService
   public synchronized List<Task> findTasks(String taskName)
      throws Exception
   {
-    ArrayList<Task> rv = new ArrayList<Task>();
+    ArrayList<Task> rv = new ArrayList<>();
 
     for(Task t : arTasks)
     {
@@ -147,7 +147,7 @@ public class CoreTaskManager extends AbstractCoreBaseService
   public synchronized List<Task> findTasks(String taskName, int idUser)
      throws Exception
   {
-    ArrayList<Task> rv = new ArrayList<Task>();
+    ArrayList<Task> rv = new ArrayList<>();
 
     for(Task t : arTasks)
     {

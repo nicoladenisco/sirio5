@@ -17,8 +17,9 @@
  */
 package org.sirio5.services.print;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.logging.Log;
@@ -146,12 +147,6 @@ abstract public class AbstractAsyncPdfPrint extends AbstractPdfPrint
     return job.getInfo();
   }
 
-  /**
-   * Reperisce informazioni aggiornate sul job in avanzamento.
-   * @param jobCode
-   * @return
-   * @throws java.lang.Exception
-   */
   @Override
   public JobInfo refreshInfo(String jobCode)
      throws Exception
@@ -173,10 +168,21 @@ abstract public class AbstractAsyncPdfPrint extends AbstractPdfPrint
   }
 
   @Override
-  public Iterator<CachedObject> getJobs()
+  public List<JobInfo> getJobs()
      throws Exception
   {
-    return CACHE.cachedObjects(CACHE_CLASS);
+    ArrayList<JobInfo> rv = new ArrayList<>();
+    Iterator<CachedObject> itr = CACHE.cachedObjects(CACHE_CLASS);
+    while(itr.hasNext())
+    {
+      CachedObject obj = itr.next();
+      if(obj.isStale())
+        continue;
+
+      AsyncPdfJob job = (AsyncPdfJob) obj.getContents();
+      rv.add(job.getInfo());
+    }
+    return rv;
   }
 
   static class AsyncPdfJobCacheItem extends CachedObject

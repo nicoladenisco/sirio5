@@ -330,6 +330,7 @@ public class pdfmaker extends HttpServlet
     context.put(PdfPrint.PATH_INFO, request.getPathInfo());
     context.put(PdfPrint.SESSION_ID, request.getSession().getId());
     context.put(PdfPrint.QUERY_STRING, request.getQueryString());
+    context.put(PdfPrint.CONTEXT_PATH, request.getContextPath());
 
     // aggiunge al context eventuali informazioni
     info = completaPrintContext(context, sRequest, request, response);

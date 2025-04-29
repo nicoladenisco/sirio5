@@ -17,10 +17,8 @@
  */
 package org.sirio5.services.print;
 
-import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 import javax.servlet.http.HttpSession;
-import org.apache.fulcrum.cache.CachedObject;
 import org.apache.turbine.services.TurbineServices;
 import org.sirio5.services.print.PdfPrint.JobInfo;
 
@@ -67,7 +65,7 @@ public class PRINT
     return getService().refreshInfo(jobCode);
   }
 
-  public static Iterator<CachedObject> getJobs()
+  public static List<JobInfo> getJobs()
      throws Exception
   {
     return getService().getJobs();

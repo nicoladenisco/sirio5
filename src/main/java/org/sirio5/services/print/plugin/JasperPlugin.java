@@ -28,14 +28,12 @@ import org.commonlib5.exec.ExecHelper;
 import org.commonlib5.utils.CommonFileUtils;
 import org.commonlib5.utils.OsIdent;
 import org.commonlib5.utils.PropertyManager;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
 import org.sirio5.services.CoreServiceException;
 import org.sirio5.services.localization.INT;
 import org.sirio5.services.print.AbstractReportParametersInfo;
 import org.sirio5.services.print.PdfPrint;
 import org.sirio5.services.print.PrintContext;
+import org.sirio5.utils.JndiDatabaseInfo;
 import org.sirio5.utils.SU;
 import org.sirio5.utils.TR;
 
@@ -200,9 +198,7 @@ public class JasperPlugin extends BasePdfPlugin
         return;
       }
 
-      Configuration cfg = Torque.getConfiguration();
-      String factory = cfg.getString("defaults.jndifactory");
-      if(SU.isOkStr(factory))
+      if(JndiDatabaseInfo.haveTorqueJndi())
       {
         // torque è configurato per l'uso di JNDI
         runTorqueJndi(reportFile, tmpParams, reportPDF);
@@ -225,45 +221,19 @@ public class JasperPlugin extends BasePdfPlugin
   protected void runTorqueJndi(File reportFile, File tmpParams, File reportPDF)
      throws Exception
   {
-    String rootAppPath = print.getRealPath("/");
-    File confDir = new File(rootAppPath + "../../conf");
-    if(!confDir.isDirectory())
+    JndiDatabaseInfo ji = new JndiDatabaseInfo();
+
+    if(!ji.haveJndi())
+      die("Nessuna risorsa JNDI identificata nella configurazione di Tomcat.");
+
+    // eseguiamo chiamata con 6 parametri
+    String[] cmdArray =
     {
-      String catalinaHome = System.getenv("CATALINA_HOME");
-      confDir = new File(catalinaHome + "/conf");
+      reportFile.getAbsolutePath(), tmpParams.getAbsolutePath(),
+      reportPDF.getAbsolutePath(), ji.getDbDriver(), ji.getDbUri(), ji.getDbUser(), ji.getDbPass()
+    };
 
-      if(!confDir.isDirectory())
-        die("Non riesco a rintracciare la directory conf di Tomcat.");
-    }
-
-    File contextXml = new File(confDir, "context.xml");
-    SAXBuilder builder = new SAXBuilder();
-    Document d = builder.build(contextXml);
-
-    List<Element> lsResch = d.getRootElement().getChildren("Resource");
-    for(Element er : lsResch)
-    {
-      String nome = er.getAttributeValue("name");
-      if(nome == null || !nome.startsWith("jdbc/"))
-        continue;
-
-      String dbDriver = er.getAttributeValue("driverClassName");
-      String dbUri = er.getAttributeValue("url");
-      String dbUser = er.getAttributeValue("username");
-      String dbPass = er.getAttributeValue("password");
-
-      // eseguiamo chiamata con 6 parametri
-      String[] cmdArray =
-      {
-        reportFile.getAbsolutePath(), tmpParams.getAbsolutePath(),
-        reportPDF.getAbsolutePath(), dbDriver, dbUri, dbUser, dbPass
-      };
-
-      runExternalJasperRender(cmdArray, reportPDF);
-      return;
-    }
-
-    die("Nessuna risorsa JNDI identificata nella configurazione di Tomcat.");
+    runExternalJasperRender(cmdArray, reportPDF);
   }
 
   /**

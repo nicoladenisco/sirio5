@@ -67,7 +67,7 @@ public class CoreGoogleLocalizationService extends CoreLocalizationService
   }
 
   @Override
-  protected String subTranslation(String key, Locale locale)
+  protected String subTranslation(String stringa, Locale locale)
   {
     initGoogle();
 
@@ -75,14 +75,14 @@ public class CoreGoogleLocalizationService extends CoreLocalizationService
     {
       // se la locale richiesta è it_IT la stringa si intende già tradotta
       if(locale.equals(originLocale))
-        return key;
+        return stringa;
 
-      String value;
+      String value, key = stringa + "/" + locale;
 
       if((value = cacheMsg.get(key)) != null)
         return value;
 
-      value = subTransSingle(key, locale);
+      value = subTransSingle(stringa, locale);
 
       if(value != null)
         cacheMsg.put(key, value);

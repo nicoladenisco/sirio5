@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -47,13 +46,8 @@ import org.apache.turbine.services.pull.tools.UITool;
 import org.apache.turbine.util.RunData;
 import org.commonlib5.exec.ExecHelper;
 import org.commonlib5.utils.*;
-import org.rigel5.SetupHolder;
 import org.sirio5.CoreConst;
-import org.sirio5.rigel.ConcurrentDatabaseModificationException;
-import org.sirio5.rigel.RigelHtmlI18n;
-import org.sirio5.rigel.UnmodificableRecordException;
 import org.sirio5.services.cache.CACHE;
-import org.sirio5.services.contatori.CounterTimeoutException;
 import org.sirio5.services.localization.INT;
 import org.sirio5.services.token.TokenAuthItem;
 
@@ -792,99 +786,6 @@ public class SU extends StringOper
   public static boolean checkNomeFileValido(String codice)
   {
     return pTestNomeFile.matcher(codice).matches();
-  }
-
-  /**
-   * Riporta errore di db all'utente se non fatale.
-   * @param pdata
-   * @param ex eccezione catturata da analizzare
-   * @throws SQLException eccezione risollevata se fatale
-   */
-  public static void reportNonFatalDatabaseError(CoreRunData pdata, SQLException ex)
-     throws SQLException
-  {
-    try
-    {
-      pdata.setMessage(
-         SetupHolder.getQueryBuilder().formatNonFatalError(ex, new RigelHtmlI18n(pdata)) + "<br>"
-         + "<span class=\"txt-white-regular-09\">"
-         + pdata.i18n("Messaggio originale: %s", ex.getLocalizedMessage())
-         + "</span>");
-    }
-    catch(Exception ex1)
-    {
-      throw ex;
-    }
-  }
-
-  /**
-   * Riporta errore di modifica concorrente all'utente.
-   * @param pdata
-   * @param ex
-   * @throws Exception
-   */
-  public static void reportConcurrentDatabaseError(CoreRunData pdata, ConcurrentDatabaseModificationException ex)
-     throws Exception
-  {
-    pdata.setMessage(
-       "<div style=\"background-color: red;\">"
-       + "<span class=\"txt-white-bold-12-nul\">" + pdata.i18n("Spiacente!") + "</span><br>"
-       + "<span class=\"txt-white-regular-11-nul\">"
-       + pdata.i18n("Un altro utente ha modificato il record che stai salvando.") + "<br>"
-       + pdata.i18n("Per evitare conflitti le tue modifiche non possono essere accettate.")
-       + "</span><br>"
-       + "<span class=\"txt-white-regular-09\">"
-       + ex.getLocalizedMessage()
-       + "</span>"
-       + "</div>"
-    );
-  }
-
-  /**
-   * Riporta errore di dato non modificabile all'utente.
-   * @param pdata
-   * @param ex
-   * @throws Exception
-   */
-  public static void reportUnmodificableRecordError(CoreRunData pdata, UnmodificableRecordException ex)
-     throws Exception
-  {
-    pdata.setMessage(
-       "<div style=\"background-color: red;\">"
-       + "<span class=\"txt-white-bold-12-nul\">" + pdata.i18n("Spiacente!") + "</span><br>"
-       + "<span class=\"txt-white-regular-11-nul\">"
-       + pdata.i18n("Non hai i permessi per modificare il record indicato.")
-       + "</span><br>"
-       + "<span class=\"txt-white-regular-09\">"
-       + ex.getLocalizedMessage()
-       + "</span>"
-       + "</div>"
-    );
-  }
-
-  /**
-   * Riporta errore di contatori congestionati all'utente.
-   * @param pdata
-   * @param ex
-   * @throws Exception
-   */
-  public static void reportCounterTimeoutException(CoreRunData pdata, CounterTimeoutException ex)
-     throws Exception
-  {
-    pdata.setMessage(
-       "<div style=\"background-color: red;\">"
-       + "<span class=\"txt-white-bold-12-nul\">" + pdata.i18n("Sistema congestionato!") + "</span><br>"
-       + "<span class=\"txt-white-regular-11-nul\">"
-       + pdata.i18n("Non è stato possibile completare l'operazione di salvataggio a causa di un sovraccarico temporaneo.")
-       + "</span><br>"
-       + "<span class=\"txt-white-regular-09\">"
-       + ex.getLocalizedMessage()
-       + "</span><br><br>"
-       + "<span class=\"txt-white-bold-12-nul\">"
-       + pdata.i18n("RIPETERE ULTIMA OPERAZIONE DI SALVATAGGIO.")
-       + "</span>"
-       + "</div>"
-    );
   }
 
   /**

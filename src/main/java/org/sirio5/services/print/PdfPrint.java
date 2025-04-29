@@ -20,7 +20,6 @@ package org.sirio5.services.print;
 import java.io.*;
 import java.util.*;
 import javax.servlet.http.HttpSession;
-import org.apache.fulcrum.cache.CachedObject;
 import org.commonlib5.utils.SimpleTimer;
 import org.sirio5.services.CoreServiceExtension;
 
@@ -50,6 +49,8 @@ public interface PdfPrint extends CoreServiceExtension
   public static final String PATH_INFO = "PATH_INFO";
   public static final String SESSION_ID = "SESSION_ID";
   public static final String QUERY_STRING = "QUERY_STRING";
+  public static final String CONTEXT_PATH = "CONTEXT_PATH";
+  public static final String XML_BUILD_URL = "xmlBuildUrl";
 
   /**
    * Descrittore di un job di stampa.
@@ -113,8 +114,8 @@ public interface PdfPrint extends CoreServiceExtension
 
   /**
    * Reperisce informazioni aggiornate sul job in avanzamento.
-   * @param jobCode
-   * @return
+   * @param jobCode codice del job
+   * @return null se non trovato (o scaduto) altrimenti il job
    * @throws java.lang.Exception
    */
   public JobInfo refreshInfo(String jobCode)
@@ -122,9 +123,9 @@ public interface PdfPrint extends CoreServiceExtension
 
   /**
    * Ritorna un iteratore sui job in elaborazione.
-   * @return
+   * @return lista dei job attivi (non scaduti)
    * @throws Exception
    */
-  public Iterator<CachedObject> getJobs()
+  public List<JobInfo> getJobs()
      throws Exception;
 }

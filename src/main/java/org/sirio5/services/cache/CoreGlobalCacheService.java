@@ -196,7 +196,7 @@ public class CoreGlobalCacheService extends AbstractCoreBaseService
   @Override
   public void removeObject(String id)
   {
-    ci.refreshObject(id);
+    ci.removeObject(id);
   }
 
   @Override
