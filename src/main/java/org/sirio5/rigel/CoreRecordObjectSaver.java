@@ -207,7 +207,7 @@ public class CoreRecordObjectSaver implements RecordObjectSaver
         }
       }
 
-      try ( TableDataSet td = new TableDataSet(con, sc.tableName()))
+      try(TableDataSet td = new TableDataSet(con, sc.getFullTableName()))
       {
         td.fetchByPrimaryKeysValues(pKey);
         return td.size() == 0 ? null : td.getRecord(0);
@@ -421,7 +421,7 @@ public class CoreRecordObjectSaver implements RecordObjectSaver
               int statoRec = getStatoRec(prev) % 10;
               if(statoRec > writeLevel && !adminFlag)
                 throw new UnmodificableRecordException(
-                   "Table:" + s.tableName() + " Key:" + pKey + " WL:" + statoRec + " UL:" + writeLevel); // NOI18N
+                   "Table:" + s.getFullTableName() + " Key:" + pKey + " WL:" + statoRec + " UL:" + writeLevel); // NOI18N
             }
 
             if(colUltmodif != null)
@@ -436,13 +436,13 @@ public class CoreRecordObjectSaver implements RecordObjectSaver
                 // se la modalità strict è attiva questo è sufficiente a sollevare l'errore ...
                 if(strict || colIdUser == null)
                   throw new ConcurrentDatabaseModificationException(
-                     "Table:" + s.tableName() + " Key:" + pKey); // NOI18N
+                     "Table:" + s.getFullTableName() + " Key:" + pKey); // NOI18N
 
                 // ... altrimenti controlla che l'utente sia diverso per sollevare l'errore
                 int userIDprev = getIdUser(prev);
                 if(userID != userIDprev)
                   throw new ConcurrentDatabaseModificationException(
-                     "Table:" + s.tableName() + " Key:" + pKey + " User:" + userIDprev); // NOI18N
+                     "Table:" + s.getFullTableName() + " Key:" + pKey + " User:" + userIDprev); // NOI18N
               }
             }
           }
