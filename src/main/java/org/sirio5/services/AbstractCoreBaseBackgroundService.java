@@ -59,8 +59,9 @@ public abstract class AbstractCoreBaseBackgroundService extends AbstractCoreBase
       {
         mustExit = true;
         thRun.join(2000);
-        if(thRun.isAlive())
-          thRun.stop();
+// il metodo stop() non esiste più in versioni recenti di java        
+//        if(thRun.isAlive())
+//          thRun.stop();
         thRun = null;
       }
     }
