@@ -326,7 +326,7 @@ public class FormSave extends RigelEditBaseAction
     Validator.postSaveMasterDetail(pwl.getMdInfo().getEleXml(),
        objInEdit, pwl.getPtm(), (hEditTable) pwl.getTbl(), 0,
        objectsDetail, eh.getPtm(), (hEditTable) eh.getTbl(),
-       data.getSession(), params, i18n, null, validateMap);
+       data.getSession(), params, i18n, validateMap);
   }
 
   @Override
