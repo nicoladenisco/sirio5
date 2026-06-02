@@ -159,6 +159,7 @@ public class CoreObjectSaver implements PeerObjectSaver
    * @deprecated usare le funzioni salva con utente specificato: sono rientranti
    */
   @Override
+  @Deprecated
   public synchronized void setUserInfo(int idUser, boolean isAdmin)
      throws Exception
   {
@@ -173,6 +174,7 @@ public class CoreObjectSaver implements PeerObjectSaver
    * @throws Exception
    * @deprecated usare le funzioni salva con utente specificato: sono rientranti
    */
+  @Deprecated
   public void setUserInfo(int idUser)
      throws Exception
   {
@@ -324,6 +326,7 @@ public class CoreObjectSaver implements PeerObjectSaver
    * @deprecated usare la funzione salva(..,userID,...) perchè rientrante
    */
   @Override
+  @Deprecated
   public void salva(Persistent obj)
      throws Exception
   {
@@ -343,6 +346,7 @@ public class CoreObjectSaver implements PeerObjectSaver
    * @deprecated usare la funzione salva(..,userID,...) perchè rientrante
    */
   @Override
+  @Deprecated
   public void salva(Persistent obj, int statoRecNew)
      throws Exception
   {
@@ -386,6 +390,7 @@ public class CoreObjectSaver implements PeerObjectSaver
    * @deprecated usare la funzione salva(..,userID,...) perchè rientrante
    */
   @Override
+  @Deprecated
   public void salva(Persistent obj, Connection dbCon, int statoRecNew)
      throws Exception
   {
@@ -402,6 +407,7 @@ public class CoreObjectSaver implements PeerObjectSaver
    * @throws Exception
    * @deprecated usare la funzione salva(..,userID,...) perchè rientrante
    */
+  @Deprecated
   public synchronized void salva(Persistent obj, Connection dbCon, int statoRecNew, int writeLevel)
      throws Exception
   {
@@ -509,6 +515,13 @@ public class CoreObjectSaver implements PeerObjectSaver
       setUuidM.invoke(obj, UUID.randomUUID().toString().toUpperCase());
 
     obj.save(dbCon);
+  }
+
+  @Override
+  public void salvaDiretto(Persistent obj, Connection dbCon, int userID, int statoRecNew)
+     throws Exception
+  {
+    saveObject(obj, dbCon, userID, statoRecNew);
   }
 
   /**
